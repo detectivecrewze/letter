@@ -330,9 +330,11 @@ function _initMusicPlayer(config) {
   _playlist = (config.playlist || []).filter(t => t.src || t.url);
   if (_playlist.length === 0) return;
 
+  const audio = _audioEl();
+  audio.volume = 0.5; // Set backsound volume to 50%
+  
   _loadTrack(0, false);
 
-  const audio = _audioEl();
   audio.addEventListener('ended', () => _loadTrack(_currentTrack + 1, true));
 }
 

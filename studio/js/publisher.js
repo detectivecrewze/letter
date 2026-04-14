@@ -87,6 +87,7 @@ const Publisher = (() => {
     const urlEl   = document.getElementById('modal-gift-url');
     const viewBtn = document.getElementById('btn-view-gift');
     const waBtn   = document.getElementById('btn-share-whatsapp');
+    const qrBox   = document.getElementById('qr-code-box');
 
     if (urlEl)   urlEl.textContent = url;
     if (viewBtn) viewBtn.href = url;
@@ -94,7 +95,74 @@ const Publisher = (() => {
       const msg = encodeURIComponent(`💌 Ada surat untukmu...\n\n${url}`);
       waBtn.href = `https://wa.me/?text=${msg}`;
     }
+
+    // Generate QR Code
+    if (qrBox && typeof QRCode !== 'undefined') {
+      qrBox.innerHTML = '';
+      new QRCode(qrBox, {
+        text: url,
+        width: 148,
+        height: 148,
+        colorDark: '#1a1a1a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      setTimeout(() => {
+        const img = qrBox.querySelector('img');
+        const canvas = qrBox.querySelector('canvas');
+        if (img) { img.style.margin = '0 auto'; img.style.display = 'block'; img.style.borderRadius = '8px'; }
+        if (canvas) canvas.style.display = 'none';
+      }, 100);
+    }
+
+    // Bind Download QR Button
+    const downloadBtn = document.getElementById('btn-download-qr');
+    if (downloadBtn) {
+      const newBtn = downloadBtn.cloneNode(true);
+      downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
+      newBtn.addEventListener('click', _handleDownloadQR);
+    }
+
     _toggleModal('modal-success', true);
+  }
+
+  async function _handleDownloadQR() {
+    const exportNode = document.getElementById('qr-export-container');
+    const btn = document.getElementById('btn-download-qr');
+
+    if (!exportNode || typeof html2canvas === 'undefined') {
+      Studio.showToast('Fitur download belum siap. Silakan screenshot manual.');
+      return;
+    }
+
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Menyiapkan...';
+    btn.style.opacity = '0.7';
+
+    try {
+      const canvas = await html2canvas(exportNode, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: '#fff',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.download = `Letter_QR_${Math.floor(Date.now() / 1000)}.png`;
+      link.href = imgData;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Error generating QR PNG:', err);
+      Studio.showToast('Gagal mendownload barcode.');
+    } finally {
+      requestAnimationFrame(() => {
+        btn.innerHTML = originalText;
+        btn.style.opacity = '1';
+      });
+    }
   }
 
   function _handleCopyLink() {

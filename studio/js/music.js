@@ -234,6 +234,7 @@ const Music = (() => {
     const durEl   = el.querySelector('.audio-duration');
 
     if (player && plyBtn) {
+      player.volume = 0.5; // Set preview volume to 50%
       player.addEventListener('loadedmetadata', () => {
         const m = Math.floor(player.duration / 60);
         const s = Math.floor(player.duration % 60).toString().padStart(2, '0');
