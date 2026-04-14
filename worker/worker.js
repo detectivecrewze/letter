@@ -492,6 +492,7 @@ var index_default = {
         const msg1 =
           `💌 <b>ORDER LETTER PREMIUM BARU (+10K)</b>\n\n` +
           `👤 Penerima: <b>${configData.recipientName || configData.to || '-'}</b>\n` +
+          `📅 Tanggal: ${configData.date || '-'}\n` +
           `✍️ Judul: ${configData.title || '-'}\n` +
           `💝 Pengirim: ${configData.from || '-'}\n` +
           `🎨 Tema: ${configData.theme || 'blush-cream'}\n` +
@@ -499,7 +500,7 @@ var index_default = {
           `🌐 Request Domain: <code>${requestDomain || '-'}</code>\n` +
           `🕐 Waktu: ${timestamp} WIB\n\n` +
           `🎵 Musik: ${configData.playlist?.length > 0 ? `${configData.playlist.length} lagu ✅` : 'Tidak ada ❌'}\n` +
-          `🔒 Password: <b>${configData.password || '(Tanpa Password)'}</b>\n` +
+          `🔒 Password: <b>${configData.login_password || '(Tanpa Password)'}</b>\n` +
           `━━━━━━━━━━━━━━━━━━\nCek pesan berikutnya untuk config.js`;
 
         await fetch(TG_URL, {

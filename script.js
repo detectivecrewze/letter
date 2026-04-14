@@ -67,8 +67,11 @@ async function init() {
 
   let config = null;
 
-  if (token) {
-    // ── Online Mode ──────────────────────────────────────────
+  if (window.STANDALONE_CONFIG && Object.keys(window.STANDALONE_CONFIG).length > 0) {
+    config = _normalizeConfig(window.STANDALONE_CONFIG);
+  }
+ 
+  if (!config && token) {
     try {
       const res = await fetch(`${WORKER_URL}/get-config?id=${encodeURIComponent(token)}`);
       if (!res.ok) throw new Error('not_found');
@@ -78,13 +81,8 @@ async function init() {
     }
   }
 
-  // ── Standalone / Demo Mode ───────────────────────────────
   if (!config) {
-    if (window.STANDALONE_CONFIG && Object.keys(window.STANDALONE_CONFIG).length > 0) {
-      config = _normalizeConfig(window.STANDALONE_CONFIG);
-    } else {
-      config = _demoConfig();
-    }
+    config = _demoConfig();
   }
 
   // ── Maintenance Mode Check ──────────────────────────────
