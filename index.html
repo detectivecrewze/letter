@@ -24,6 +24,31 @@
 
 <body>
   
+  <!-- Password Gate (Hidden by default) -->
+  <div id="password-gate" class="hidden">
+    <div class="gate-card">
+      <div class="gate-icon-box">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+      </div>
+
+      <h2 class="gate-title">Letter Protected</h2>
+      <p class="gate-desc">Please enter the password to unlock this special message.</p>
+
+      <div id="gate-hint-container" class="hidden">
+        <span class="hint-label">Secret Clue:</span>
+        <p id="gate-hint-text"></p>
+      </div>
+
+      <div class="gate-input-wrapper">
+        <input id="gate-password-input" type="password" placeholder="Enter password..." autocomplete="off" />
+      </div>
+
+      <button id="btn-gate-verify">Open Letter</button>
+
+      <p id="gate-error" class="hidden">Invalid password. Try again.</p>
+    </div>
+  </div>
+
   <!-- ══════════════════════════════════════════════════════ -->
   <!-- STATE: MAINTENANCE                                     -->
   <!-- ══════════════════════════════════════════════════════ -->

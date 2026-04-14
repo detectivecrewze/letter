@@ -23,6 +23,8 @@ const Studio = (() => {
     _setVal('input-letter-to',      config.letterTo || config.salutation || '');
     _setVal('input-letter-msg',     config.message  || config.letter_body || '');
     _setVal('input-letter-from',    config.from     || '');
+    _setVal('input-login-password', config.login_password || '');
+    _setVal('input-login-hint',     config.login_hint     || '');
   }
 
   function _setVal(id, val) {
@@ -37,7 +39,9 @@ const Studio = (() => {
       'input-letter-date',
       'input-letter-to',
       'input-letter-msg',
-      'input-letter-from'
+      'input-letter-from',
+      'input-login-password',
+      'input-login-hint'
     ].forEach(id => {
       document.getElementById(id)?.addEventListener('input', () => Autosave.trigger());
     });

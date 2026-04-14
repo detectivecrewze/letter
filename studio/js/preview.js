@@ -30,7 +30,7 @@ const Preview = (() => {
       await Autosave.saveNow();
       // URL ke letter
       let previewUrl = `../index.html?to=${token}`;
-      if (skipTW) previewUrl += '&skipTW=1';
+      if (skipTW) previewUrl += '&skipTW=1&skipAuth=1';
       
       previewWin.location.href = previewUrl;
     } catch (e) {

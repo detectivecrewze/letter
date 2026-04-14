@@ -123,7 +123,7 @@ async function init() {
 
   // Show envelope — wait for user tap
   showState('envelope');
-  await _waitForEnvelopeOpen();
+  await _waitForEnvelopeOpen(config);
 
   // Transition to letter
   showState('letter');
@@ -161,7 +161,11 @@ function _normalizeConfig(raw) {
     show_watermark: raw.show_watermark !== false,
     is_active:      raw.is_active !== false,
     // Dedicated salutation for the letter body
-    salutation:    raw.letterTo || raw.salutation || raw.to || 'Dear,'
+    salutation:    raw.letterTo || raw.salutation || raw.to || 'Dear,',
+    
+    // Auth
+    login_password: raw.login_password || '',
+    login_hint:     raw.login_hint     || ''
   };
 }
 
@@ -182,13 +186,18 @@ function _demoConfig() {
    ════════════════════════════════════════════════════════════ */
 let _renderLetterTimeStart = 0;
 
-function _waitForEnvelopeOpen() {
+function _waitForEnvelopeOpen(config) {
   return new Promise(resolve => {
     const scene   = document.getElementById('envelope-scene');
     const wrapper = document.getElementById('envelope-wrapper');
     const hint    = document.getElementById('envelope-hint');
 
-    function openEnvelope() {
+    async function openEnvelope() {
+      // 1. Check for Password Gate before anything else
+      if (config.login_password && config.login_password.trim() !== '') {
+        await _handleAuthentication(config);
+      }
+
       // Prevent double-trigger
       wrapper.removeEventListener('click',   openEnvelope);
       wrapper.removeEventListener('keydown', onKeydown);
@@ -196,18 +205,18 @@ function _waitForEnvelopeOpen() {
       // Hide hint immediately
       if (hint) hint.style.opacity = '0';
 
-      // 1. Add opening class — CSS handles flap + letter-peek animations
+      // 2. Add opening class — CSS handles flap + letter-peek animations
       wrapper.classList.add('is-opening');
 
-      // 2. iOS FIX: Start music immediately on user gesture
+      // 3. iOS FIX: Start music immediately on user gesture
       _loadTrack(0, true);
 
-      // 3. After flap finishes (~700ms), start exit fade
+      // 4. After flap finishes (~600ms), start exit fade
       setTimeout(() => {
         if (scene) scene.classList.add('is-exit');
       }, 600);
 
-      // 3. Resolve (switch to letter state) after exit animation
+      // 5. Resolve (switch to letter state) after exit animation
       setTimeout(resolve, 1150);
     }
 
@@ -426,4 +435,67 @@ function _setText(id, text) {
 
 function _delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+async function _handleAuthentication(config) {
+  const params = new URLSearchParams(window.location.search);
+  const skipAuth = params.get('skipAuth') === '1';
+
+  const gateEl = document.getElementById('password-gate');
+  const passInput = document.getElementById('gate-password-input');
+  const verifyBtn = document.getElementById('btn-gate-verify');
+  const hintContainer = document.getElementById('gate-hint-container');
+  const hintText = document.getElementById('gate-hint-text');
+  const errorEl = document.getElementById('gate-error');
+
+  if (skipAuth || !config.login_password || config.login_password.trim() === '') {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    // Reset state
+    gateEl.classList.remove('hidden');
+    gateEl.style.opacity = '0';
+    gateEl.style.display = 'flex';
+    
+    // Force reflow for transition
+    void gateEl.offsetWidth;
+    gateEl.style.opacity = '1';
+    
+    if (config.login_hint) {
+      hintText.textContent = config.login_hint;
+      hintContainer.classList.remove('hidden');
+    }
+
+    verifyBtn.addEventListener('click', () => {
+      const inputPass = passInput.value.trim().toLowerCase();
+      const actualPass = config.login_password.trim().toLowerCase();
+      const card = gateEl.querySelector('.gate-card');
+
+      if (inputPass === actualPass) {
+        gateEl.style.opacity = '0';
+        setTimeout(() => {
+          gateEl.classList.add('hidden');
+          resolve();
+        }, 700);
+      } else {
+        errorEl.classList.remove('hidden');
+        passInput.value = '';
+        passInput.focus();
+        
+        // Shake animation
+        card.classList.remove('gate-shake');
+        void card.offsetWidth; // Trigger reflow
+        card.classList.add('gate-shake');
+        
+        // Vibrate if mobile
+        if (window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate(50);
+        }
+      }
+    });
+
+    passInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') verifyBtn.click();
+    });
+  });
 }

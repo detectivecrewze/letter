@@ -78,6 +78,10 @@ const Autosave = (() => {
       message:       document.getElementById('input-letter-msg')?.value        || '',
       letter_body:   document.getElementById('input-letter-msg')?.value        || '',
       from:          document.getElementById('input-letter-from')?.value.trim() || '',
+      
+      // Auth Settings
+      login_password: document.getElementById('input-login-password')?.value.trim() || '',
+      login_hint:     document.getElementById('input-login-hint')?.value.trim()     || '',
 
       // Section 3 — Music
       playlist: Music.getPlaylistArray(),

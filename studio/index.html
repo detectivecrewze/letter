@@ -83,10 +83,30 @@
 
             <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Kepada
               Siapa?</label>
-            <input id="input-recipient-name" type="text" placeholder="Contoh : Lisa" class="input-minimal mb-4"
+            <input id="input-recipient-name" type="text" placeholder="Contoh : Lisa" class="input-minimal mb-8"
               autocomplete="off" />
 
-            <div class="section-hint mt-6 flex items-start gap-3 bg-[#fdf9f4]/50 p-4 rounded-2xl border border-[#d4a373]/10">
+            <!-- Password Protection -->
+            <div class="mt-4 p-5 bg-[#fdf9f4]/50 rounded-3xl border border-[#d4a373]/10">
+              <div class="flex items-center gap-2 mb-4">
+                <svg class="w-3.5 h-3.5 text-[#d4a373]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <h3 class="text-[9px] uppercase tracking-[0.2em] font-bold text-gray-700">Password Lock (Opsional)</h3>
+              </div>
+              
+              <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Password Akses</label>
+              <input id="input-login-password" type="text" placeholder="e.g. tanggal-jadian" class="input-minimal mb-6" autocomplete="off" />
+
+              <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Hint / Clue Password</label>
+              <input id="input-login-hint" type="text" placeholder="e.g. Kapan kita pertama kali ketemu?" class="input-minimal" autocomplete="off" />
+              
+              <p class="text-[8px] text-gray-400 mt-4 leading-relaxed font-medium">
+                Kunci suratmu agar hanya dia yang bisa baca. Biarkan kosong jika tidak ingin dipassword.
+              </p>
+            </div>
+
+            <div class="section-hint mt-8 flex items-start gap-3 bg-[#fdf9f4]/50 p-4 rounded-2xl border border-[#d4a373]/10">
               <svg class="w-4 h-4 text-[#d4a373] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

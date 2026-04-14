@@ -1171,3 +1171,181 @@ body::before {
 .hidden {
   display: none !important;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PASSWORD GATE — Premium Security Overlay
+   ══════════════════════════════════════════════════════════════ */
+#password-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(253, 249, 244, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 20px;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#password-gate.hidden {
+  display: none !important;
+}
+
+#password-gate .gate-card {
+  width: 100%;
+  max-width: 380px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 45px 35px;
+  border-radius: 45px;
+  box-shadow: 0 40px 100px -20px rgba(60, 40, 30, 0.15);
+  border: 1px solid rgba(212, 163, 115, 0.2);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+#password-gate .gate-card::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 140px;
+  height: 140px;
+  background: radial-gradient(circle, rgba(212, 163, 115, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+#password-gate .gate-icon-box {
+  width: 70px;
+  height: 70px;
+  background: #fdf9f4;
+  border: 1px solid rgba(212, 163, 115, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  color: var(--gold, #d4a373);
+}
+
+#password-gate .gate-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #3d2418;
+  margin-bottom: 8px;
+}
+
+#password-gate .gate-desc {
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  color: #999;
+  letter-spacing: 0.05em;
+  margin-bottom: 35px;
+  line-height: 1.6;
+}
+
+#password-gate #gate-hint-container {
+  margin-bottom: 35px;
+  border-top: 1px solid #f9f4f0;
+  padding-top: 25px;
+}
+
+#password-gate .hint-label {
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: #c4a898;
+  margin-bottom: 6px;
+  display: block;
+}
+
+#password-gate #gate-hint-text {
+  font-family: var(--font-body);
+  font-size: 1.45rem;
+  color: #b58756;
+  line-height: 1.2;
+}
+
+#password-gate .gate-input-wrapper {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+#password-gate input {
+  width: 100%;
+  background: #fcfaf8;
+  border: 1px solid #eee6de;
+  border-radius: 24px;
+  padding: 18px 24px;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  color: #3d2418;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+#password-gate input:focus {
+  background: #fff;
+  border-color: var(--gold, #d4a373);
+  box-shadow: 0 10px 30px rgba(212, 163, 115, 0.08);
+}
+
+#password-gate input::placeholder {
+  font-size: 0.9rem;
+  color: #d8ced1;
+  font-family: var(--font-ui);
+  letter-spacing: 0.1em;
+}
+
+#password-gate #btn-gate-verify {
+  width: 100%;
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 22px;
+  border-radius: 28px;
+  font-family: var(--font-ui);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+#password-gate #btn-gate-verify:hover {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+}
+
+#password-gate #btn-gate-verify:active {
+  transform: translateY(0);
+}
+
+#password-gate #gate-error {
+  margin-top: 18px;
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  color: #f28b82;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+@keyframes gateShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.gate-shake {
+  animation: gateShake 0.4s ease-in-out !important;
+}
