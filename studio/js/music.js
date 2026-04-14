@@ -5,7 +5,7 @@
  */
 const Music = (() => {
   const MAX_SIZE   = 30 * 1024 * 1024; // 30MB
-  const MAX_TRACKS = 3;
+  const MAX_TRACKS = 1;
   const PLAYLIST_URL = './playlist.json';
 
   let playlist      = [];
@@ -99,9 +99,6 @@ const Music = (() => {
 
     return `
     <div id="${track.id}" class="p-6 bg-white border border-gray-100 rounded-2xl relative shadow-sm hover:shadow-md transition-shadow mb-4">
-      ${index > 0 || playlist.length > 1 ? `<button class="btn-remove-track absolute top-4 right-4 text-gray-300 hover:text-red-400 transition-colors text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full bg-gray-50 border border-gray-100">✕</button>` : ''}
-
-      <h3 class="text-[10px] font-bold text-[#d4a373] uppercase tracking-[0.2em] mb-4">Lagu ${index + 1}</h3>
 
       <!-- Tab Bar -->
       <div class="flex bg-gray-50 rounded-lg p-1 mb-5 max-w-xs">
