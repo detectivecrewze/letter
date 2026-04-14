@@ -58,7 +58,6 @@ const Music = (() => {
       cover:      { url: data.coverUrl || null },
       title:      data.title || '',
       artist:     data.artist || '',
-      quotes:     data.quotes || '',
       isPlaying:  false,
       uploading:  false,
     };
@@ -122,7 +121,6 @@ const Music = (() => {
             <button class="btn-clear-library text-[8px] font-bold text-gray-300 hover:text-red-400 transition-colors">✕</button>
           </div>
         </div>
-        <textarea class="input-quotes w-full p-3 bg-[#fdf9f4] border border-[#d4a373]/20 rounded-xl text-[10px] text-gray-700 placeholder-gray-400 focus:outline-none focus:border-[#d4a373] resize-none" rows="2" placeholder="Tambah lirik atau quotes untuk lagu ini...">${track.quotes || ''}</textarea>
         ` : `
         <div class="text-center py-6 border-2 border-dashed border-gray-100 rounded-xl bg-gray-50/50 mb-3">
           <p class="text-[9px] uppercase tracking-[0.2em] text-gray-400 font-bold mb-3">Belum ada lagu dipilih</p>
@@ -188,7 +186,7 @@ const Music = (() => {
 
     el.querySelector('.btn-open-library')?.addEventListener('click', () => _openLibraryModal(track));
     el.querySelector('.btn-clear-library')?.addEventListener('click', () => {
-      track.title = ''; track.artist = ''; track.quotes = '';
+      track.title = ''; track.artist = ''; 
       track.cover.url = null; track.audio.url = null; track.audio.name = null;
       renderAll(); Autosave.trigger();
     });
@@ -225,7 +223,7 @@ const Music = (() => {
 
     el.querySelector('.input-title')?.addEventListener('input',  e => { track.title  = e.target.value; Autosave.trigger(); });
     el.querySelector('.input-artist')?.addEventListener('input', e => { track.artist = e.target.value; Autosave.trigger(); });
-    el.querySelector('.input-quotes')?.addEventListener('input', e => { track.quotes = e.target.value; Autosave.trigger(); });
+
 
     // Audio player
     const player  = el.querySelector('.audio-player');
@@ -299,7 +297,6 @@ const Music = (() => {
       track.mode       = 'library';
       track.title      = selectedSong.title;
       track.artist     = selectedSong.artist;
-      track.quotes     = selectedSong.quotes || '';
       track.cover.url  = selectedSong.coverUrl || null;
       track.audio.url  = selectedSong.audioUrl || null;
       track.audio.name = selectedSong.title;
@@ -321,7 +318,7 @@ const Music = (() => {
         <div class="flex-1 min-w-0">
           <p class="text-[11px] font-bold text-gray-800 truncate">${song.title}</p>
           <p class="text-[9px] text-gray-400 mt-0.5">${song.artist} · ${song.genre || ''}</p>
-          ${song.quotes ? `<p class="text-[8px] text-[#d4a373] mt-1 truncate italic">"${song.quotes}"</p>` : ''}
+
         </div>
         <div class="song-check w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0 transition-all">
           <span class="check-icon text-[8px] text-white hidden">✓</span>
@@ -384,7 +381,6 @@ const Music = (() => {
       coverUrl:   t.cover.url || null,
       title:      t.title.trim(),
       artist:     t.artist.trim(),
-      quotes:     t.quotes || null,
     }));
   }
 

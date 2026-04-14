@@ -86,8 +86,14 @@
             <input id="input-recipient-name" type="text" placeholder="Contoh : Lisa" class="input-minimal mb-4"
               autocomplete="off" />
 
-            <p class="section-hint mt-2 mb-0">💡 <strong>Nama Amplop</strong> adalah teks yang muncul di tampilan depan
-              amplop surat.</p>
+            <div class="section-hint mt-6 flex items-start gap-3 bg-[#fdf9f4]/50 p-4 rounded-2xl border border-[#d4a373]/10">
+              <svg class="w-4 h-4 text-[#d4a373] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
+                <strong>Nama Amplop</strong> adalah teks yang muncul secara eksklusif pada tampilan depan fisik amplop surat digital Anda.
+              </p>
+            </div>
 
           </div>
         </div>
@@ -142,11 +148,19 @@
             </div>
 
             <textarea id="input-letter-msg" placeholder="Aku mau bilang kalau selama ini..." rows="6"
-              class="w-full resize-none border border-gray-100 rounded-2xl p-5 text-[15px] leading-relaxed focus:outline-none focus:border-[#d4a373] transition-all bg-white text-gray-800 placeholder:text-gray-200"
-              style="font-family: 'Caveat', cursive;"></textarea>
+              class="w-full resize-none border border-gray-100 rounded-2xl p-5 text-[15px] leading-relaxed focus:outline-none focus:border-[#d4a373] transition-all bg-white text-gray-800 placeholder:text-gray-200"></textarea>
 
             <input id="input-letter-from" type="text" placeholder="Pengirim (e.g. Your Biggest Fans, Rey)"
               class="input-minimal mt-4 text-right" />
+
+            <div class="section-hint mt-8 flex items-start gap-3 bg-[#fdf9f4]/50 p-4 rounded-2xl border border-[#d4a373]/10">
+              <svg class="w-4 h-4 text-[#d4a373] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
+                Efek mengetik muncul di <strong>Preview Akhir</strong> &amp; <strong>Surat Terkirim</strong>.
+              </p>
+            </div>
           </div>
         </div>
       </section>

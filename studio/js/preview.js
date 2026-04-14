@@ -5,18 +5,19 @@
 
 const Preview = (() => {
   function init() {
-    document.getElementById('btn-preview-letter')?.addEventListener('click', openPreview);
+    // Main Preview (bottom button) -> Normal with typewriter
+    document.getElementById('btn-preview-letter')?.addEventListener('click', () => openPreview(false));
 
-    // Section-specific preview buttons
+    // Section-specific preview buttons -> Fast skip typewriter
     document.body.addEventListener('click', e => {
       const btn = e.target.closest('.btn-section-preview');
       if (btn) {
-        openPreview();
+        openPreview(true);
       }
     });
   }
 
-  async function openPreview() {
+  async function openPreview(skipTW = false) {
     const token = Auth.getToken();
     if (!token) { Studio.showToast('Token tidak ditemukan.'); return; }
 
@@ -28,7 +29,9 @@ const Preview = (() => {
     try {
       await Autosave.saveNow();
       // URL ke letter
-      const previewUrl = `../index.html?to=${token}`;
+      let previewUrl = `../index.html?to=${token}`;
+      if (skipTW) previewUrl += '&skipTW=1';
+      
       previewWin.location.href = previewUrl;
     } catch (e) {
       previewWin.close();

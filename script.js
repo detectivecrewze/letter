@@ -238,6 +238,27 @@ function _renderLetterSkeleton(config) {
    TYPEWRITER ENGINE
    ════════════════════════════════════════════════════════════ */
 async function _typewriteLetter(config) {
+  const params = new URLSearchParams(window.location.search);
+  const skipTW = params.get('skipTW') === '1';
+
+  if (skipTW) {
+    // ── Instant Render Mode ──────────────────────────────
+    if (config.title) _setText('letter-title', config.title);
+    if (config.date) _setText('letter-date', config.date);
+    if (config.salutation) _setText('letter-to', config.salutation);
+
+    const bodyEl = document.getElementById('letter-body');
+    if (bodyEl) {
+      const raw = (config.letter_body || '').trim();
+      const paragraphs = raw.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
+      bodyEl.innerHTML = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+    }
+
+    if (config.from) _setText('letter-from', config.from);
+    return;
+  }
+
+  // ── Typewriter Mode (Normal) ───────────────────────────
   // 1. Type Title (Top)
   if (config.title) {
     await _typewriteSimple('letter-title', config.title, 80);

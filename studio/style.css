@@ -143,9 +143,17 @@ section {
   border-bottom: 1px solid #e0e0e0;
   border-radius: 0;
   padding: 1rem 0;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  font-family: 'Caveat', cursive;
   transition: all 0.4s ease;
   width: 100%;
+}
+
+textarea, 
+#studio-pass-input,
+#input-request-domain,
+#input-gift-name {
+  font-family: 'Caveat', cursive !important;
 }
 
 .input-minimal:focus {
