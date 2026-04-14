@@ -50,12 +50,13 @@
 
   /* Envelope Default (Blush) */
   --env-bg: #ecdccb;
-  --env-fold: #e0cdb8;        /* Sharpened from #ead6c3 */
-  --env-fold-bottom: #d9c2ab; /* Sharpened from #f2e1d0 */
+  --env-fold: #d1bba4;        /* Darkened even more */
+  --env-fold-bottom: #c4ab92; /* Darkened even more */
   --env-flap-open: #dfcebd;
   --env-label-bg: #faf7f2;
-  --env-border: rgba(200, 180, 160, 0.4);
-  --env-shadow: rgba(180, 150, 130, 0.15);
+  --env-border: rgba(180, 150, 130, 0.45);
+  --env-shadow: rgba(160, 130, 110, 0.2);
+  --env-texture-opacity: 0.08;
 }
 
 /* ── Sage Theme ────────────────────────────────────────────────── */
@@ -100,12 +101,12 @@
 
   /* Envelope Rose */
   --env-bg: #f2e4e4;
-  --env-fold: #e6d5d5;        /* Sharpened from #eadada */
-  --env-fold-bottom: #dec9c9; /* Sharpened from #f8f0f0 */
+  --env-fold: #dbbfbf;        /* Darkened even more */
+  --env-fold-bottom: #c9a9a9; /* Darkened even more */
   --env-flap-open: #dfcece;
   --env-label-bg: #fffafa;
-  --env-border: rgba(196, 133, 138, 0.2);
-  --env-shadow: rgba(180, 150, 150, 0.1);
+  --env-border: rgba(196, 133, 138, 0.3);
+  --env-shadow: rgba(180, 130, 130, 0.15);
 }
 
 /* ── Midnight Theme ───────────────────────────────────────────── */
@@ -125,7 +126,7 @@
   --border: rgba(107, 140, 186, 0.18);
   --tape-color: rgba(107, 140, 186, 0.25);
 
-  /* Envelope Midnight (Black Gold) */
+  /* Envelope Midnight (Midnight Blue) */
   --env-bg: #141e35;
   --env-fold: #18243e;
   --env-fold-bottom: #1c2b4a;
@@ -133,6 +134,7 @@
   --env-label-bg: #141e35;
   --env-border: rgba(107, 140, 186, 0.2);
   --env-shadow: rgba(0, 0, 0, 0.4);
+  --env-texture-opacity: 0.03; 
   --text: #e8dcc8; /* Goldish text */
 }
 
@@ -373,13 +375,19 @@ body::before {
   overflow: hidden;
   transition: box-shadow 0.3s, transform 0.3s;
 
+  /* Hide white-spot pattern on midnight theme */
+  [data-theme="midnight"] & {
+    background-image: none;
+  }
+
   /* Grained texture */
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    opacity: 0.08;
+    opacity: var(--env-texture-opacity);
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
   }
 }
 
@@ -827,13 +835,14 @@ body::before {
 
 .letter-date {
   font-family: var(--font-ui);
-  font-weight: 400;
+  font-weight: 600;
   font-style: normal;
-  font-size: 0.65rem;
-  letter-spacing: 0.35em;
+  font-size: 0.72rem;
+  letter-spacing: 0.38em;
   text-transform: uppercase;
-  color: var(--text-faint);
-  margin-top: 0.5rem;
+  color: var(--text-light);
+  margin-top: 0.65rem;
+  opacity: 0.9;
 }
 
 /* ══════════════════════════════════════════════════════════════

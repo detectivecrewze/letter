@@ -388,20 +388,29 @@ const Music = (() => {
   // ── Upload to R2 via Worker ───────────────────────────────
   async function _uploadToR2(file) {
     const workerUrl = Auth.getWorkerUrl();
+    const token     = Auth.getToken();
     const timestamp = Date.now();
     const randomStr = Math.random().toString(36).substring(7);
     const ext       = file.name.split('.').pop().toLowerCase();
-    const key       = `letters/${timestamp}-${randomStr}.${ext}`;
+    
+    const baseName  = file.name.substring(0, file.name.lastIndexOf('.')).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const key       = `letters/${timestamp}-${randomStr}-${baseName}.${ext}`;
 
-    const res = await fetch(`${workerUrl}/upload-direct/${key}`, {
+    const res = await fetch(`${workerUrl}/upload-direct/${key}?id=${encodeURIComponent(token)}`, {
       method:  'PUT',
-      headers: { 'Content-Type': file.type || 'audio/mpeg', 'Content-Length': file.size },
+      headers: { 
+        'Content-Type': file.type || 'audio/mpeg'
+      },
       body:    file,
     });
 
-    if (!res.ok) throw new Error('Upload gagal');
+    if (!res.ok) throw new Error('Upload gagal (Server Error)');
+    
     const data = await res.json();
-    return data.url;
+    let rawUrl = (data.url || data.publicUrl);
+    
+    // Auto-fix domain mismatch
+    return rawUrl.replace('letter-assets', 'arcade-assets') + '?v=' + timestamp;
   }
 
   // ── Getters ───────────────────────────────────────────────

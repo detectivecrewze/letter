@@ -53,6 +53,13 @@ const Studio = (() => {
       document.getElementById(id)?.addEventListener('input', () => Autosave.trigger());
     });
 
+    // Manual Save Button
+    document.getElementById('btn-save-draft')?.addEventListener('click', async () => {
+      showToast('Menyimpan draft...');
+      await Autosave.saveNow();
+      showToast('Draft berhasil disimpan! ✓');
+    });
+
     // Theme Selection Binding
     document.querySelectorAll('.theme-option').forEach(btn => {
       btn.addEventListener('click', () => {
