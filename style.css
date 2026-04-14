@@ -726,7 +726,9 @@ body::before {
 .ornament-top {
   width: 200px;
   max-width: 100%;
-  opacity: 0.6;
+  opacity: 0;
+  transform: scale(0.95);
+  animation: ornamentFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
 }
 
 .letter-title {
@@ -735,32 +737,55 @@ body::before {
   font-weight: 400;
   color: var(--text);
   margin-top: 0.2rem;
-  line-height: 1.1;
+  line-height: 1;
   position: relative;
   display: inline-block;
-  padding-bottom: 1rem;
   text-align: center;
 }
 
-/* Premium Calligraphic Double Underscroll */
-.letter-title::after {
-  content: '';
-  position: absolute;
-  left: -5%;
-  bottom: 0;
-  width: 110%;
-  height: 24px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 14C50 12 90 16 130 14C170 12 210 14 230 13' stroke='%23c9a96e' stroke-width='4' stroke-linecap='round' opacity='0.2'/%3E%3Cpath d='M5 18C60 16 120 20 180 17C210 15.5 235 18 235 18' stroke='%23c9a96e' stroke-width='1.5' stroke-linecap='round' stroke-dasharray='1 2'/%3E%3Cpath d='M20 16C70 14 120 18 170 15' stroke='%23d4a5a5' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  z-index: -1;
-  pointer-events: none;
-  animation: drawLine 1.5s ease-out forwards;
+.letter-title-underline {
+  width: 400px;
+  max-width: 115%;
+  margin-top: -1.25rem;
+  margin-bottom: 0.5rem;
+  opacity: 0;
+  transform: translateY(5px);
+  animation: ornamentFadeUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.4s;
 }
 
-@keyframes drawLine {
-  from { clip-path: inset(0 100% 0 0); opacity: 0; }
-  to { clip-path: inset(0 0 0 0); opacity: 1; }
+.letter-title-underline svg path:not([d*="L"]) {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  animation: drawOrnament 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.6s;
+}
+
+.letter-title-underline svg path[d*="L"], 
+.letter-title-underline svg circle {
+  opacity: 0;
+  transform: scale(0);
+  transform-origin: center;
+  animation: popPoint 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Diamond center */
+.letter-title-underline svg path[d*="L"] { animation-delay: 1.3s; transform-origin: 200px 32px; }
+
+/* End points */
+.letter-title-underline svg circle:nth-child(3) { animation-delay: 1.5s; } /* Gold left */
+.letter-title-underline svg circle:nth-child(4) { animation-delay: 1.5s; } /* Gold right */
+.letter-title-underline svg circle:nth-child(6) { animation-delay: 1.7s; } /* Pink left */
+.letter-title-underline svg circle:nth-child(7) { animation-delay: 1.7s; } /* Pink right */
+
+@keyframes ornamentFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes drawOrnament {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes popPoint {
+  to { opacity: 1; transform: scale(1); }
 }
 
 .letter-date {

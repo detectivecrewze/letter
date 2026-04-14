@@ -139,17 +139,29 @@
           <!-- ── Header: ornament + date + title ── -->
           <header class="letter-header">
             <div class="ornament-top" aria-hidden="true">
-              <svg viewBox="0 0 200 24" fill="none"
-                   xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-                <line x1="0" y1="12" x2="78" y2="12"
-                      stroke="var(--accent)" stroke-width="0.6" stroke-dasharray="3 4"/>
-                <text x="100" y="17" text-anchor="middle" font-size="13"
-                      fill="var(--gold)" font-family="Georgia, serif">✦</text>
-                <line x1="122" y1="12" x2="200" y2="12"
-                      stroke="var(--accent)" stroke-width="0.6" stroke-dasharray="3 4"/>
+              <svg viewBox="0 0 200 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="0" y1="12" x2="85" y2="12" stroke="var(--accent)" stroke-width="0.7" stroke-dasharray="3 4" opacity="0.5" />
+                <path d="M100 6 L106 12 L100 18 L94 12 Z" fill="var(--gold)" />
+                <line x1="115" y1="12" x2="200" y2="12" stroke="var(--accent)" stroke-width="0.7" stroke-dasharray="3 4" opacity="0.5" />
               </svg>
             </div>
             <h1 class="letter-title" id="letter-title"></h1>
+            <div class="letter-title-underline" aria-hidden="true">
+              <svg viewBox="0 0 400 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Gold Wave: Elegant S-Curve -->
+                <path d="M30 32 C 130 52, 270 12, 370 32" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round" opacity="0.8" />
+                <!-- Diamond center at the inflection point -->
+                <path d="M200 27 L205 32 L200 37 L195 32 Z" fill="var(--gold)" />
+                <!-- End points -->
+                <circle cx="30" cy="32" r="1.5" fill="var(--gold)" />
+                <circle cx="370" cy="32" r="1.5" fill="var(--gold)" />
+                
+                <!-- Pink Wave: Competing S-Curve -->
+                <path d="M70 38 C 150 56, 250 20, 330 38" stroke="var(--accent)" stroke-width="1" stroke-linecap="round" opacity="0.6" />
+                <circle cx="70" cy="38" r="1" fill="var(--accent)" />
+                <circle cx="330" cy="38" r="1" fill="var(--accent)" />
+              </svg>
+            </div>
             <time class="letter-date" id="letter-date"></time>
           </header>
 
