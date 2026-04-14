@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Link — Letter Edition</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #fcfaf7; }
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+  <!-- LOGIN GATE -->
+  <div id="login-gate" class="w-full max-w-sm">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-light tracking-tight text-gray-900 mb-2">Generator Link</h1>
+      <p class="text-[9px] uppercase tracking-[0.4em] text-gray-400">Letter Edition — Admin Only</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <input id="gen-password" type="password" placeholder="Password Admin"
+        class="w-full border-b border-gray-200 py-3 text-sm focus:outline-none focus:border-gray-800 text-center transition-colors bg-transparent mb-6 placeholder-gray-300">
+      <button id="btn-login" class="w-full bg-gray-900 text-white py-3 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-black transition-colors">
+        Masuk
+      </button>
+      <p id="login-error" class="hidden text-[9px] text-rose-500 text-center mt-3 font-semibold">Password salah</p>
+    </div>
+  </div>
+
+  <!-- GENERATOR & RENAME PANEL (hidden initially) -->
+  <div id="generator-panel" class="hidden w-full max-w-md fade-in">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-light tracking-tight text-gray-900 mb-2">Generator Link</h1>
+      <p class="text-[9px] uppercase tracking-[0.4em] text-gray-400">Letter Edition — Kelola Link</p>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="flex items-center gap-2 mb-6 bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm mx-auto max-w-md">
+      <button id="tab-create" class="flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold bg-[#fcfaf7] border border-[#d4a373]/20 text-[#b58756] rounded-lg shadow-sm transition-all pointer-events-none">Buat Baru</button>
+      <button id="tab-rename" class="flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 rounded-lg transition-all">Ganti Nama</button>
+      <button id="tab-qr" class="flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 rounded-lg transition-all">QR Code</button>
+    </div>
+
+    <!-- PANEL CREATE -->
+    <div id="panel-create" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5 fade-in">
+      <!-- ID / Slug -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">ID / Slug Surat</label>
+        <input id="gen-id" type="text" placeholder="e.g. dinda-2026 atau bisa auto-generate"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+        <p class="text-[8px] text-gray-400 mt-1.5">Huruf kecil, angka, strip saja. Min. 3 karakter.</p>
+      </div>
+
+      <!-- Studio Password (opsional) -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">Password Studio <span class="text-gray-300 font-normal">(opsional)</span></label>
+        <input id="gen-studio-pass" type="text" placeholder="Password untuk mengunci Studio Editor"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+        <p class="text-[8px] text-gray-400 mt-1.5">Kosongkan kalau tidak perlu password editor.</p>
+      </div>
+
+      <!-- Auto-generate ID -->
+      <div class="flex items-center gap-3 pt-1">
+        <input type="checkbox" id="auto-gen-id" class="w-3.5 h-3.5 accent-gray-800">
+        <label for="auto-gen-id" class="text-[10px] text-gray-600 cursor-pointer">Auto-generate ID unik</label>
+      </div>
+
+      <!-- Submit button -->
+      <button id="btn-generate" class="w-full bg-[#d4a373] text-white py-3.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-[#c4956a] transition-colors shadow-sm mt-2">
+        <span class="btn-text">Buat Link Sekarang</span>
+      </button>
+
+      <p id="gen-error" class="hidden text-[9px] text-rose-500 text-center font-semibold"></p>
+    </div>
+
+    <!-- PANEL RENAME -->
+    <div id="panel-rename" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5 fade-in">
+      <!-- Old ID -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">ID Lama (Sebelumnya)</label>
+        <input id="rename-old-id" type="text" placeholder="e.g. dinda-salah-nama"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+      </div>
+
+      <!-- New ID -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">ID Baru (Yang Benar)</label>
+        <input id="rename-new-id" type="text" placeholder="e.g. dinda-for-you"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+        <p class="text-[8px] text-gray-400 mt-1.5">Huruf kecil, angka, strip saja. Min. 3 karakter.</p>
+      </div>
+
+      <!-- Submit button -->
+      <button id="btn-rename" class="w-full bg-gray-900 text-white py-3.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-black transition-colors shadow-sm mt-2">
+        <span class="btn-text">Ganti Nama Link</span>
+      </button>
+
+      <p id="rename-error" class="hidden text-[9px] text-rose-500 text-center font-semibold"></p>
+    </div>
+
+    <!-- PANEL QR -->
+    <div id="panel-qr" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5 fade-in">
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">Link Website / Surat</label>
+        <input id="qr-link" type="text" placeholder="e.g. https://letter.for-you-always.my.id/?to=dinda"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+      </div>
+      <button id="btn-generate-qr" class="w-full bg-gray-900 text-white py-3.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-black transition-colors shadow-sm mt-2">
+        <span class="btn-text">Buat Barcode</span>
+      </button>
+
+      <div id="qr-result" class="hidden mt-6 flex-col items-center">
+        <div id="qr-export-container" style="background: linear-gradient(160deg, #fffaf5 0%, #fff8f0 50%, #f5efe6 100%); padding: 28px 24px 20px; border-radius: 16px; border: 1px solid rgba(212,174,106,0.2); box-shadow: 0 20px 50px -15px rgba(0,0,0,0.12), 0 4px 12px rgba(212,174,106,0.08); position: relative; max-width: 220px; width: 100%; margin: 0 auto;">
+          <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: linear-gradient(90deg, transparent, #d4a373, transparent); border-radius: 0 0 4px 4px;"></div>
+          <p style="font-family: serif; font-style: italic; font-size: 22px; color: #1a1a1a; margin-bottom: 2px; letter-spacing: -0.02em; text-align: center;">For You</p>
+          <p style="font-size: 7px; text-transform: uppercase; letter-spacing: 0.35em; color: #d4a373; font-weight: 600; margin-bottom: 16px; text-align: center;">scan to open your gift</p>
+          <div id="qr-code-box" style="background: white; border-radius: 10px; padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 148px; width: 148px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.04); box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);"></div>
+          <p style="font-size: 6px; text-transform: uppercase; letter-spacing: 0.4em; color: #c4b49a; margin-top: 14px; text-align: center;">letter edition</p>
+        </div>
+        <button id="btn-download-qr" class="w-full mt-6 py-3.5 text-[9px] uppercase tracking-[0.2em] font-bold rounded-lg transition-all flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #d4a373 0%, #c4956a 100%); color: white; border: none; box-shadow: 0 4px 14px rgba(212,174,106,0.35);">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          Download Barcode
+        </button>
+      </div>
+    </div>
+
+
+    <!-- RESULT -->
+    <div id="result-card" class="hidden mt-6 bg-white rounded-2xl shadow-sm border border-emerald-100 p-8 space-y-5 fade-in">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+        <p id="result-title" class="text-[9px] uppercase tracking-widest text-emerald-600 font-semibold">Berhasil Dibuat!</p>
+      </div>
+
+      <div>
+        <p class="text-[8px] uppercase tracking-widest text-gray-400 mb-2 font-semibold">ID Surat</p>
+        <p id="result-id" class="text-sm font-mono text-gray-800 bg-gray-50 rounded-lg px-3 py-2"></p>
+      </div>
+
+      <div>
+        <p class="text-[8px] uppercase tracking-widest text-gray-400 mb-2 font-semibold">Link Studio Editor (untuk Customer)</p>
+        <div class="flex gap-2">
+          <p id="result-studio" class="flex-1 text-[10px] font-mono text-[#d4a373] bg-gray-50 rounded-lg px-3 py-2 break-all"></p>
+          <button onclick="_copyText('result-studio', this)" class="text-[8px] uppercase tracking-wider font-semibold text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap">Salin</button>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-[8px] uppercase tracking-widest text-gray-400 mb-2 font-semibold">Link Surat (untuk Penerima)</p>
+        <div class="flex gap-2">
+          <p id="result-gift" class="flex-1 text-[10px] font-mono text-gray-800 bg-gray-50 rounded-lg px-3 py-2 break-all"></p>
+          <button onclick="_copyText('result-gift', this)" class="text-[8px] uppercase tracking-wider font-semibold text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap">Salin</button>
+        </div>
+      </div>
+
+      <button id="btn-jump-to-qr" class="w-full border border-gray-200 text-[#b58756] bg-amber-50 py-3 rounded-xl text-[9px] font-semibold uppercase tracking-widest hover:border-[#b58756] transition-colors mb-2">
+        + Buat Barcode (QR Code)
+      </button>
+      <button id="btn-generate-another" class="w-full border border-gray-200 text-gray-600 py-3 rounded-xl text-[9px] font-semibold uppercase tracking-widest hover:border-gray-800 hover:text-gray-800 transition-colors">
+        + Buat / Kelola Lainnya
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full text-[9px] uppercase tracking-widest font-semibold shadow-lg z-50"></div>
+
+  <script>
+    const WORKER_URL = 'https://letter-edition.aldoramadhan16.workers.dev';
+    let _authToken = null;
+    let _toastTimer = null;
+
+    // ── Login ─────────────────────────────────────────────────────────
+    document.getElementById('gen-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click(); });
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const pass = document.getElementById('gen-password').value;
+      const btn = document.getElementById('btn-login');
+      const err = document.getElementById('login-error');
+
+      btn.textContent = 'Memverifikasi...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/generator-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          _authToken = pass;
+          document.getElementById('login-gate').style.display = 'none';
+          document.getElementById('generator-panel').classList.remove('hidden');
+        } else {
+          err.classList.remove('hidden');
+          document.getElementById('gen-password').classList.add('shake');
+          setTimeout(() => document.getElementById('gen-password').classList.remove('shake'), 500);
+        }
+      } catch (e) {
+        err.textContent = 'Gagal terhubung ke server.';
+        err.classList.remove('hidden');
+      }
+
+      btn.textContent = 'Masuk';
+      btn.disabled = false;
+    });
+
+    // ── Tab Navigation ───────────────────────────────────────────────
+    const tabCreate = document.getElementById('tab-create');
+    const tabRename = document.getElementById('tab-rename');
+    const tabQr = document.getElementById('tab-qr');
+    const panelCreate = document.getElementById('panel-create');
+    const panelRename = document.getElementById('panel-rename');
+    const panelQr = document.getElementById('panel-qr');
+    const resultCard = document.getElementById('result-card');
+
+    function setActiveTab(activeTabEl) {
+      [tabCreate, tabRename, tabQr].forEach(t => {
+        t.className = 'flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 rounded-lg transition-all';
+        t.style.pointerEvents = 'auto';
+      });
+      activeTabEl.className = 'flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold bg-[#fcfaf7] border border-[#d4a373]/20 text-[#b58756] rounded-lg shadow-sm transition-all pointer-events-none';
+    }
+
+    tabCreate.addEventListener('click', () => {
+      setActiveTab(tabCreate);
+      panelRename.classList.add('hidden');
+      panelQr.classList.add('hidden');
+      panelCreate.classList.remove('hidden');
+      resultCard.classList.add('hidden');
+    });
+
+    tabRename.addEventListener('click', () => {
+      setActiveTab(tabRename);
+      panelCreate.classList.add('hidden');
+      panelQr.classList.add('hidden');
+      panelRename.classList.remove('hidden');
+      resultCard.classList.add('hidden');
+    });
+
+    tabQr.addEventListener('click', () => {
+      setActiveTab(tabQr);
+      panelCreate.classList.add('hidden');
+      panelRename.classList.add('hidden');
+      panelQr.classList.remove('hidden');
+      resultCard.classList.add('hidden');
+    });
+
+    // ── Auto-generate ID toggle ──────────────────────────────────────
+    document.getElementById('auto-gen-id').addEventListener('change', function() {
+      const idInput = document.getElementById('gen-id');
+      if (this.checked) {
+        idInput.value = 'auto-' + Math.random().toString(36).substring(2, 9);
+        idInput.disabled = true;
+      } else {
+        idInput.value = '';
+        idInput.disabled = false;
+      }
+    });
+
+    // ── Generate Link ────────────────────────────────────────────────
+    document.getElementById('btn-generate').addEventListener('click', async () => {
+      const idInput = document.getElementById('gen-id');
+      const passInput = document.getElementById('gen-studio-pass');
+      const btn = document.getElementById('btn-generate');
+      const btnText = btn.querySelector('.btn-text');
+      const errEl = document.getElementById('gen-error');
+
+      const id = idInput.value.trim();
+      const studioPassword = passInput.value.trim() || null;
+
+      if (!id || id.length < 3) {
+        errEl.textContent = 'ID minimal 3 karakter!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      btnText.textContent = 'Membuat...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/generate-link`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${_authToken}`
+          },
+          body: JSON.stringify({ id, studioPassword })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('result-id').textContent = data.id;
+          document.getElementById('result-studio').textContent = data.studioUrl;
+          document.getElementById('result-gift').textContent = data.giftUrl;
+          document.getElementById('result-card').classList.remove('hidden');
+          document.getElementById('result-card').scrollIntoView({ behavior: 'smooth' });
+
+          // Auto-copy studio link
+          navigator.clipboard.writeText(data.studioUrl).then(() => {
+            _showToast('Link Studio tersalin otomatis!');
+          });
+        } else {
+          errEl.textContent = data.error || 'Gagal membuat link.';
+          errEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        errEl.textContent = 'Gagal terhubung ke server.';
+        errEl.classList.remove('hidden');
+      }
+
+      btnText.textContent = 'Buat Link Sekarang';
+      btn.disabled = false;
+    });
+
+    // ── Rename Link ──────────────────────────────────────────────────
+    document.getElementById('btn-rename').addEventListener('click', async () => {
+      const oldInput = document.getElementById('rename-old-id');
+      const newInput = document.getElementById('rename-new-id');
+      const btn = document.getElementById('btn-rename');
+      const btnText = btn.querySelector('.btn-text');
+      const errEl = document.getElementById('rename-error');
+
+      const oldId = oldInput.value.trim();
+      const newId = newInput.value.trim();
+
+      if (!oldId || !newId) {
+        errEl.textContent = 'Isi kedua ID!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      btnText.textContent = 'Memproses...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/change-id`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${_authToken}`
+          },
+          body: JSON.stringify({ oldId, newId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('result-title').textContent = 'Nama Berhasil Diganti!';
+          document.getElementById('result-id').textContent = data.id;
+          document.getElementById('result-studio').textContent = data.studioUrl;
+          document.getElementById('result-gift').textContent = data.giftUrl;
+          document.getElementById('result-card').classList.remove('hidden');
+          document.getElementById('result-card').scrollIntoView({ behavior: 'smooth' });
+        } else {
+          errEl.textContent = data.error || 'Gagal mengganti nama link.';
+          errEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        errEl.textContent = 'Gagal terhubung ke server.';
+        errEl.classList.remove('hidden');
+      }
+
+      btnText.textContent = 'Ganti Nama Link';
+      btn.disabled = false;
+    });
+
+    // ── Generate Another / Jump to QR ───────────────────────────────
+    document.getElementById('btn-jump-to-qr').addEventListener('click', () => {
+      const giftUrl = document.getElementById('result-gift').textContent;
+      document.getElementById('qr-link').value = giftUrl;
+      document.getElementById('tab-qr').click();
+      setTimeout(() => document.getElementById('btn-generate-qr').click(), 100);
+    });
+
+    document.getElementById('btn-generate-another').addEventListener('click', () => {
+      document.getElementById('result-card').classList.add('hidden');
+      document.getElementById('gen-id').value = '';
+      document.getElementById('gen-studio-pass').value = '';
+      document.getElementById('rename-old-id').value = '';
+      document.getElementById('rename-new-id').value = '';
+      document.getElementById('auto-gen-id').checked = false;
+      document.getElementById('gen-id').disabled = false;
+    });
+
+    // ── Generate QR ──────────────────────────────────────────────────
+    document.getElementById('btn-generate-qr').addEventListener('click', () => {
+      const linkInput = document.getElementById('qr-link').value.trim();
+      const qrBox = document.getElementById('qr-code-box');
+
+      if (!linkInput) {
+        _showToast('Masukkan link website terlebih dahulu!');
+        return;
+      }
+
+      qrBox.innerHTML = '';
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrBox, {
+          text: linkInput,
+          width: 128,
+          height: 128,
+          colorDark: '#1a1a1a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        setTimeout(() => {
+          const img = qrBox.querySelector('img');
+          const canvas = qrBox.querySelector('canvas');
+          if (img) { img.style.margin = '0 auto'; img.style.display = 'block'; img.style.borderRadius = '4px'; }
+          if (canvas) canvas.style.display = 'none';
+        }, 100);
+      }
+
+      document.getElementById('qr-result').classList.remove('hidden');
+      document.getElementById('qr-result').classList.add('flex');
+    });
+
+    // ── Download QR ──────────────────────────────────────────────────
+    document.getElementById('btn-download-qr').addEventListener('click', async () => {
+      const exportNode = document.getElementById('qr-export-container');
+      const btn = document.getElementById('btn-download-qr');
+
+      if (!exportNode || typeof html2canvas === 'undefined') {
+        _showToast('Gagal mendownload. Fitur belum siap.');
+        return;
+      }
+
+      const originalText = btn.innerHTML;
+      btn.innerHTML = 'Menyiapkan...';
+      btn.style.opacity = '0.7';
+
+      try {
+        const canvas = await html2canvas(exportNode, {
+          scale: 3,
+          useCORS: true,
+          backgroundColor: '#fff',
+          logging: false
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `Letter_QR_${Math.floor(Date.now() / 1000)}.png`;
+        link.href = imgData;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error('Error generating QR PNG:', err);
+        _showToast('Gagal mendownload barcode.');
+      } finally {
+        requestAnimationFrame(() => {
+          btn.innerHTML = originalText;
+          btn.style.opacity = '1';
+        });
+      }
+    });
+
+    // ── Copy Helper ──────────────────────────────────────────────────
+    function _copyText(elId, btn) {
+      const text = document.getElementById(elId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Tersalin!';
+        setTimeout(() => btn.textContent = orig, 2000);
+        _showToast('Link tersalin!');
+      });
+    }
+
+    function _showToast(msg) {
+      const t = document.getElementById('toast');
+      if (_toastTimer) clearTimeout(_toastTimer);
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      _toastTimer = setTimeout(() => t.classList.add('hidden'), 2500);
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</body>
+</html>

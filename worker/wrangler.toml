@@ -1,0 +1,30 @@
+# ============================================================
+# Letter Edition — Cloudflare Worker Configuration
+# ============================================================
+# SEBELUM DEPLOY:
+# 1. Buat KV namespace:
+#    wrangler kv namespace create LETTER_DATA
+#    Lalu isi id di bawah.
+# 2. Buat R2 bucket (atau reuse yang ada):
+#    wrangler r2 bucket create letter-edition
+# 3. Set secrets via:
+#    wrangler secret put ADMIN_SECRET
+#    wrangler secret put GENERATOR_SECRET
+#    wrangler secret put TELEGRAM_BOT_TOKEN
+#    wrangler secret put TELEGRAM_CHAT_ID
+#    wrangler secret put QWEN_API_KEY
+# ============================================================
+
+name = "letter-edition"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# R2 Bucket — PAKAI YANG SAMA dengan Loves/Arcade (agar hemat & domain sudah jalan)
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "arcade-edition-storage"
+
+# KV Namespace — Database config studio & letter
+[[kv_namespaces]]
+binding = "LETTER_DATA"
+id = "b22dd27d97fe458689c0392fae841481"

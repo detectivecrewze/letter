@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Letter For You</title>
+  <meta name="description" content="A heartfelt letter, crafted just for you.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph (WhatsApp preview) -->
+  <meta property="og:title" content="Ada surat untukmu ✉️">
+  <meta property="og:description" content="Seseorang mengirimkan sesuatu yang spesial.">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Caveat:wght@400;500;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: MAINTENANCE                                     -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-maintenance" class="state-screen hidden">
+    <div class="maintenance-content">
+      <div class="maint-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 22H22L12 2Z" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 9V14" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12 18H12.01" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1>System Update</h1>
+      <p>This digital letter is currently undergoing brief maintenance and will be available again soon. Thank you for your patience.</p>
+      <div class="maint-footer">
+        <span>EST. 2025</span>
+        <span class="dot"></span>
+        <span>Premium Experience</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: LOADING                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-loading" class="state-screen">
+    <div class="loading-seal" aria-hidden="true">
+      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="26" fill="var(--gold)" opacity="0.15"/>
+        <circle cx="28" cy="28" r="20" fill="var(--gold)" opacity="0.22"/>
+        <circle cx="28" cy="28" r="13" fill="var(--gold)" opacity="0.15"/>
+        <text x="28" y="33" text-anchor="middle" font-size="14"
+              fill="var(--gold)" font-family="Georgia, serif" opacity="0.9">✦</text>
+      </svg>
+    </div>
+    <p class="loading-label">Opening your letter…</p>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: ENVELOPE                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-envelope" class="state-screen hidden">
+    <div class="env-bg" aria-hidden="true"></div>
+
+    <!-- Soft ambient blobs -->
+    <div class="env-blob env-blob-tl" aria-hidden="true"></div>
+    <div class="env-blob env-blob-br" aria-hidden="true"></div>
+
+    <div class="envelope-scene" id="envelope-scene">
+
+      <!-- Envelope card -->
+      <div class="envelope-wrapper" id="envelope-wrapper"
+           role="button" aria-label="Open this letter" tabindex="0">
+
+        <!-- ── Envelope body ── -->
+        <div class="envelope-body">
+
+          <!-- ── Top flap (CSS border-trick triangle, height:0) ── -->
+          <div class="env-flap" id="env-flap" aria-hidden="true"></div>
+
+          <!-- Wax seal — sibling of flap, positioned from envelope-body -->
+          <div class="env-seal" id="env-seal">
+            <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="36" cy="36" r="34" fill="#9b3b24" opacity="0.1"/>
+              <circle cx="36" cy="36" r="29" fill="#8b2d1a"/>
+              <circle cx="36" cy="36" r="27" fill="#a83a23"/>
+              <circle cx="36" cy="36" r="25" fill="#bf4c30"/>
+              <ellipse cx="29" cy="27" rx="8" ry="5"
+                       fill="white" opacity="0.13"
+                       transform="rotate(-35 29 27)"/>
+              <circle cx="36" cy="36" r="21" fill="none"
+                      stroke="#e8957a" stroke-width="0.9" opacity="0.55"/>
+              <circle cx="36" cy="36" r="18" fill="none"
+                      stroke="#e8957a" stroke-width="0.4" opacity="0.3"/>
+              <text x="36" y="43" text-anchor="middle"
+                    font-size="20" fill="#fde8e0"
+                    font-family="Georgia,serif" opacity="0.92">✦</text>
+            </svg>
+          </div>
+
+          <!-- Recipient block on envelope face -->
+          <div class="env-recipient" aria-label="Recipient name">
+            <span class="env-to-label">for</span>
+            <span class="env-to-name" id="env-to-name">kamu</span>
+          </div>
+
+        </div><!-- /envelope-body -->
+
+      </div><!-- /envelope-wrapper -->
+
+      <!-- Tap hint, positioned below envelope -->
+      <p class="envelope-hint" id="envelope-hint">
+        <span aria-hidden="true">❦</span>&ensp;tap to open&ensp;<span aria-hidden="true">❦</span>
+      </p>
+
+    </div><!-- /envelope-scene -->
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: LETTER                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-letter" class="state-screen hidden">
+
+    <!-- Ambient paper background -->
+    <div class="paper-bg" aria-hidden="true"></div>
+
+    <!-- Scroll wrapper -->
+    <div class="letter-scroll">
+      <article class="letter-paper" id="letter-paper" role="main">
+        <div class="letter-tape"></div>
+        <div class="letter-paper-inner">
+
+          <!-- ── Header: ornament + date + title ── -->
+          <header class="letter-header">
+            <div class="ornament-top" aria-hidden="true">
+              <svg viewBox="0 0 200 24" fill="none"
+                   xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <line x1="0" y1="12" x2="78" y2="12"
+                      stroke="var(--accent)" stroke-width="0.6" stroke-dasharray="3 4"/>
+                <text x="100" y="17" text-anchor="middle" font-size="13"
+                      fill="var(--gold)" font-family="Georgia, serif">✦</text>
+                <line x1="122" y1="12" x2="200" y2="12"
+                      stroke="var(--accent)" stroke-width="0.6" stroke-dasharray="3 4"/>
+              </svg>
+            </div>
+            <h1 class="letter-title" id="letter-title"></h1>
+            <time class="letter-date" id="letter-date"></time>
+          </header>
+
+          <!-- ── Salutation ── -->
+          <div class="letter-salutation">
+            <span class="letter-to" id="letter-to"></span>
+          </div>
+
+          <!-- ── Body (injected by script.js) ── -->
+          <div class="letter-body" id="letter-body" aria-label="Letter content"></div>
+
+          <!-- ── Footer: signature ── -->
+          <footer class="letter-footer">
+            <div class="letter-closing-wrap">
+              <span class="letter-from" id="letter-from"></span>
+            </div>
+
+            <div class="footer-divider" aria-hidden="true">
+              <svg viewBox="0 0 200 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="0"   y1="8" x2="70"  y2="8"
+                      stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2 4"/>
+                <circle cx="100" cy="8" r="2.5"
+                        fill="none" stroke="var(--gold)" stroke-width="0.8"/>
+                <line x1="130" y1="8" x2="200" y2="8"
+                      stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2 4"/>
+              </svg>
+            </div>
+          </footer>
+        </div>
+      </article>
+    </div>
+
+
+
+  </div><!-- /state-letter -->
+
+  <!-- Hidden audio element -->
+  <audio id="audio-player" preload="auto"></audio>
+
+  <!-- Standalone config (demo / premium mode) -->
+  <script src="config.js"></script>
+  <!-- Main logic -->
+  <script src="script.js"></script>
+
+</body>
+</html>

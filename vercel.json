@@ -1,0 +1,20 @@
+{
+    "rewrites": [
+        {
+            "source": "/studio/(.*)",
+            "destination": "/studio/index.html"
+        },
+        {
+            "source": "/generator",
+            "destination": "/generator/index.html"
+        },
+        {
+            "source": "/admin",
+            "destination": "/admin-insights/index.html"
+        },
+        {
+            "source": "/:id",
+            "destination": "/index.html"
+        }
+    ]
+}
