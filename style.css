@@ -47,6 +47,15 @@
   --letter-padding-v: 4.5rem;
   --letter-padding-h: 5.5rem;
   --letter-padding-h-mobile: 1.85rem;
+
+  /* Envelope Default (Blush) */
+  --env-bg: #ecdccb;
+  --env-fold: #e0cdb8;        /* Sharpened from #ead6c3 */
+  --env-fold-bottom: #d9c2ab; /* Sharpened from #f2e1d0 */
+  --env-flap-open: #dfcebd;
+  --env-label-bg: #faf7f2;
+  --env-border: rgba(200, 180, 160, 0.4);
+  --env-shadow: rgba(180, 150, 130, 0.15);
 }
 
 /* ── Sage Theme ────────────────────────────────────────────────── */
@@ -63,6 +72,15 @@
   --gold-soft: #d9cfa8;
   --shadow: rgba(80, 120, 80, 0.09);
   --tape-color: rgba(180, 210, 180, 0.38);
+
+  /* Envelope Sage */
+  --env-bg: #e6ede5;
+  --env-fold: #dee6dd;
+  --env-fold-bottom: #f0f4ef;
+  --env-flap-open: #d8e0d7;
+  --env-label-bg: #f8faf7;
+  --env-border: rgba(122, 158, 126, 0.2);
+  --env-shadow: rgba(80, 100, 80, 0.1);
 }
 
 /* ── Dusty Rose Theme ─────────────────────────────────────────── */
@@ -79,6 +97,15 @@
   --gold-soft: #e8d5b0;
   --shadow: rgba(180, 100, 110, 0.10);
   --tape-color: rgba(212, 165, 170, 0.38);
+
+  /* Envelope Rose */
+  --env-bg: #f2e4e4;
+  --env-fold: #e6d5d5;        /* Sharpened from #eadada */
+  --env-fold-bottom: #dec9c9; /* Sharpened from #f8f0f0 */
+  --env-flap-open: #dfcece;
+  --env-label-bg: #fffafa;
+  --env-border: rgba(196, 133, 138, 0.2);
+  --env-shadow: rgba(180, 150, 150, 0.1);
 }
 
 /* ── Midnight Theme ───────────────────────────────────────────── */
@@ -97,6 +124,16 @@
   --shadow-deep: rgba(0, 0, 0, 0.5);
   --border: rgba(107, 140, 186, 0.18);
   --tape-color: rgba(107, 140, 186, 0.25);
+
+  /* Envelope Midnight (Black Gold) */
+  --env-bg: #141e35;
+  --env-fold: #18243e;
+  --env-fold-bottom: #1c2b4a;
+  --env-flap-open: #0f1729;
+  --env-label-bg: #141e35;
+  --env-border: rgba(107, 140, 186, 0.2);
+  --env-shadow: rgba(0, 0, 0, 0.4);
+  --text: #e8dcc8; /* Goldish text */
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -327,12 +364,12 @@ body::before {
   width: 100%;
   height: 100%;
   position: relative;
-  background: #ecdccb;
+  background: var(--env-bg);
   background-image: url('https://www.transparenttextures.com/patterns/natural-paper.png');
-  border: 1px solid rgba(200, 180, 160, 0.4);
+  border: 1px solid var(--env-border);
   box-shadow:
-    0 4px 20px rgba(180, 150, 130, 0.15),
-    0 25px 70px rgba(120, 100, 80, 0.25);
+    0 4px 20px var(--env-shadow),
+    0 25px 70px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   transition: box-shadow 0.3s, transform 0.3s;
 
@@ -370,8 +407,8 @@ body::before {
     height: 0;
     border-top: 140px solid transparent;
     border-bottom: 140px solid transparent;
-    border-left: 160px solid #ead6c3;
-    filter: drop-shadow(2px 0 5px rgba(0, 0, 0, 0.02));
+    border-left: 160px solid var(--env-fold);
+    filter: drop-shadow(4px 0 8px rgba(0, 0, 0, 0.08));
   }
 
   /* Right triangle */
@@ -384,8 +421,8 @@ body::before {
     height: 0;
     border-top: 140px solid transparent;
     border-bottom: 140px solid transparent;
-    border-right: 160px solid #ead6c3;
-    filter: drop-shadow(-2px 0 5px rgba(0, 0, 0, 0.02));
+    border-right: 160px solid var(--env-fold);
+    filter: drop-shadow(-4px 0 8px rgba(0, 0, 0, 0.08));
   }
 }
 
@@ -397,9 +434,9 @@ body::before {
   height: 0;
   border-left: 210px solid transparent;
   border-right: 210px solid transparent;
-  border-bottom: 155px solid #f2e1d0;
+  border-bottom: 155px solid var(--env-fold-bottom);
   z-index: 4;
-  filter: drop-shadow(0 -2px 10px rgba(0, 0, 0, 0.03));
+  filter: drop-shadow(0 -5px 12px rgba(0, 0, 0, 0.08));
 }
 
 /* ── Letter peeking from inside ────────── */
@@ -463,10 +500,10 @@ body::before {
   height: 0;
   border-left: 210px solid transparent;
   border-right: 210px solid transparent;
-  border-top: 120px solid #ecdccb;
+  border-top: 120px solid var(--env-bg);
 
   /* Flap border — fake with filter */
-  filter: drop-shadow(0 2px 5px rgba(180, 150, 130, 0.4));
+  filter: drop-shadow(0 2px 5px var(--env-shadow));
 }
 
 /* Wax seal — positioned on envelope body, centered over flap tip */
@@ -491,9 +528,9 @@ body::before {
   left: 50%;
   transform: translateX(-50%);
   width: 82%;
-  background: #faf7f2;
-  border: 1px solid rgba(210, 190, 170, 0.4);
-  box-shadow: 0 4px 12px rgba(180, 150, 130, 0.08);
+  background: var(--env-label-bg);
+  border: 1px solid var(--env-border);
+  box-shadow: 0 4px 12px var(--env-shadow);
   padding: 0.9rem 1rem;
   text-align: center;
   z-index: 20;
@@ -506,7 +543,7 @@ body::before {
   pointer-events: none;
   border-radius: 2px;
   /* subtle inner lines */
-  background-image: repeating-linear-gradient(to bottom, transparent, transparent 32px, rgba(200, 180, 160, 0.15) 32px, rgba(200, 180, 160, 0.15) 33px);
+  background-image: repeating-linear-gradient(to bottom, transparent, transparent 32px, var(--env-border) 32px, var(--env-border) 33px);
 }
 
 .env-to-label {
@@ -514,8 +551,8 @@ body::before {
   font-size: 0.65rem;
   letter-spacing: 0.45em;
   text-transform: uppercase;
-  color: #a89486;
-  background: #faf7f2;
+  color: var(--text-light);
+  background: var(--env-label-bg);
   padding: 0 8px;
   z-index: 1;
 }
@@ -538,7 +575,7 @@ body::before {
 
 .envelope-wrapper.is-opening .env-flap {
   transform: perspective(600px) rotateX(-180deg);
-  border-top-color: #dfcebd;
+  border-top-color: var(--env-flap-open);
 }
 
 .envelope-wrapper.is-opening .env-seal {
@@ -1182,7 +1219,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(253, 249, 244, 0.65);
+  background: var(--bg); /* Fallback */
+  background: color-mix(in srgb, var(--bg), transparent 30%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   padding: 20px;
@@ -1196,11 +1234,11 @@ body::before {
 #password-gate .gate-card {
   width: 100%;
   max-width: 380px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-card);
   padding: 45px 35px;
   border-radius: 45px;
-  box-shadow: 0 40px 100px -20px rgba(60, 40, 30, 0.15);
-  border: 1px solid rgba(212, 163, 115, 0.2);
+  box-shadow: 0 40px 100px -20px var(--shadow-deep);
+  border: 1px solid var(--border);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1220,14 +1258,14 @@ body::before {
 #password-gate .gate-icon-box {
   width: 70px;
   height: 70px;
-  background: #fdf9f4;
-  border: 1px solid rgba(212, 163, 115, 0.15);
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 28px;
-  color: var(--gold, #d4a373);
+  color: var(--gold);
 }
 
 #password-gate .gate-title {
@@ -1236,14 +1274,14 @@ body::before {
   letter-spacing: 0.35em;
   text-transform: uppercase;
   font-weight: 700;
-  color: #3d2418;
+  color: var(--text);
   margin-bottom: 8px;
 }
 
 #password-gate .gate-desc {
   font-family: var(--font-ui);
   font-size: 0.7rem;
-  color: #999;
+  color: var(--text-light);
   letter-spacing: 0.05em;
   margin-bottom: 35px;
   line-height: 1.6;
@@ -1260,7 +1298,7 @@ body::before {
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.25em;
-  color: #c4a898;
+  color: var(--text-faint);
   margin-bottom: 6px;
   display: block;
 }
@@ -1268,7 +1306,7 @@ body::before {
 #password-gate #gate-hint-text {
   font-family: var(--font-body);
   font-size: 1.45rem;
-  color: #b58756;
+  color: var(--accent);
   line-height: 1.2;
 }
 
@@ -1279,22 +1317,22 @@ body::before {
 
 #password-gate input {
   width: 100%;
-  background: #fcfaf8;
-  border: 1px solid #eee6de;
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
   border-radius: 24px;
   padding: 18px 24px;
   text-align: center;
   font-family: var(--font-body);
   font-size: 1.4rem;
-  color: #3d2418;
+  color: var(--text);
   transition: all 0.3s ease;
   outline: none;
 }
 
 #password-gate input:focus {
-  background: #fff;
-  border-color: var(--gold, #d4a373);
-  box-shadow: 0 10px 30px rgba(212, 163, 115, 0.08);
+  background: var(--bg-card);
+  border-color: var(--gold);
+  box-shadow: 0 10px 30px var(--shadow);
 }
 
 #password-gate input::placeholder {
@@ -1306,8 +1344,8 @@ body::before {
 
 #password-gate #btn-gate-verify {
   width: 100%;
-  background: #111;
-  color: #fff;
+  background: var(--text);
+  color: var(--bg-card);
   border: none;
   padding: 22px;
   border-radius: 28px;
@@ -1318,7 +1356,7 @@ body::before {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 15px 35px var(--shadow);
 }
 
 #password-gate #btn-gate-verify:hover {

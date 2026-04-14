@@ -167,8 +167,22 @@ textarea,
   border-bottom-style: dashed;
 }
 
+/* ── Theme Options ── */
+.theme-option {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+.theme-option.active span {
+  color: var(--gold, #d4a373);
+  font-weight: 800;
+}
+
 /* ── Photo Gallery Grid ── */
-#photo-grid {
+.photo-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 1rem;

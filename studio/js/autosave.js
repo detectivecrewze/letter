@@ -85,6 +85,7 @@ const Autosave = (() => {
 
       // Section 3 — Music
       playlist: Music.getPlaylistArray(),
+      theme:    Studio.getActiveTheme(),
 
       // Meta
       status:         'published',

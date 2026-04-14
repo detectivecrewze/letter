@@ -4,6 +4,7 @@
 const Studio = (() => {
 
   let _studioPassword = '';
+  let _activeTheme    = 'blush-cream';
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -25,6 +26,12 @@ const Studio = (() => {
     _setVal('input-letter-from',    config.from     || '');
     _setVal('input-login-password', config.login_password || '');
     _setVal('input-login-hint',     config.login_hint     || '');
+    
+    // Theme Initial State
+    _activeTheme = config.theme || 'blush-cream';
+    document.querySelectorAll('.theme-option').forEach(btn => {
+      if (btn.dataset.theme === _activeTheme) btn.classList.add('active');
+    });
   }
 
   function _setVal(id, val) {
@@ -44,6 +51,17 @@ const Studio = (() => {
       'input-login-hint'
     ].forEach(id => {
       document.getElementById(id)?.addEventListener('input', () => Autosave.trigger());
+    });
+
+    // Theme Selection Binding
+    document.querySelectorAll('.theme-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.theme-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        _activeTheme = btn.dataset.theme;
+        Autosave.trigger();
+        showToast(`Tema '${_activeTheme}' dipilih`);
+      });
     });
   }
 
@@ -82,8 +100,9 @@ const Studio = (() => {
   }
 
   function getStudioPassword() { return _studioPassword; }
+  function getActiveTheme() { return _activeTheme; }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {
