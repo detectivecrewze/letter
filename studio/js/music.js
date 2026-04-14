@@ -310,24 +310,57 @@ const Music = (() => {
         list.innerHTML = `<div class="text-center py-10 text-[9px] text-gray-400 uppercase tracking-widest">Playlist kosong</div>`;
         return;
       }
+
+      // Shared preview audio for library
+      const libAudio = new Audio();
+      libAudio.volume = 0.5;
+
       list.innerHTML = songs.map((song, i) => `
       <div class="library-song-item flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0" data-idx="${i}">
+        <button class="lib-play-btn w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 hover:bg-[#d4a373] hover:text-white transition-all" data-idx="${i}">
+          <span class="play-icon text-[10px] ml-0.5">▶</span>
+        </button>
         <div class="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
           ${song.coverUrl ? `<img src="${song.coverUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-300 text-base\\'>🎵</div>'">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base">🎵</div>`}
         </div>
-        <div class="flex-1 min-w-0">
+        <div class="flex-1 min-w-0 pointer-events-none">
           <p class="text-[11px] font-bold text-gray-800 truncate">${song.title}</p>
           <p class="text-[9px] text-gray-400 mt-0.5">${song.artist} · ${song.genre || ''}</p>
-
         </div>
-        <div class="song-check w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0 transition-all">
+        <div class="song-check w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0 transition-all pointer-events-none">
           <span class="check-icon text-[8px] text-white hidden">✓</span>
         </div>
       </div>`).join('');
 
       list.querySelectorAll('.library-song-item').forEach(item => {
+        const idx = parseInt(item.dataset.idx);
+        const song = songs[idx];
+        const playBtn = item.querySelector('.lib-play-btn');
+
+        // Playback logic
+        playBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          
+          if (libAudio.src !== song.audioUrl && song.audioUrl) libAudio.src = song.audioUrl;
+
+          if (libAudio.paused) {
+            document.querySelectorAll('audio').forEach(a => a.pause());
+            list.querySelectorAll('.play-icon').forEach(icon => icon.textContent = '▶');
+            libAudio.play();
+            playBtn.querySelector('.play-icon').textContent = '⏸';
+          } else {
+            libAudio.pause();
+            playBtn.querySelector('.play-icon').textContent = '▶';
+          }
+        });
+
+        libAudio.addEventListener('ended', () => {
+          playBtn.querySelector('.play-icon').textContent = '▶';
+        });
+
+        // Selection logic
         item.addEventListener('click', () => {
-          selectedSong = songs[parseInt(item.dataset.idx)];
+          selectedSong = song;
           list.querySelectorAll('.library-song-item').forEach(el => {
             el.classList.remove('bg-[#fdf9f4]');
             const chk = el.querySelector('.song-check');
@@ -341,6 +374,8 @@ const Music = (() => {
           modal.querySelector('#library-confirm-btn').disabled = false;
         });
       });
+
+      modal.querySelector('#library-modal-close')?.addEventListener('click', () => libAudio.pause());
     };
 
     if (_kurasiFetched && _kurasiData.length > 0) {
