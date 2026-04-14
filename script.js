@@ -117,15 +117,8 @@ async function init() {
       .replace(/^(Dearest|Dear|To)[:,\s]+/i, '') // Remove prefixes like Dearest, Dear, etc.
       .replace(/[,;:.]\s*$/, '');                // Remove trailing punctuation
     
-    // If it already starts with a common title (Kak, Dek, etc) or common Indonesian prefixes, don't force 'Kak'
     const cleanName = displayName.trim();
-    if (!cleanName) {
-      envName.textContent = 'kamu';
-    } else if (cleanName.match(/^(kak|dek|mas|mbak|ibu|pak|aunt|uncle)\s+/i)) {
-      envName.textContent = cleanName;
-    } else {
-      envName.textContent = 'Kak ' + cleanName;
-    }
+    envName.textContent = cleanName ? cleanName : 'kamu';
   }
 
   // Show envelope — wait for user tap
