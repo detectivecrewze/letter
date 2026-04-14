@@ -22,15 +22,20 @@ const CDN_URL = 'https://letter-assets.for-you-always.my.id';
 
 var index_default = {
   async fetch(request, env) {
+    const origin = request.headers.get('Origin') || '*';
     const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, Cache-Control, Pragma',
-      'Access-Control-Expose-Headers': 'Content-Length, Content-Range',
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, Cache-Control, Pragma',
+      'Access-Control-Max-Age': '86400',
+      'Vary': 'Origin',
     };
 
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
+      return new Response(null, { 
+        status: 204, 
+        headers: corsHeaders 
+      });
     }
 
     // ── SECURITY: Origin Validation ────────────────────────────
@@ -191,10 +196,6 @@ var index_default = {
 
       try {
         const body = await request.json();
-        body._server_metadata = {
-          lastSaved: new Date().toISOString(),
-          ip: request.headers.get('cf-connecting-ip') || 'unknown',
-        };
         await env.LETTER_DATA.put(id, JSON.stringify(body));
 
         return new Response(JSON.stringify({
@@ -403,13 +404,14 @@ var index_default = {
             if (data) {
               const config = JSON.parse(data);
               return {
-                giftId: keyObj.name,
+                id: keyObj.name,
                 recipientName: config.recipientName || config.to || 'Unknown',
                 title: config.title || '',
                 from: config.from || '',
                 status: config.status || 'unknown',
                 theme: config.theme || 'blush-cream',
-                hasMusic: !!(config.playlist && config.playlist.length > 0),
+                playlist: config.playlist || [],
+                lastOpened: config.lastOpened || null,
                 isPremium: config.isPremium || false,
                 publishedAt: config.publishedAt || config.createdAt || null,
               };

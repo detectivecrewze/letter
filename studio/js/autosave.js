@@ -88,12 +88,12 @@ const Autosave = (() => {
       theme:    Studio.getActiveTheme(),
 
       // Meta
-      status:         'published',
+      status:         Auth.getInitialConfig()?.status || 'draft',
       is_active:      true,
       show_watermark: true,
-      isPremium:      false,
+      isPremium:      Auth.getInitialConfig()?.isPremium || false,
       _meta:          { theme_folder: 'letter' },
-      updatedAt:      new Date().toISOString(),
+      publishedAt:    Auth.getInitialConfig()?.publishedAt || null,
     };
   }
 

@@ -1,0 +1,183 @@
+/* 
+ * admin/style.css
+ * Letter Edition Admin Dashboard UI - Reusing Premium Aesthetics
+ */
+
+:root {
+    --brand-deep: #0f172a;       /* Slate 900 */
+    --brand-wine: #1e293b;       /* Slate 800 */
+    --brand-accent: #3b82f6;     /* Blue 500 */
+    --brand-gold: #d4a373;       /* Letter Gold */
+    --brand-cream: #f8fafc;      /* Slate 50 */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--brand-deep);
+    color: var(--brand-cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+    margin: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Texture & Atmosphere
+   ────────────────────────────────────────────────────────── */
+.film-grain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.ambient-glow {
+    position: fixed;
+    width: 70vw;
+    height: 70vw;
+    max-width: 700px;
+    max-height: 700px;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: 0;
+    opacity: 0.15;
+    animation: drift 20s infinite alternate ease-in-out;
+}
+
+.glow-1 {
+    background: radial-gradient(circle, var(--brand-gold) 0%, transparent 70%);
+    top: -10%;
+    left: -10%;
+}
+
+.glow-2 {
+    background: radial-gradient(circle, var(--brand-accent) 0%, transparent 70%);
+    bottom: -20%;
+    right: -10%;
+    opacity: 0.1;
+    animation-delay: -8s;
+}
+
+@keyframes drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(5%, 8%) scale(1.05); }
+}
+
+/* ──────────────────────────────────────────────────────────
+   Glassmorphism & Cards
+   ────────────────────────────────────────────────────────── */
+.glass-card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.summary-card {
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(212, 163, 115, 0.3);
+}
+
+.glass-table-wrapper {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ──────────────────────────────────────────────────────────
+   Form Elements
+   ────────────────────────────────────────────────────────── */
+.select-premium {
+    background-color: rgba(30, 41, 59, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: var(--brand-cream) !important;
+    font-size: 11px !important;
+    border-radius: 12px !important;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d4a373'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 1.1em !important;
+    padding-right: 2.2rem !important;
+}
+
+.select-premium:focus {
+    border-color: var(--brand-gold) !important;
+    box-shadow: 0 0 10px rgba(212, 163, 115, 0.2) !important;
+}
+
+.custom-checkbox {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.5);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.custom-checkbox:checked {
+    background: var(--brand-gold);
+    border-color: var(--brand-gold);
+}
+
+.custom-checkbox:checked::after {
+    content: '✓';
+    position: absolute;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* ──────────────────────────────────────────────────────────
+   Badges
+   ────────────────────────────────────────────────────────── */
+.badge-tag {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid transparent;
+}
+
+.badge-sage { background: rgba(163, 177, 138, 0.15); color: #a3b18a; border-color: rgba(163, 177, 138, 0.3); }
+.badge-rose { background: rgba(212, 165, 165, 0.15); color: #d4a5a5; border-color: rgba(212, 165, 165, 0.3); }
+.badge-blush { background: rgba(229, 211, 196, 0.15); color: #e5d3c4; border-color: rgba(229, 211, 196, 0.3); }
+.badge-midnight { background: rgba(51, 65, 85, 0.2); color: #94a3b8; border-color: rgba(51, 65, 85, 0.4); }
+
+/* ──────────────────────────────────────────────────────────
+   Buttons
+   ────────────────────────────────────────────────────────── */
+.btn-gold {
+    background: var(--brand-gold);
+    color: #fff;
+    font-weight: 700;
+}
+
+.btn-gold:hover:not(:disabled) {
+    background: #c2925f;
+    transform: translateY(-1px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
