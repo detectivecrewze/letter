@@ -10,7 +10,7 @@
         },
         {
             "source": "/admin",
-            "destination": "/admin-insights/index.html"
+            "destination": "/admin/index.html"
         },
         {
             "source": "/:id",
