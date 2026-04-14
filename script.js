@@ -66,21 +66,36 @@ async function init() {
   const token  = params.get('to') || params.get('token') || params.get('id') || _getTokenFromPath();
 
   let config = null;
-
-  if (window.STANDALONE_CONFIG && Object.keys(window.STANDALONE_CONFIG).length > 0) {
-    config = _normalizeConfig(window.STANDALONE_CONFIG);
-  }
  
-  if (!config && token) {
+  // ── 1. Online Mode (Prioritaskan KV jika ada Token/ID di URL) ──
+  if (token) {
     try {
-      const res = await fetch(`${WORKER_URL}/get-config?id=${encodeURIComponent(token)}`);
-      if (!res.ok) throw new Error('not_found');
-      config = _normalizeConfig(await res.json());
+      // Tambahkan cache-breaker agar tidak terkena cache browser/HP
+      const cacheBuster = `&_cb=${Date.now()}`;
+      const res = await fetch(`${WORKER_URL}/get-config?id=${encodeURIComponent(token)}${cacheBuster}`, {
+        cache: 'no-store', // Paksa browser ambil data terbaru
+        headers: {
+          'Pragma': 'no-cache',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
+      if (res.ok) {
+        config = _normalizeConfig(await res.json());
+      }
     } catch (err) {
-      console.warn('[Letter] Worker fetch failed:', err.message);
+      console.warn('[Letter] Database fetch failed, falling back...', err.message);
     }
   }
-
+ 
+  // ── 2. Standalone Mode (Gunakan config.js jika KV gagal/tidak ada token) ──
+  if (!config) {
+    if (window.STANDALONE_CONFIG && Object.keys(window.STANDALONE_CONFIG).length > 0) {
+      config = _normalizeConfig(window.STANDALONE_CONFIG);
+    }
+  }
+ 
+  // ── 3. Fallback / Demo Mode ──
   if (!config) {
     config = _demoConfig();
   }

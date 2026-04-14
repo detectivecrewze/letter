@@ -21,7 +21,14 @@ const Auth = (() => {
     }
 
     try {
-      const res = await fetch(`${WORKER_URL}/get-config?id=${encodeURIComponent(_token)}`);
+      const cacheBuster = `&_cb=${Date.now()}`;
+      const res = await fetch(`${WORKER_URL}/get-config?id=${encodeURIComponent(_token)}${cacheBuster}`, {
+        cache: 'no-store',
+        headers: {
+          'Pragma': 'no-cache',
+          'Cache-Control': 'no-cache'
+        }
+      });
 
       if (res.status === 404) {
         _showError('Project tidak ditemukan. Silakan minta link baru dari admin.');
