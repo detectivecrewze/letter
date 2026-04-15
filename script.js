@@ -123,6 +123,9 @@ async function init() {
   // Initialize music player early (so it's ready for the iOS gesture trigger)
   _initMusicPlayer(config);
 
+  // Initialize download button logic
+  _initDownloadButton(config);
+
   // Set recipient name on envelope
   const envName = document.getElementById('env-to-name');
   if (envName) {
@@ -277,6 +280,13 @@ async function _typewriteLetter(config) {
     }
 
     if (config.from) _setText('letter-from', config.from);
+
+    // Show download button instantly
+    const saveBtnContainer = document.getElementById('save-letter-container');
+    if (saveBtnContainer) {
+      saveBtnContainer.style.display = 'block';
+      saveBtnContainer.style.opacity = '1';
+    }
     return;
   }
 
@@ -346,6 +356,14 @@ async function _typewriteLetter(config) {
     await _delay(800);
     await _typewriteSimple('letter-from', config.from, 110);
   }
+
+  // 5. Show Download Button smoothly
+  const saveBtnContainer = document.getElementById('save-letter-container');
+  if (saveBtnContainer) {
+    await _delay(800);
+    saveBtnContainer.style.display = 'block';
+    setTimeout(() => { saveBtnContainer.style.opacity = '1'; }, 50);
+  }
 }
 
 async function _typewriteSimple(elId, text, speed) {
@@ -358,6 +376,100 @@ async function _typewriteSimple(elId, text, speed) {
     el.textContent += ch;
     await _delay(speed);
   }
+}
+
+/* ════════════════════════════════════════════════════════════
+   DOWNLOAD / SCREENSHOT
+   ════════════════════════════════════════════════════════════ */
+function _initDownloadButton(config) {
+  const btn = document.getElementById('btn-save-letter');
+  if (!btn) return;
+  
+  btn.addEventListener('click', async () => {
+    if (typeof html2canvas === 'undefined') {
+      alert('Sistem sedang memuat.. silakan tunggu sebentar dan coba lagi.');
+      return;
+    }
+    
+    // UI Feedback
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Menyimpan... ⏳';
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
+
+    try {
+      const targetEl = document.getElementById('letter-paper');
+      const btnContainer = document.getElementById('save-letter-container');
+      const scrollWrapper = document.querySelector('.letter-scroll');
+
+      // Sembunyikan scrollbar agar bersih
+      if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
+
+      // Sembunyikan tombol agar tidak ikut terfoto
+      if (btnContainer) btnContainer.style.display = 'none';
+
+      // Ambil screenshot HANYA dari kertas surat (letter-paper) seperti sebelumnya
+      const canvas = await html2canvas(targetEl, {
+        scale: 2, // Retina display
+        useCORS: true,
+        backgroundColor: null,
+        onclone: (clonedDoc) => {
+          // 1. Salin atribut tema agar teks dan warna background kertas akurat
+          const currentTheme = document.body.getAttribute('data-theme');
+          if (currentTheme) {
+            clonedDoc.body.setAttribute('data-theme', currentTheme);
+          }
+
+          // 2. FORCE DRAW SVGs: html2canvas sering gagal merender SVG yang punya animasi stroke
+          // Kita paksa semua garis tergambar penuh di clone document
+          const svgPaths = clonedDoc.querySelectorAll('svg path');
+          svgPaths.forEach(path => {
+            path.style.animation = 'none';
+            path.style.strokeDashoffset = '0';
+            path.style.strokeDasharray = 'none';
+            path.style.opacity = '1';
+          });
+
+          // Sama untuk SVG circle (titik ornamen)
+          const svgCircles = clonedDoc.querySelectorAll('svg circle');
+          svgCircles.forEach(circle => {
+            circle.style.animation = 'none';
+            circle.style.opacity = '1';
+            circle.style.transform = 'scale(1)';
+          });
+          
+          const svgContainers = clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline');
+          svgContainers.forEach(container => {
+             container.style.opacity = '1';
+             container.style.transform = 'none';
+             container.style.animation = 'none';
+          });
+        }
+      });
+      
+      // Kembalikan tombol dan scrollbar
+      if (btnContainer) btnContainer.style.display = 'block';
+      if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
+
+      // Ekspor Gambar
+      const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
+      link.download = `Surat_Untuk_${safeName}.png`;
+      link.href = imgData;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (e) {
+      console.error('Screenshot failed:', e);
+      alert('Ouch! Gambar gagal disimpan. Anda masih bisa men-screenshot layar ini secara manual.');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    }
+  });
 }
 
 /* ════════════════════════════════════════════════════════════

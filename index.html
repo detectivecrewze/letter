@@ -164,7 +164,7 @@
           <!-- ── Header: ornament + date + title ── -->
           <header class="letter-header">
             <div class="ornament-top" aria-hidden="true">
-              <svg viewBox="0 0 200 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="100%" height="100%" viewBox="0 0 200 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <line x1="0" y1="12" x2="85" y2="12" stroke="var(--accent)" stroke-width="0.7" stroke-dasharray="3 4" opacity="0.5" />
                 <path d="M100 6 L106 12 L100 18 L94 12 Z" fill="var(--gold)" />
                 <line x1="115" y1="12" x2="200" y2="12" stroke="var(--accent)" stroke-width="0.7" stroke-dasharray="3 4" opacity="0.5" />
@@ -172,7 +172,7 @@
             </div>
             <h1 class="letter-title" id="letter-title"></h1>
             <div class="letter-title-underline" aria-hidden="true">
-              <svg viewBox="0 0 400 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="100%" height="100%" viewBox="0 0 400 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <!-- Gold Wave: Elegant S-Curve -->
                 <path d="M30 32 C 130 52, 270 12, 370 32" stroke="var(--gold)" stroke-width="1.2" stroke-linecap="round" opacity="0.8" />
                 <!-- Diamond center at the inflection point -->
@@ -205,7 +205,7 @@
             </div>
 
             <div class="footer-divider" aria-hidden="true">
-              <svg viewBox="0 0 200 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="100%" height="100%" viewBox="0 0 200 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <line x1="0"   y1="8" x2="70"  y2="8"
                       stroke="var(--accent)" stroke-width="0.5" stroke-dasharray="2 4"/>
                 <circle cx="100" cy="8" r="2.5"
@@ -217,15 +217,25 @@
           </footer>
         </div>
       </article>
+
+      <!-- Download Button Container -->
+      <div id="save-letter-container" style="display: none; opacity: 0; transition: opacity 1s ease-in-out; text-align: center; margin-top: 2rem; margin-bottom: 3rem; padding-bottom: 2rem;">
+        <button id="btn-save-letter" style="font-family: var(--font-ui); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.25em; padding: 12px 28px; background: var(--text-light); color: #fff; border: 1px solid var(--text-light); border-radius: 30px; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px var(--shadow);">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Simpan Surat Ini
+        </button>
+      </div>
+
     </div>
-
-
 
   </div><!-- /state-letter -->
 
   <!-- Hidden audio element -->
   <audio id="audio-player" preload="auto"></audio>
 
+  <!-- External Library for PNG Screenshot -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  
   <!-- Standalone config (demo / premium mode) -->
   <script src="config.js"></script>
   <!-- Main logic -->
