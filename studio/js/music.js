@@ -289,11 +289,26 @@ const Music = (() => {
 
     let selectedSong = null;
 
-    modal.querySelector('#library-modal-close')?.addEventListener('click', () => modal.remove());
-    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    const stopPreview = () => {
+      libAudio.pause();
+      libAudio.src = "";
+    };
+
+    modal.querySelector('#library-modal-close')?.addEventListener('click', () => { 
+      stopPreview();
+      modal.remove(); 
+    });
+
+    modal.addEventListener('click', e => { 
+      if (e.target === modal) {
+        stopPreview();
+        modal.remove(); 
+      }
+    });
 
     modal.querySelector('#library-confirm-btn')?.addEventListener('click', () => {
       if (!selectedSong) return;
+      stopPreview();
       track.mode       = 'library';
       track.title      = selectedSong.title;
       track.artist     = selectedSong.artist;
@@ -375,7 +390,6 @@ const Music = (() => {
         });
       });
 
-      modal.querySelector('#library-modal-close')?.addEventListener('click', () => libAudio.pause());
     };
 
     if (_kurasiFetched && _kurasiData.length > 0) {

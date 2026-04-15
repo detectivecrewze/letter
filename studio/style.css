@@ -2,9 +2,15 @@
  
 #input-letter-to, #input-letter-from {
   font-family: 'Sacramento', cursive !important;
-  font-size: 2.2rem !important;
+  font-size: 1.8rem !important;
   color: #3d2418;
   padding-bottom: 2px;
+}
+ 
+@media (max-width: 640px) {
+  #input-letter-to, #input-letter-from {
+    font-size: 1.45rem !important;
+  }
 }
 
 /* ── Base Variables & Reset ── */
