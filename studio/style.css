@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Sacramento&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&family=Sacramento&display=swap');
  
 #input-letter-to, #input-letter-from {
   font-family: 'Sacramento', cursive !important;
@@ -58,7 +58,7 @@ body::before {
 h1,
 h2,
 h3 {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
 }
 
 /* ── Glassmorphism Containers ── */
@@ -365,7 +365,7 @@ textarea,
 
 /* ── Utilities ── */
 .text-serif {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Cormorant Garamond', serif;
 }
 
 .italic-title {
