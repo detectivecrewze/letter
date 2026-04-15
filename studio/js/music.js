@@ -288,6 +288,8 @@ const Music = (() => {
     document.body.appendChild(modal);
 
     let selectedSong = null;
+    const libAudio = new Audio();
+    libAudio.volume = 0.5;
 
     const stopPreview = () => {
       libAudio.pause();
@@ -326,9 +328,8 @@ const Music = (() => {
         return;
       }
 
-      // Shared preview audio for library
-      const libAudio = new Audio();
-      libAudio.volume = 0.5;
+      // Shared preview audio for library menggunakan libAudio dari scope atas
+
 
       list.innerHTML = songs.map((song, i) => `
       <div class="library-song-item flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0" data-idx="${i}">

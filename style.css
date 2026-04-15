@@ -503,7 +503,7 @@ body::before {
   width: 100%;
   z-index: 10;
   transform-origin: top center;
-  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 1.1s cubic-bezier(0.19, 1, 0.22, 1);
 
   /* Triangle pointing down (closed flap) */
   height: 0;
@@ -526,7 +526,7 @@ body::before {
   height: 72px;
   z-index: 30;
   /* above everything */
-  transition: opacity 0.4s, transform 0.4s;
+  transition: opacity 0.6s, transform 0.6s ease-out;
 }
 
 /* Recipient name on envelope front */
@@ -594,7 +594,7 @@ body::before {
 
 .envelope-wrapper.is-opening .env-letter-peek {
   transform: translateX(-50%) translateY(-100px);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
 }
 
 .envelope-wrapper.is-opening .env-recipient {

@@ -69,7 +69,7 @@ const Publisher = (() => {
 
       if (data.success) {
         Autosave.cancel();
-        const url = `${location.protocol}//${location.host}/?to=${token}`;
+        const url = `${location.protocol}//${location.host}/${token}`;
         _showSuccessModal(url);
       } else {
         throw new Error(data.error || 'Server error');

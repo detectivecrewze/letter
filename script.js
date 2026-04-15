@@ -18,9 +18,9 @@ const WORKER_URL = 'https://letter-edition.aldoramadhan16.workers.dev';
 // TODO: Ganti URL ini setelah deploy worker letter-edition ke Cloudflare
 
 // Typewriter speed (ms per character)
-const TW_CHAR_DELAY  = 28;
+const TW_CHAR_DELAY  = 42;
 // Pause between paragraphs (ms)
-const TW_PARA_PAUSE  = 550;
+const TW_PARA_PAUSE  = 800;
 
 /* ════════════════════════════════════════════════════════════
    STATE MACHINE
@@ -224,13 +224,13 @@ function _waitForEnvelopeOpen(config) {
       // 3. iOS FIX: Start music immediately on user gesture
       _loadTrack(0, true);
 
-      // 4. After flap finishes (~600ms), start exit fade
+      // 4. After flap finishes (~1100ms), start exit fade
       setTimeout(() => {
         if (scene) scene.classList.add('is-exit');
-      }, 600);
+      }, 1100);
 
       // 5. Resolve (switch to letter state) after exit animation
-      setTimeout(resolve, 1150);
+      setTimeout(resolve, 2000);
     }
 
     function onKeydown(e) {
