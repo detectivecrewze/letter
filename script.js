@@ -508,15 +508,34 @@ function _initDownloadButton(config) {
       // Draw the letter
       ctx.drawImage(letterCanvas, drawX, drawY, drawW, drawH);
 
-      // ── Download ──────────────────────────────────────────────
-      const imgDataUrl = story.toDataURL('image/png');
-      const link = document.createElement('a');
-      const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
-      link.download = `Surat_Untuk_${safeName}.png`;
-      link.href = imgDataUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // ── Download menggunakan Blob (Jauh Lebih Aman untuk RAM iPhone) ─────────
+      await new Promise(resolve => {
+        story.toBlob((blob) => {
+          if (!blob) {
+             console.error('Canvas toBlob failed (Memory limit or empty canvas)');
+             resolve();
+             return;
+          }
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
+          link.download = `Surat_Untuk_${safeName}.png`;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Bersihkan memory virtual URL agar tidak nyangkut (Memory Leak di iOS)
+          setTimeout(() => URL.revokeObjectURL(url), 500); 
+          resolve();
+        }, 'image/png');
+      });
+
+      // PENTING UNTUK iOS: Kosongkan secara paksa pixel buffer canvas
+      // Jika tidak dilakukan, menekan donwload 2x / ganti template akan menyebabkan freeze
+      letterCanvas.width = 0; letterCanvas.height = 0;
+      story.width = 0; story.height = 0;
+      noiseCanvas.width = 0; noiseCanvas.height = 0;
 
     } catch (e) {
       console.error('Screenshot failed:', e);
