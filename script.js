@@ -406,46 +406,11 @@ function _initDownloadButton(config) {
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
       if (btnContainer) btnContainer.style.display = 'none';
 
-      // 1. KUNCI LEBAR KERTAS MURNI Awal
-      // Agar barisan teks (enter/spasi)-nya 100% sama dengan yang dilihat di layar
-      const oldWidth = targetEl.style.width;
-      const elWidth = targetEl.offsetWidth;
-      const elHeight = targetEl.offsetHeight;
-      targetEl.style.width = elWidth + 'px';
-
-      // 2. KALKULASI RASIO IG STORY (9:16)
-      // Jika surat sangat panjang ke bawah, kita butuh melebarkan frame ke samping
-      // agar tidak terlihat seperti "garis kurus" di IG Story.
-      let targetWrapWidth = (elHeight / 16) * 9;
-      
-      // Batasan (Limit) frame agar tidak terlalu over-size
-      if (targetWrapWidth > 1080) targetWrapWidth = 1080;
-      if (targetWrapWidth < 720) targetWrapWidth = 720; 
-      
-      let paddingX = 40; // Default base margin kiri jikalau surat sudah lumayan lebar
-      if (elWidth < targetWrapWidth) {
-          paddingX = (targetWrapWidth - elWidth) / 2;
-      }
-
-      // 3. APPLY PEMBUNGKUS (FRAME)
-      const oldParent = targetEl.parentNode;
-      const tWrap = document.createElement('div');
-      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
-      
-      tWrap.style.backgroundColor = bodyBg;
-      tWrap.style.padding = `80px ${paddingX}px`; // Atas-bawah 80px, Kiri-kanan menyesuaikan
-      tWrap.style.display = 'flex';
-      tWrap.style.justifyContent = 'center'; // Memastikan posisi kertas tepat di tengah background
-      tWrap.style.boxSizing = 'content-box';
-
-      oldParent.insertBefore(tWrap, targetEl);
-      tWrap.appendChild(targetEl);
-
-      // 4. Ambil screenshot dari wrapper lebar
-      const canvas = await html2canvas(tWrap, {
+      // Ambil screenshot langsung dari target utama kertas
+      const canvas = await html2canvas(targetEl, {
         scale: 2, // Retina display
         useCORS: true,
-        backgroundColor: bodyBg,
+        backgroundColor: null,
         onclone: (clonedDoc) => {
           // Salin tema untuk font / variabel warna kertas
           const currentTheme = document.body.getAttribute('data-theme');
@@ -473,15 +438,11 @@ function _initDownloadButton(config) {
         }
       });
       
-      // 5. Kembalikan ke susunan DOM & Lebar awal
-      oldParent.insertBefore(targetEl, tWrap);
-      oldParent.removeChild(tWrap);
-      targetEl.style.width = oldWidth;
-      
+      // Kembalikan ke susunan DOM awal
       if (btnContainer) btnContainer.style.display = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
 
-      // 6. Unduh Manual
+      // Unduh Manual
       const imgData = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
