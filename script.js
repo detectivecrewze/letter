@@ -402,44 +402,70 @@ function _initDownloadButton(config) {
       const btnContainer = document.getElementById('save-letter-container');
       const scrollWrapper = document.querySelector('.letter-scroll');
 
-      // Sembunyikan scrollbar agar bersih
+      // Sembunyikan scrollbar bawaan
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
-
-      // Sembunyikan tombol agar tidak ikut terfoto
       if (btnContainer) btnContainer.style.display = 'none';
 
-      // Ambil screenshot HANYA dari kertas surat (letter-paper) seperti sebelumnya
-      const canvas = await html2canvas(targetEl, {
+      // 1. KUNCI LEBAR KERTAS MURNI Awal
+      // Agar barisan teks (enter/spasi)-nya 100% sama dengan yang dilihat di layar
+      const oldWidth = targetEl.style.width;
+      const elWidth = targetEl.offsetWidth;
+      const elHeight = targetEl.offsetHeight;
+      targetEl.style.width = elWidth + 'px';
+
+      // 2. KALKULASI RASIO IG STORY (9:16)
+      // Jika surat sangat panjang ke bawah, kita butuh melebarkan frame ke samping
+      // agar tidak terlihat seperti "garis kurus" di IG Story.
+      let targetWrapWidth = (elHeight / 16) * 9;
+      
+      // Batasan (Limit) frame agar tidak terlalu over-size
+      if (targetWrapWidth > 1080) targetWrapWidth = 1080;
+      if (targetWrapWidth < 720) targetWrapWidth = 720; 
+      
+      let paddingX = 40; // Default base margin kiri jikalau surat sudah lumayan lebar
+      if (elWidth < targetWrapWidth) {
+          paddingX = (targetWrapWidth - elWidth) / 2;
+      }
+
+      // 3. APPLY PEMBUNGKUS (FRAME)
+      const oldParent = targetEl.parentNode;
+      const tWrap = document.createElement('div');
+      const bodyBg = window.getComputedStyle(document.body).backgroundColor;
+      
+      tWrap.style.backgroundColor = bodyBg;
+      tWrap.style.padding = `80px ${paddingX}px`; // Atas-bawah 80px, Kiri-kanan menyesuaikan
+      tWrap.style.display = 'flex';
+      tWrap.style.justifyContent = 'center'; // Memastikan posisi kertas tepat di tengah background
+      tWrap.style.boxSizing = 'content-box';
+
+      oldParent.insertBefore(tWrap, targetEl);
+      tWrap.appendChild(targetEl);
+
+      // 4. Ambil screenshot dari wrapper lebar
+      const canvas = await html2canvas(tWrap, {
         scale: 2, // Retina display
         useCORS: true,
-        backgroundColor: null,
+        backgroundColor: bodyBg,
         onclone: (clonedDoc) => {
-          // 1. Salin atribut tema agar teks dan warna background kertas akurat
+          // Salin tema untuk font / variabel warna kertas
           const currentTheme = document.body.getAttribute('data-theme');
           if (currentTheme) {
             clonedDoc.body.setAttribute('data-theme', currentTheme);
           }
 
-          // 2. FORCE DRAW SVGs: html2canvas sering gagal merender SVG yang punya animasi stroke
-          // Kita paksa semua garis tergambar penuh di clone document
-          const svgPaths = clonedDoc.querySelectorAll('svg path');
-          svgPaths.forEach(path => {
+          // Force draw SVG animasi yang sering hilang
+          clonedDoc.querySelectorAll('svg path').forEach(path => {
             path.style.animation = 'none';
             path.style.strokeDashoffset = '0';
             path.style.strokeDasharray = 'none';
             path.style.opacity = '1';
           });
-
-          // Sama untuk SVG circle (titik ornamen)
-          const svgCircles = clonedDoc.querySelectorAll('svg circle');
-          svgCircles.forEach(circle => {
+          clonedDoc.querySelectorAll('svg circle').forEach(circle => {
             circle.style.animation = 'none';
             circle.style.opacity = '1';
             circle.style.transform = 'scale(1)';
           });
-          
-          const svgContainers = clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline');
-          svgContainers.forEach(container => {
+          clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline').forEach(container => {
              container.style.opacity = '1';
              container.style.transform = 'none';
              container.style.animation = 'none';
@@ -447,11 +473,15 @@ function _initDownloadButton(config) {
         }
       });
       
-      // Kembalikan tombol dan scrollbar
+      // 5. Kembalikan ke susunan DOM & Lebar awal
+      oldParent.insertBefore(targetEl, tWrap);
+      oldParent.removeChild(tWrap);
+      targetEl.style.width = oldWidth;
+      
       if (btnContainer) btnContainer.style.display = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
 
-      // Ekspor Gambar
+      // 6. Unduh Manual
       const imgData = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
