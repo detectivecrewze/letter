@@ -320,8 +320,7 @@ async function _typewriteLetter(config) {
       p.style.transition = 'opacity 0.4s';
       p.style.opacity    = '1';
 
-      for (let ci = 0; ci < para.length; ci++) {
-        const ch = para[ci];
+      for (const ch of para) {
         const textNode = document.createTextNode(ch);
         p.insertBefore(textNode, cursor);
 
@@ -355,8 +354,8 @@ async function _typewriteSimple(elId, text, speed) {
   el.style.display = '';
   el.textContent = '';
 
-  for (let i = 0; i < text.length; i++) {
-    el.textContent += text[i];
+  for (const ch of text) {
+    el.textContent += ch;
     await _delay(speed);
   }
 }
