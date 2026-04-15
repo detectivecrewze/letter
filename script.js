@@ -18,9 +18,9 @@ const WORKER_URL = 'https://letter-edition.aldoramadhan16.workers.dev';
 // TODO: Ganti URL ini setelah deploy worker letter-edition ke Cloudflare
 
 // Typewriter speed (ms per character)
-const TW_CHAR_DELAY  = 42;
+const TW_CHAR_DELAY = 42;
 // Pause between paragraphs (ms)
-const TW_PARA_PAUSE  = 800;
+const TW_PARA_PAUSE = 800;
 
 /* ════════════════════════════════════════════════════════════
    STATE MACHINE
@@ -37,11 +37,11 @@ function showState(stateId) {
    THEME
    ════════════════════════════════════════════════════════════ */
 const THEME_MAP = {
-  'blush-cream':   null,
-  'cream':         null,
-  'sage':          'sage',
-  'dusty-rose':    'dusty-rose',
-  'midnight':      'midnight',
+  'blush-cream': null,
+  'cream': null,
+  'sage': 'sage',
+  'dusty-rose': 'dusty-rose',
+  'midnight': 'midnight',
   'midnight-blue': 'midnight',
 };
 
@@ -63,10 +63,10 @@ async function init() {
   showState('loading');
 
   const params = new URLSearchParams(window.location.search);
-  const token  = params.get('to') || params.get('token') || params.get('id') || _getTokenFromPath();
+  const token = params.get('to') || params.get('token') || params.get('id') || _getTokenFromPath();
 
   let config = null;
- 
+
   // ── 1. Online Mode (Prioritaskan KV jika ada Token/ID di URL) ──
   if (token) {
     try {
@@ -79,7 +79,7 @@ async function init() {
           'Cache-Control': 'no-cache'
         }
       });
-      
+
       if (res.ok) {
         config = _normalizeConfig(await res.json());
       }
@@ -87,14 +87,14 @@ async function init() {
       console.warn('[Letter] Database fetch failed, falling back...', err.message);
     }
   }
- 
+
   // ── 2. Standalone Mode (Gunakan config.js jika KV gagal/tidak ada token) ──
   if (!config) {
     if (window.STANDALONE_CONFIG && Object.keys(window.STANDALONE_CONFIG).length > 0) {
       config = _normalizeConfig(window.STANDALONE_CONFIG);
     }
   }
- 
+
   // ── 3. Fallback / Demo Mode ──
   if (!config) {
     config = _demoConfig();
@@ -132,7 +132,7 @@ async function init() {
     let displayName = (config.recipientName || config.to || '')
       .replace(/^(Dearest|Dear|To)[:,\s]+/i, '') // Remove prefixes like Dearest, Dear, etc.
       .replace(/[,;:.]\s*$/, '');                // Remove trailing punctuation
-    
+
     const cleanName = displayName.trim();
     envName.textContent = cleanName ? cleanName : 'kamu';
   }
@@ -167,21 +167,21 @@ function _getTokenFromPath() {
 function _normalizeConfig(raw) {
   return {
     recipientName: raw.recipientName || raw.to || raw.recipient || '',
-    to:            raw.to           || raw.recipient || 'Dear,',
-    title:         raw.title        || '',
-    from:          raw.from         || raw.sender    || '',
-    letter_body:   raw.letter_body  || raw.message   || '',
-    date:          raw.date         || '',
-    playlist:      Array.isArray(raw.playlist) ? raw.playlist : [],
-    theme:         raw.theme        || 'blush-cream',
+    to: raw.to || raw.recipient || 'Dear,',
+    title: raw.title || '',
+    from: raw.from || raw.sender || '',
+    letter_body: raw.letter_body || raw.message || '',
+    date: raw.date || '',
+    playlist: Array.isArray(raw.playlist) ? raw.playlist : [],
+    theme: raw.theme || 'blush-cream',
     show_watermark: raw.show_watermark !== false,
-    is_active:      raw.is_active !== false,
+    is_active: raw.is_active !== false,
     // Dedicated salutation for the letter body
-    salutation:    raw.letterTo || raw.salutation || raw.to || 'Dear,',
-    
+    salutation: raw.letterTo || raw.salutation || raw.to || 'Dear,',
+
     // Auth
     login_password: raw.login_password || '',
-    login_hint:     raw.login_hint     || ''
+    login_hint: raw.login_hint || ''
   };
 }
 
@@ -204,9 +204,9 @@ let _renderLetterTimeStart = 0;
 
 function _waitForEnvelopeOpen(config) {
   return new Promise(resolve => {
-    const scene   = document.getElementById('envelope-scene');
+    const scene = document.getElementById('envelope-scene');
     const wrapper = document.getElementById('envelope-wrapper');
-    const hint    = document.getElementById('envelope-hint');
+    const hint = document.getElementById('envelope-hint');
 
     async function openEnvelope() {
       // 1. Check for Password Gate before anything else
@@ -215,7 +215,7 @@ function _waitForEnvelopeOpen(config) {
       }
 
       // Prevent double-trigger
-      wrapper.removeEventListener('click',   openEnvelope);
+      wrapper.removeEventListener('click', openEnvelope);
       wrapper.removeEventListener('keydown', onKeydown);
 
       // Hide hint immediately
@@ -240,7 +240,7 @@ function _waitForEnvelopeOpen(config) {
       if (e.key === 'Enter' || e.key === ' ') openEnvelope();
     }
 
-    wrapper.addEventListener('click',   openEnvelope);
+    wrapper.addEventListener('click', openEnvelope);
     wrapper.addEventListener('keydown', onKeydown);
   });
 }
@@ -250,10 +250,10 @@ function _waitForEnvelopeOpen(config) {
    ════════════════════════════════════════════════════════════ */
 function _renderLetterSkeleton(config) {
   // Elements exist but are empty for typewriter
-  _setText('letter-date',    '');
-  _setText('letter-title',   '');
-  _setText('letter-to',      '');
-  _setText('letter-from',    '');
+  _setText('letter-date', '');
+  _setText('letter-title', '');
+  _setText('letter-to', '');
+  _setText('letter-from', '');
 
   const bodyEl = document.getElementById('letter-body');
   if (bodyEl) bodyEl.innerHTML = '';
@@ -328,7 +328,7 @@ async function _typewriteLetter(config) {
 
       await _delay(150);
       p.style.transition = 'opacity 0.4s';
-      p.style.opacity    = '1';
+      p.style.opacity = '1';
 
       for (const ch of para) {
         const textNode = document.createTextNode(ch);
@@ -341,7 +341,7 @@ async function _typewriteLetter(config) {
         }
 
         const delay = ch === '.' || ch === ',' || ch === '!' || ch === '?'
-          ? TW_CHAR_DELAY * 4 
+          ? TW_CHAR_DELAY * 4
           : TW_CHAR_DELAY + (Math.random() * 12 - 6);
 
         await _delay(delay);
@@ -381,17 +381,25 @@ async function _typewriteSimple(elId, text, speed) {
 /* ════════════════════════════════════════════════════════════
    DOWNLOAD / SCREENSHOT
    ════════════════════════════════════════════════════════════ */
+// ── Theme background colors for the IG Story canvas ────────────
+const _THEME_BG = {
+  'sage': ['#dce8da', '#c8d8c6'],
+  'dusty-rose': ['#f5dada', '#ead0d0'],
+  'midnight': ['#1a1f2e', '#111624'],
+  'blush-cream': ['#f5e8d8', '#ecdccb'],
+  'default': ['#f5e8d8', '#ecdccb'],
+};
+
 function _initDownloadButton(config) {
   const btn = document.getElementById('btn-save-letter');
   if (!btn) return;
-  
+
   btn.addEventListener('click', async () => {
     if (typeof html2canvas === 'undefined') {
       alert('Sistem sedang memuat.. silakan tunggu sebentar dan coba lagi.');
       return;
     }
-    
-    // UI Feedback
+
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Menyimpan... ⏳';
     btn.style.opacity = '0.7';
@@ -402,56 +410,114 @@ function _initDownloadButton(config) {
       const btnContainer = document.getElementById('save-letter-container');
       const scrollWrapper = document.querySelector('.letter-scroll');
 
-      // Sembunyikan scrollbar bawaan
+      // Hide UI chrome before capture
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
       if (btnContainer) btnContainer.style.display = 'none';
 
-      // Ambil screenshot langsung dari target utama kertas
-      const canvas = await html2canvas(targetEl, {
-        scale: 2, // Retina display
+      // ── Step 1: capture the letter at 2× scale ───────────────
+      const letterCanvas = await html2canvas(targetEl, {
+        scale: 2,
         useCORS: true,
         backgroundColor: null,
         onclone: (clonedDoc) => {
-          // Salin tema untuk font / variabel warna kertas
-          const currentTheme = document.body.getAttribute('data-theme');
-          if (currentTheme) {
-            clonedDoc.body.setAttribute('data-theme', currentTheme);
-          }
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          if (currentTheme) clonedDoc.documentElement.setAttribute('data-theme', currentTheme);
 
-          // Force draw SVG animasi yang sering hilang
-          clonedDoc.querySelectorAll('svg path').forEach(path => {
-            path.style.animation = 'none';
-            path.style.strokeDashoffset = '0';
-            path.style.strokeDasharray = 'none';
-            path.style.opacity = '1';
+          clonedDoc.querySelectorAll('svg path').forEach(el => {
+            el.style.animation = 'none';
+            el.style.strokeDashoffset = '0';
+            el.style.strokeDasharray = 'none';
+            el.style.opacity = '1';
           });
-          clonedDoc.querySelectorAll('svg circle').forEach(circle => {
-            circle.style.animation = 'none';
-            circle.style.opacity = '1';
-            circle.style.transform = 'scale(1)';
+          clonedDoc.querySelectorAll('svg circle').forEach(el => {
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1)';
           });
-          clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline').forEach(container => {
-             container.style.opacity = '1';
-             container.style.transform = 'none';
-             container.style.animation = 'none';
+          clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline').forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+            el.style.animation = 'none';
           });
         }
       });
-      
-      // Kembalikan ke susunan DOM awal
+
+      // Restore DOM
       if (btnContainer) btnContainer.style.display = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
 
-      // Unduh Manual
-      const imgData = canvas.toDataURL('image/png');
+      // ── Step 2: compose into a 9:16 IG Story canvas ──────────
+      const STORY_W = 1080;
+      const STORY_H = 1920;
+      const PADDING = 80; // px breathing room on each side
+
+      const story = document.createElement('canvas');
+      story.width = STORY_W;
+      story.height = STORY_H;
+      const ctx = story.getContext('2d');
+
+      // Background gradient (theme-aware)
+      const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
+      const [bgTop, bgBot] = _THEME_BG[themeKey] || _THEME_BG['default'];
+      const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
+      grad.addColorStop(0, bgTop);
+      grad.addColorStop(0.5, bgBot);
+      grad.addColorStop(1, bgTop);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+      // Subtle noise texture overlay
+      const noiseCanvas = document.createElement('canvas');
+      noiseCanvas.width = 200;
+      noiseCanvas.height = 200;
+      const nctx = noiseCanvas.getContext('2d');
+      const imgData = nctx.createImageData(200, 200);
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        const v = Math.floor(Math.random() * 255);
+        imgData.data[i] = imgData.data[i + 1] = imgData.data[i + 2] = v;
+        imgData.data[i + 3] = 8; // very faint
+      }
+      nctx.putImageData(imgData, 0, 0);
+      const noisePat = ctx.createPattern(noiseCanvas, 'repeat');
+      ctx.fillStyle = noisePat;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+      // ── Scale letter to fit with padding ──────────────────────
+      const maxW = STORY_W - PADDING * 2;
+      const maxH = STORY_H - PADDING * 2;
+
+      const scale = Math.min(maxW / letterCanvas.width, maxH / letterCanvas.height, 1);
+      const drawW = Math.round(letterCanvas.width * scale);
+      const drawH = Math.round(letterCanvas.height * scale);
+
+      // Center vertically
+      const drawX = Math.round((STORY_W - drawW) / 2);
+      const drawY = Math.round((STORY_H - drawH) / 2);
+      
+      const isDark = themeKey === 'midnight' || themeKey === 'midnight-blue';
+
+      // Soft drop shadow behind the letter card
+      ctx.save();
+      ctx.shadowColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(60,30,20,0.18)';
+      ctx.shadowBlur = 48;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = isDark ? 'rgba(0,0,0,0.01)' : 'rgba(255,255,255,0.01)';
+      ctx.fillRect(drawX, drawY, drawW, drawH);
+      ctx.restore();
+
+      // Draw the letter
+      ctx.drawImage(letterCanvas, drawX, drawY, drawW, drawH);
+
+      // ── Download ──────────────────────────────────────────────
+      const imgDataUrl = story.toDataURL('image/png');
       const link = document.createElement('a');
       const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
       link.download = `Surat_Untuk_${safeName}.png`;
-      link.href = imgData;
+      link.href = imgDataUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
+
     } catch (e) {
       console.error('Screenshot failed:', e);
       alert('Ouch! Gambar gagal disimpan. Anda masih bisa men-screenshot layar ini secara manual.');
@@ -467,7 +533,7 @@ function _initDownloadButton(config) {
    MUSIC PLAYER
    ════════════════════════════════════════════════════════════ */
 let _currentTrack = 0;
-let _playlist     = [];
+let _playlist = [];
 
 const _audioEl = () => document.getElementById('audio-player');
 
@@ -477,7 +543,7 @@ function _initMusicPlayer(config) {
 
   const audio = _audioEl();
   audio.volume = 0.5; // Set backsound volume to 50%
-  
+
   _loadTrack(0, false);
 
   audio.addEventListener('ended', () => _loadTrack(_currentTrack + 1, true));
@@ -489,13 +555,13 @@ function _loadTrack(idx, autoplay) {
   _currentTrack = ((idx % len) + len) % len;
 
   const track = _playlist[_currentTrack];
-  const src   = track.src || track.url || '';
+  const src = track.src || track.url || '';
 
-  _setText('mp-title',  track.title  || track.name || 'Untitled');
+  _setText('mp-title', track.title || track.name || 'Untitled');
   _setText('mp-artist', track.artist || '');
 
   const audio = _audioEl();
-  const href  = new URL(src, window.location.href).href;
+  const href = new URL(src, window.location.href).href;
 
   if (audio.getAttribute('data-src') !== href) {
     audio.setAttribute('data-src', href);
@@ -503,7 +569,7 @@ function _loadTrack(idx, autoplay) {
     audio.load();
   }
 
-  if (autoplay) audio.play().catch(() => {});
+  if (autoplay) audio.play().catch(() => { });
 
   // Reset progress
   const bar = document.getElementById('mp-progress-bar');
@@ -513,16 +579,16 @@ function _loadTrack(idx, autoplay) {
 function _togglePlay() {
   const audio = _audioEl();
   if (audio.paused) {
-    audio.play().catch(() => {});
+    audio.play().catch(() => { });
   } else {
     audio.pause();
   }
 }
 
 function _setPlayState(playing) {
-  const playIcon  = document.querySelector('#mp-play .mp-play-icon');
+  const playIcon = document.querySelector('#mp-play .mp-play-icon');
   const pauseIcon = document.querySelector('#mp-play .mp-pause-icon');
-  if (playIcon)  playIcon.classList.toggle('hidden', playing);
+  if (playIcon) playIcon.classList.toggle('hidden', playing);
   if (pauseIcon) pauseIcon.classList.toggle('hidden', !playing);
 }
 
@@ -571,11 +637,11 @@ async function _handleAuthentication(config) {
     gateEl.classList.remove('hidden');
     gateEl.style.opacity = '0';
     gateEl.style.display = 'flex';
-    
+
     // Force reflow for transition
     void gateEl.offsetWidth;
     gateEl.style.opacity = '1';
-    
+
     if (config.login_hint) {
       hintText.textContent = config.login_hint;
       hintContainer.classList.remove('hidden');
@@ -596,12 +662,12 @@ async function _handleAuthentication(config) {
         errorEl.classList.remove('hidden');
         passInput.value = '';
         passInput.focus();
-        
+
         // Shake animation
         card.classList.remove('gate-shake');
         void card.offsetWidth; // Trigger reflow
         card.classList.add('gate-shake');
-        
+
         // Vibrate if mobile
         if (window.navigator && window.navigator.vibrate) {
           window.navigator.vibrate(50);
