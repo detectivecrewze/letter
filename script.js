@@ -394,12 +394,56 @@ function _initDownloadButton(config) {
   const btn = document.getElementById('btn-save-letter');
   if (!btn) return;
 
-  btn.addEventListener('click', async () => {
-    if (typeof html2canvas === 'undefined') {
-      alert('Sistem sedang memuat.. silakan tunggu sebentar dan coba lagi.');
-      return;
-    }
+  // ─── Inject rotate animation CSS (once) ──────────────────────────────────
+  if (!document.getElementById('_rotate-hint-css')) {
+    const s = document.createElement('style');
+    s.id = '_rotate-hint-css';
+    s.textContent = `
+      @keyframes _phoneRotate {
+        0%   { transform: rotate(0deg); }
+        35%  { transform: rotate(-90deg); }
+        65%  { transform: rotate(-90deg); }
+        100% { transform: rotate(0deg); }
+      }
+      #_rotate-overlay {
+        position: fixed; inset: 0; z-index: 99999;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 24px;
+        backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+        padding: 48px 36px; text-align: center;
+        opacity: 0; transition: opacity 0.3s ease;
+      }
+      #_rotate-overlay .rh-emoji {
+        font-size: 54px;
+        animation: _phoneRotate 2s ease-in-out infinite;
+        display: block;
+      }
+      #_rotate-overlay .rh-title {
+        font-family: var(--font-display, 'DM Serif Display', serif);
+        font-size: 1.3rem; font-weight: 600;
+        margin: 0 0 6px; letter-spacing: 0.01em;
+      }
+      #_rotate-overlay .rh-sub {
+        font-family: var(--font-ui, 'DM Sans', sans-serif);
+        font-size: 0.78rem; line-height: 1.65;
+        margin: 0; letter-spacing: 0.02em; opacity: 0.65;
+      }
+      #_rotate-overlay .rh-divider {
+        width: 40px; height: 2px; border-radius: 2px; opacity: 0.4;
+      }
+      #_rotate-overlay .rh-skip {
+        font-family: var(--font-ui, 'DM Sans', sans-serif);
+        font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em;
+        padding: 10px 26px; border-radius: 30px; cursor: pointer;
+        background: transparent; transition: opacity 0.2s;
+      }
+      #_rotate-overlay .rh-skip:hover { opacity: 0.75; }
+    `;
+    document.head.appendChild(s);
+  }
 
+  // ─── The actual capture + download — UNTOUCHED ───────────────────────────
+  const _doCapture = async () => {
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Menyimpan... ⏳';
     btn.style.opacity = '0.7';
@@ -545,6 +589,83 @@ function _initDownloadButton(config) {
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
     }
+  };
+
+  // ─── Click handler: show modal in portrait, skip in landscape ────────────
+  btn.addEventListener('click', async () => {
+    if (typeof html2canvas === 'undefined') {
+      alert('Sistem sedang memuat.. silakan tunggu sebentar dan coba lagi.');
+      return;
+    }
+
+    // Already landscape → langsung capture tanpa modal
+    if (window.innerWidth > window.innerHeight) {
+      await _doCapture();
+      return;
+    }
+
+    // ── Build modal overlay ───────────────────────────────────────
+    const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
+    const isDark = themeKey === 'midnight' || themeKey === 'midnight-blue';
+    const accent = '#c9a96e';
+    const bg = isDark ? 'rgba(12,14,26,0.96)' : 'rgba(252,242,232,0.96)';
+    const textColor = isDark ? '#f5e8d8' : '#3a2012';
+
+    const overlay = document.createElement('div');
+    overlay.id = '_rotate-overlay';
+    overlay.style.background = bg;
+    overlay.innerHTML = `
+      <span class="rh-emoji">📱</span>
+      <div>
+        <p class="rh-title" style="color:${textColor};">Untuk hasil terbaik,<br>miringkan HP kamu dulu 🔁</p>
+        <p class="rh-sub" style="color:${textColor};">Surat tampil lebih lebar &amp; proporsional saat landscape ✨<br>Pastikan <em>rotation lock</em> tidak aktif.</p>
+      </div>
+      <div class="rh-divider" style="background:${accent};"></div>
+      <button class="rh-skip" id="_rotate-skip"
+        style="border:1px solid ${accent}; color:${accent};">
+        Tetap Simpan (Portrait)
+      </button>
+    `;
+    document.body.appendChild(overlay);
+    // Fade in
+    requestAnimationFrame(() => requestAnimationFrame(() => { overlay.style.opacity = '1'; }));
+
+    let done = false;
+
+    const closeModal = () => {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 320);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onOrient);
+    };
+
+    const trigger = async () => {
+      if (done) return;
+      done = true;
+      closeModal();
+      // Tunggu sebentar agar layout selesai rotate sebelum capture
+      await new Promise(r => setTimeout(r, 350));
+      await _doCapture();
+    };
+
+    // Auto-detect rotate
+    const onResize = () => {
+      if (window.innerWidth > window.innerHeight) trigger();
+    };
+    const onOrient = () => {
+      // orientationchange butuh delay kecil agar innerWidth sudah update
+      setTimeout(() => { if (window.innerWidth > window.innerHeight) trigger(); }, 150);
+    };
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onOrient);
+
+    // Fallback button
+    document.getElementById('_rotate-skip').addEventListener('click', () => {
+      if (done) return;
+      done = true;
+      closeModal();
+      _doCapture();
+    });
   });
 }
 
