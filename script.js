@@ -390,31 +390,16 @@ const _THEME_BG = {
   'default': ['#f5e8d8', '#ecdccb'],
 };
 
-function _initDownloadButton(config) {
-  const btn = document.getElementById('btn-save-letter');
-  if (!btn) return;
+function _captureAndDownload(config) {
+  return new Promise(async (resolve, reject) => {
+    const targetEl = document.getElementById('letter-paper');
+    const btnContainer = document.getElementById('save-letter-container');
+    const scrollWrapper = document.querySelector('.letter-scroll');
 
-  btn.addEventListener('click', async () => {
-    if (typeof html2canvas === 'undefined') {
-      alert('Sistem sedang memuat.. silakan tunggu sebentar dan coba lagi.');
-      return;
-    }
-
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Menyimpan... ⏳';
-    btn.style.opacity = '0.7';
-    btn.style.pointerEvents = 'none';
+    if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
+    if (btnContainer) btnContainer.style.display = 'none';
 
     try {
-      const targetEl = document.getElementById('letter-paper');
-      const btnContainer = document.getElementById('save-letter-container');
-      const scrollWrapper = document.querySelector('.letter-scroll');
-
-      // Hide UI chrome before capture
-      if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
-      if (btnContainer) btnContainer.style.display = 'none';
-
-      // ── Step 1: capture the letter at 2× scale ───────────────
       const letterCanvas = await html2canvas(targetEl, {
         scale: 2,
         useCORS: true,
@@ -422,67 +407,52 @@ function _initDownloadButton(config) {
         onclone: (clonedDoc) => {
           const currentTheme = document.documentElement.getAttribute('data-theme');
           if (currentTheme) clonedDoc.documentElement.setAttribute('data-theme', currentTheme);
-
           clonedDoc.querySelectorAll('svg path').forEach(el => {
-            el.style.animation = 'none';
-            el.style.strokeDashoffset = '0';
-            el.style.strokeDasharray = 'none';
-            el.style.opacity = '1';
+            el.style.animation = 'none'; el.style.strokeDashoffset = '0';
+            el.style.strokeDasharray = 'none'; el.style.opacity = '1';
           });
           clonedDoc.querySelectorAll('svg circle').forEach(el => {
-            el.style.animation = 'none';
-            el.style.opacity = '1';
-            el.style.transform = 'scale(1)';
+            el.style.animation = 'none'; el.style.opacity = '1'; el.style.transform = 'scale(1)';
           });
           clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline').forEach(el => {
-            el.style.opacity = '1';
-            el.style.transform = 'none';
-            el.style.animation = 'none';
+            el.style.opacity = '1'; el.style.transform = 'none'; el.style.animation = 'none';
           });
         }
       });
 
-      // Restore DOM
       if (btnContainer) btnContainer.style.display = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
 
-      // ── Step 2: compose into a 9:16 IG Story canvas ──────────
-      const STORY_W = 1080;
-      const STORY_H = 1920;
-      const PADDING = 80; // px breathing room on each side
+      const isLandscape = window.innerWidth > window.innerHeight;
+      const STORY_W = isLandscape ? 1920 : 1080;
+      const STORY_H = isLandscape ? 1080 : 1920;
+      const PADDING = 72;
 
       const story = document.createElement('canvas');
       story.width = STORY_W;
       story.height = STORY_H;
       const ctx = story.getContext('2d');
 
-      // Background gradient (theme-aware)
       const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
       const [bgTop, bgBot] = _THEME_BG[themeKey] || _THEME_BG['default'];
       const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
-      grad.addColorStop(0, bgTop);
-      grad.addColorStop(0.5, bgBot);
-      grad.addColorStop(1, bgTop);
+      grad.addColorStop(0, bgTop); grad.addColorStop(0.5, bgBot); grad.addColorStop(1, bgTop);
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, STORY_W, STORY_H);
 
-      // Subtle noise texture overlay
       const noiseCanvas = document.createElement('canvas');
-      noiseCanvas.width = 200;
-      noiseCanvas.height = 200;
+      noiseCanvas.width = noiseCanvas.height = 200;
       const nctx = noiseCanvas.getContext('2d');
       const imgData = nctx.createImageData(200, 200);
       for (let i = 0; i < imgData.data.length; i += 4) {
         const v = Math.floor(Math.random() * 255);
         imgData.data[i] = imgData.data[i + 1] = imgData.data[i + 2] = v;
-        imgData.data[i + 3] = 8; // very faint
+        imgData.data[i + 3] = 8;
       }
       nctx.putImageData(imgData, 0, 0);
-      const noisePat = ctx.createPattern(noiseCanvas, 'repeat');
-      ctx.fillStyle = noisePat;
+      ctx.fillStyle = ctx.createPattern(noiseCanvas, 'repeat');
       ctx.fillRect(0, 0, STORY_W, STORY_H);
 
-      // ── Scale letter to fit with padding ──────────────────────
       const maxW = STORY_W - PADDING * 2;
       const maxH = STORY_H - PADDING * 2;
 
