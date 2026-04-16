@@ -390,111 +390,6 @@ const _THEME_BG = {
   'default': ['#f5e8d8', '#ecdccb'],
 };
 
-// ── Core capture & download (called once HP is landscape) ────────
-async function _captureAndDownload(config) {
-  const targetEl = document.getElementById('letter-paper');
-  const btnContainer = document.getElementById('save-letter-container');
-  const scrollWrapper = document.querySelector('.letter-scroll');
-
-  if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
-  if (btnContainer) btnContainer.style.display = 'none';
-
-  const letterCanvas = await html2canvas(targetEl, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: null,
-    onclone: (clonedDoc) => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      if (currentTheme) clonedDoc.documentElement.setAttribute('data-theme', currentTheme);
-      clonedDoc.querySelectorAll('svg path').forEach(el => {
-        el.style.animation = 'none'; el.style.strokeDashoffset = '0';
-        el.style.strokeDasharray = 'none'; el.style.opacity = '1';
-      });
-      clonedDoc.querySelectorAll('svg circle').forEach(el => {
-        el.style.animation = 'none'; el.style.opacity = '1'; el.style.transform = 'scale(1)';
-      });
-      clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline').forEach(el => {
-        el.style.opacity = '1'; el.style.transform = 'none'; el.style.animation = 'none';
-      });
-    }
-  });
-
-  if (btnContainer) btnContainer.style.display = 'block';
-  if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
-
-  // ── Compose into themed canvas ────────────────────────────────
-  const isLandscape = window.innerWidth > window.innerHeight;
-  const STORY_W = isLandscape ? 1920 : 1080;
-  const STORY_H = isLandscape ? 1080 : 1920;
-  const PADDING = 72;
-
-  const story = document.createElement('canvas');
-  story.width = STORY_W;
-  story.height = STORY_H;
-  const ctx = story.getContext('2d');
-
-  const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
-  const [bgTop, bgBot] = _THEME_BG[themeKey] || _THEME_BG['default'];
-  const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
-  grad.addColorStop(0, bgTop); grad.addColorStop(0.5, bgBot); grad.addColorStop(1, bgTop);
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, STORY_W, STORY_H);
-
-  // Noise texture
-  const noiseCanvas = document.createElement('canvas');
-  noiseCanvas.width = noiseCanvas.height = 200;
-  const nctx = noiseCanvas.getContext('2d');
-  const imgData = nctx.createImageData(200, 200);
-  for (let i = 0; i < imgData.data.length; i += 4) {
-    const v = Math.floor(Math.random() * 255);
-    imgData.data[i] = imgData.data[i + 1] = imgData.data[i + 2] = v;
-    imgData.data[i + 3] = 8;
-  }
-  nctx.putImageData(imgData, 0, 0);
-  ctx.fillStyle = ctx.createPattern(noiseCanvas, 'repeat');
-  ctx.fillRect(0, 0, STORY_W, STORY_H);
-
-  const maxW = STORY_W - PADDING * 2;
-  const maxH = STORY_H - PADDING * 2;
-  const scale = Math.min(maxW / letterCanvas.width, maxH / letterCanvas.height, 1);
-  const drawW = Math.round(letterCanvas.width * scale);
-  const drawH = Math.round(letterCanvas.height * scale);
-  const drawX = Math.round((STORY_W - drawW) / 2);
-  const drawY = Math.round((STORY_H - drawH) / 2);
-
-  const isDark = themeKey === 'midnight';
-  ctx.save();
-  ctx.shadowColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(60,30,20,0.18)';
-  ctx.shadowBlur = 48;
-  ctx.shadowOffsetY = 12;
-  ctx.fillStyle = isDark ? 'rgba(0,0,0,0.01)' : 'rgba(255,255,255,0.01)';
-  ctx.fillRect(drawX, drawY, drawW, drawH);
-  ctx.restore();
-  ctx.drawImage(letterCanvas, drawX, drawY, drawW, drawH);
-
-  // ── Blob download ─────────────────────────────────────────────
-  await new Promise(resolve => {
-    story.toBlob((blob) => {
-      if (!blob) { resolve(); return; }
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
-      link.download = `Surat_Untuk_${safeName}.png`;
-      link.href = url;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(url), 500);
-      resolve();
-    }, 'image/png');
-  });
-
-  // iOS memory cleanup
-  letterCanvas.width = 0; letterCanvas.height = 0;
-  story.width = 0; story.height = 0;
-  noiseCanvas.width = 0; noiseCanvas.height = 0;
-}
-
 function _initDownloadButton(config) {
   const btn = document.getElementById('btn-save-letter');
   if (!btn) return;
@@ -505,137 +400,151 @@ function _initDownloadButton(config) {
       return;
     }
 
-    // ── Jika sudah landscape → langsung capture ───────────────
-    if (window.innerWidth > window.innerHeight) {
-      const originalText = btn.innerHTML;
-      btn.innerHTML = 'Menyimpan... ⏳';
-      btn.style.opacity = '0.7';
-      btn.style.pointerEvents = 'none';
-      try {
-        await _captureAndDownload(config);
-      } catch (e) {
-        console.error('Screenshot failed:', e);
-        alert('Gambar gagal disimpan. Coba screenshot manual ya!');
-      } finally {
-        btn.innerHTML = originalText;
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      }
-      return;
-    }
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Menyimpan... ⏳';
+    btn.style.opacity = '0.7';
+    btn.style.pointerEvents = 'none';
 
-    // ── Portrait: tampilkan overlay "Putar HP" ────────────────
-    const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
-    const isDark = themeKey === 'midnight';
+    try {
+      const targetEl = document.getElementById('letter-paper');
+      const btnContainer = document.getElementById('save-letter-container');
+      const scrollWrapper = document.querySelector('.letter-scroll');
 
-    const overlay = document.createElement('div');
-    overlay.id = 'rotate-overlay';
-    overlay.style.cssText = `
-      position: fixed; inset: 0; z-index: 9999;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 28px;
-      background: ${isDark ? 'rgba(10,12,22,0.97)' : 'rgba(253,240,232,0.97)'};
-      backdrop-filter: blur(12px);
-      opacity: 0; transition: opacity 0.35s ease;
-      font-family: var(--font-ui, "DM Sans", sans-serif);
-      padding: 40px 32px; text-align: center;
-    `;
+      // Hide UI chrome before capture
+      if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
+      if (btnContainer) btnContainer.style.display = 'none';
 
-    const accentColor = isDark ? '#c9a96e' : '#c9a96e';
-    const textColor = isDark ? '#f5e8d8' : '#3d2418';
-    const subColor = isDark ? 'rgba(245,232,216,0.55)' : 'rgba(61,36,24,0.5)';
+      // ── Step 1: capture the letter at 2× scale ───────────────
+      const letterCanvas = await html2canvas(targetEl, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: null,
+        onclone: (clonedDoc) => {
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          if (currentTheme) clonedDoc.documentElement.setAttribute('data-theme', currentTheme);
 
-    overlay.innerHTML = `
-      <div style="font-size: 56px; animation: rotateHint 1.8s ease-in-out infinite;">📱</div>
-      <div>
-        <p style="font-family: var(--font-display, serif); font-size: 1.35rem; font-weight: 600;
-                  color: ${textColor}; margin: 0 0 8px; letter-spacing: 0.02em;">
-          Putar HP ke mode Landscape
-        </p>
-        <p style="font-size: 0.78rem; color: ${subColor}; margin: 0; line-height: 1.6; letter-spacing: 0.03em;">
-          Foto surat jadi lebih proporsional &amp; estetik ✨<br>
-          <span style="opacity:0.7;">Pastikan rotation lock tidak aktif</span>
-        </p>
-      </div>
-      <div style="width: 44px; height: 2px; background: ${accentColor}; border-radius: 2px; opacity: 0.5;"></div>
-      <button id="rotate-skip-btn" style="
-        font-family: var(--font-ui, sans-serif); font-size: 0.7rem;
-        text-transform: uppercase; letter-spacing: 0.2em;
-        padding: 10px 24px; border-radius: 30px; cursor: pointer;
-        background: transparent; border: 1px solid ${accentColor};
-        color: ${accentColor}; transition: all 0.2s ease;
-      ">Tetap Simpan (Portrait)</button>
-    `;
-
-    // CSS keyframes for phone rotation hint
-    if (!document.getElementById('rotate-hint-style')) {
-      const style = document.createElement('style');
-      style.id = 'rotate-hint-style';
-      style.textContent = `
-        @keyframes rotateHint {
-          0%   { transform: rotate(0deg);   }
-          30%  { transform: rotate(-90deg); }
-          60%  { transform: rotate(-90deg); }
-          90%  { transform: rotate(0deg);   }
-          100% { transform: rotate(0deg);   }
+          clonedDoc.querySelectorAll('svg path').forEach(el => {
+            el.style.animation = 'none';
+            el.style.strokeDashoffset = '0';
+            el.style.strokeDasharray = 'none';
+            el.style.opacity = '1';
+          });
+          clonedDoc.querySelectorAll('svg circle').forEach(el => {
+            el.style.animation = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'scale(1)';
+          });
+          clonedDoc.querySelectorAll('.ornament-top, .letter-title-underline').forEach(el => {
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+            el.style.animation = 'none';
+          });
         }
-      `;
-      document.head.appendChild(style);
+      });
+
+      // Restore DOM
+      if (btnContainer) btnContainer.style.display = 'block';
+      if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
+
+      // ── Step 2: compose into a 9:16 IG Story canvas ──────────
+      const STORY_W = 1080;
+      const STORY_H = 1920;
+      const PADDING = 80; // px breathing room on each side
+
+      const story = document.createElement('canvas');
+      story.width = STORY_W;
+      story.height = STORY_H;
+      const ctx = story.getContext('2d');
+
+      // Background gradient (theme-aware)
+      const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
+      const [bgTop, bgBot] = _THEME_BG[themeKey] || _THEME_BG['default'];
+      const grad = ctx.createLinearGradient(0, 0, 0, STORY_H);
+      grad.addColorStop(0, bgTop);
+      grad.addColorStop(0.5, bgBot);
+      grad.addColorStop(1, bgTop);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+      // Subtle noise texture overlay
+      const noiseCanvas = document.createElement('canvas');
+      noiseCanvas.width = 200;
+      noiseCanvas.height = 200;
+      const nctx = noiseCanvas.getContext('2d');
+      const imgData = nctx.createImageData(200, 200);
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        const v = Math.floor(Math.random() * 255);
+        imgData.data[i] = imgData.data[i + 1] = imgData.data[i + 2] = v;
+        imgData.data[i + 3] = 8; // very faint
+      }
+      nctx.putImageData(imgData, 0, 0);
+      const noisePat = ctx.createPattern(noiseCanvas, 'repeat');
+      ctx.fillStyle = noisePat;
+      ctx.fillRect(0, 0, STORY_W, STORY_H);
+
+      // ── Scale letter to fit with padding ──────────────────────
+      const maxW = STORY_W - PADDING * 2;
+      const maxH = STORY_H - PADDING * 2;
+
+      const scale = Math.min(maxW / letterCanvas.width, maxH / letterCanvas.height, 1);
+      const drawW = Math.round(letterCanvas.width * scale);
+      const drawH = Math.round(letterCanvas.height * scale);
+
+      // Center vertically
+      const drawX = Math.round((STORY_W - drawW) / 2);
+      const drawY = Math.round((STORY_H - drawH) / 2);
+
+      const isDark = themeKey === 'midnight' || themeKey === 'midnight-blue';
+
+      // Soft drop shadow behind the letter card
+      ctx.save();
+      ctx.shadowColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(60,30,20,0.18)';
+      ctx.shadowBlur = 48;
+      ctx.shadowOffsetY = 12;
+      ctx.fillStyle = isDark ? 'rgba(0,0,0,0.01)' : 'rgba(255,255,255,0.01)';
+      ctx.fillRect(drawX, drawY, drawW, drawH);
+      ctx.restore();
+
+      // Draw the letter
+      ctx.drawImage(letterCanvas, drawX, drawY, drawW, drawH);
+
+      // ── Download menggunakan Blob (Jauh Lebih Aman untuk RAM iPhone) ─────────
+      await new Promise(resolve => {
+        story.toBlob((blob) => {
+          if (!blob) {
+            console.error('Canvas toBlob failed (Memory limit or empty canvas)');
+            resolve();
+            return;
+          }
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
+          link.download = `Surat_Untuk_${safeName}.png`;
+          link.href = url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // Bersihkan memory virtual URL agar tidak nyangkut (Memory Leak di iOS)
+          setTimeout(() => URL.revokeObjectURL(url), 500);
+          resolve();
+        }, 'image/png');
+      });
+
+      // PENTING UNTUK iOS: Kosongkan secara paksa pixel buffer canvas
+      // Jika tidak dilakukan, menekan donwload 2x / ganti template akan menyebabkan freeze
+      letterCanvas.width = 0; letterCanvas.height = 0;
+      story.width = 0; story.height = 0;
+      noiseCanvas.width = 0; noiseCanvas.height = 0;
+
+    } catch (e) {
+      console.error('Screenshot failed:', e);
+      alert('Ouch! Gambar gagal disimpan. Anda masih bisa men-screenshot layar ini secara manual.');
+    } finally {
+      btn.innerHTML = originalText;
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
     }
-
-    document.body.appendChild(overlay);
-    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
-
-    const closeOverlay = () => {
-      overlay.style.opacity = '0';
-      setTimeout(() => overlay.remove(), 350);
-      window.removeEventListener('orientationchange', onRotate);
-      window.removeEventListener('resize', onRotate);
-    };
-
-    const doCapture = async () => {
-      closeOverlay();
-      await _delay(420); // Beri waktu browser settle setelah rotasi
-      btn.innerHTML = 'Menyimpan... ⏳';
-      btn.style.opacity = '0.7';
-      btn.style.pointerEvents = 'none';
-      try {
-        await _captureAndDownload(config);
-      } catch (e) {
-        console.error('Screenshot failed:', e);
-        alert('Gambar gagal disimpan. Coba screenshot manual ya!');
-      } finally {
-        btn.innerHTML = originalBtnText;
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      }
-    };
-
-    const originalBtnText = btn.innerHTML;
-
-    // Auto-capture saat HP diputar ke landscape
-    const onRotate = () => {
-      if (window.innerWidth > window.innerHeight) doCapture();
-    };
-    window.addEventListener('orientationchange', onRotate);
-    window.addEventListener('resize', onRotate);
-
-    // Fallback: simpan portrait jika user pencet skip
-    document.getElementById('rotate-skip-btn')?.addEventListener('click', async () => {
-      closeOverlay();
-      btn.innerHTML = 'Menyimpan... ⏳';
-      btn.style.opacity = '0.7';
-      btn.style.pointerEvents = 'none';
-      try {
-        await _captureAndDownload(config);
-      } catch (e) {
-        alert('Gambar gagal disimpan. Coba screenshot manual ya!');
-      } finally {
-        btn.innerHTML = originalBtnText;
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      }
-    });
   });
 }
 
