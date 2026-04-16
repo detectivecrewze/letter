@@ -23,8 +23,8 @@
   --bg: #fdf6ee;
   --bg-card: #fef9f3;
   --bg-card2: #fffdf8;
-  --text: #3d2418;
-  --text-light: #8a6a5a;
+  --text: #2c1b14; /* Deep espresso / darker ink */
+  --text-light: #7a5c4d;
   --text-faint: #c4a898;
   --accent: #d4a5a5;
   --accent-soft: #f0d6d6;
@@ -89,8 +89,8 @@
   --bg: #fdf0f0;
   --bg-card: #fff5f5;
   --bg-card2: #fffafb;
-  --text: #3d1f2b;
-  --text-light: #8a4a5a;
+  --text: #2b1820; /* Deep blackberry / darker ink */
+  --text-light: #804051;
   --text-faint: #c49898;
   --accent: #c4858a;
   --accent-soft: #f0cccd;
