@@ -347,6 +347,11 @@ body::before {
   }
 }
 
+@keyframes float-envelope {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
 /* Wrapper — clickable */
 .envelope-wrapper {
   cursor: pointer;
@@ -355,6 +360,7 @@ body::before {
   height: 280px;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  animation: float-envelope 4s ease-in-out infinite;
 }
 
 .envelope-wrapper:focus-visible .envelope-body {
@@ -578,6 +584,7 @@ body::before {
 /* ── OPEN animation classes ────────────── */
 /* Applied by JS when user taps */
 .envelope-wrapper.is-opening {
+  animation: none !important;
   transform: translateY(15px) scale(1.03);
   transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
