@@ -283,10 +283,10 @@ async function _playFlowerTransition(theme) {
       const maxDist = Math.sqrt(Math.pow(cx, 2) + Math.pow(cy, 2));
 
       // Delay berdasarkan jarak: pusat muncul dulu, tepi belakangan
-      // Ripple diperlambat menjadi 2500ms agar gelombangnya terasa lebih dramatis dan pelan
-      const rippleDelay = (dist / maxDist) * 2500;
+      // Ripple dipercepat menjadi 1200ms agar gelombangnya terasa pas
+      const rippleDelay = (dist / maxDist) * 1200;
       // Tambahkan sedikit noise agar tidak terlalu rapi/mekanis
-      const jitter = Math.random() * 300;
+      const jitter = Math.random() * 200;
       const delay = rippleDelay + jitter;
 
       flowers.push({ x, y, delay });
@@ -308,7 +308,7 @@ async function _playFlowerTransition(theme) {
       img.style.top = `${y}px`;
 
       const rotation = Math.random() * 360;
-      // Mengembalikan efek putaran: berputar perlahan 180 hingga 360 derajat saat mekar
+      // Berputar perlahan 180 hingga 360 derajat saat mekar
       const finalRotation = rotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 180);
       // Skala bervariasi agar tumpukan terlihat natural
       const finalScale = 1.0 + Math.random() * 1.8;
@@ -318,8 +318,8 @@ async function _playFlowerTransition(theme) {
       img.style.opacity = '0';
       img.style.willChange = 'transform, opacity';
       
-      // Animasi membesar dan berputar dibuat jauh lebih pelan dan dramatis (2.5 detik)
-      img.style.transition = 'transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease-in-out';
+      // Animasi membesar dan berputar dibuat lebih pas (1.2 detik)
+      img.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out';
       img.style.width = '150px';
       img.style.height = 'auto';
 
@@ -335,11 +335,11 @@ async function _playFlowerTransition(theme) {
         if (bloomed === totalFlowers) {
           // Tahan sebentar agar bisa dinikmati
           setTimeout(() => {
-            container.style.transition = 'opacity 2s ease-in-out';
+            container.style.transition = 'opacity 1.5s ease-in-out';
             container.style.opacity = '0';
             resolveTransition();
-            setTimeout(() => container.remove(), 2000);
-          }, 1500);
+            setTimeout(() => container.remove(), 1500);
+          }, 1000);
         }
       }, delay);
     });
