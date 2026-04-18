@@ -263,7 +263,7 @@ async function _playFlowerTransition(theme) {
   if (theme && theme.toLowerCase().includes('midnight')) {
     flowerAssets = ['./assets/flower_midnight1.png', './assets/flower_midnight2.png'];
   }
-  const totalFlowers = 60; // Sedikit dikurangi agar lebih cepat namun tetap penuh
+  const totalFlowers = 45; // Dikurangi menjadi 45 karena ukurannya membesar, sudah cukup menutup layar
 
   return new Promise(resolveTransition => {
     let spawned = 0;
@@ -272,50 +272,47 @@ async function _playFlowerTransition(theme) {
       img.src = flowerAssets[i % flowerAssets.length];
       img.style.position = 'absolute';
       
-      // Posisi AWAL: tepat di tengah layar (lokasi amplop)
+      // Posisi tetap di tengah, pergerakan akan diurus oleh transform (GPU Accelerated)
       img.style.left = '50%';
       img.style.top = '50%';
 
-      // Menentukan posisi AKHIR yang acak
-      const finalLeft = Math.random() * 120 - 10; 
-      const finalTop = Math.random() * 120 - 10;
+      // Menentukan jarak lemparan (translasi) dalam satuan vw/vh
+      // Bergerak secara acak antara -75 hingga +75 vw/vh dari titik tengah
+      const translateX = (Math.random() - 0.5) * 150; 
+      const translateY = (Math.random() - 0.5) * 150; 
 
       // Rotasi dan ukuran
       const initialRotation = Math.random() * 360;
-      // Berputar 180 hingga 540 derajat secara acak selama perjalanan
       const finalRotation = initialRotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 360);
       const finalScale = 1.2 + Math.random() * 2.5; 
 
-      img.style.transform = `translate(-50%, -50%) rotate(${initialRotation}deg) scale(0)`;
+      // Menggunakan translate3d untuk mengaktifkan Hardware Acceleration (memori GPU)
+      img.style.transform = `translate3d(-50%, -50%, 0) rotate(${initialRotation}deg) scale(0)`;
       img.style.opacity = '0';
-      // Animasikan left, top, transform, dan opacity bersamaan dengan efek meledak (ease-out)
-      img.style.transition = 'left 1.5s cubic-bezier(0.25, 1, 0.5, 1), top 1.5s cubic-bezier(0.25, 1, 0.5, 1), transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-in';
+      
+      // Beritahu browser untuk bersiap merender perubahan animasi ini di GPU
+      img.style.willChange = 'transform, opacity';
+      
+      // Animasi hanya pada transform dan opacity (sangat ringan)
+      img.style.transition = 'transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-in';
       img.style.width = '150px'; 
       img.style.height = 'auto';
-      img.style.filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))';
+      // Catatan: filter: drop-shadow sengaja DHILANGKAN karena sangat membebani GPU HP
       
       container.appendChild(img);
 
-      // Delay sangat singkat (burst/ledakan) maksimal 400ms agar menyebar serentak
       const delay = Math.random() * 400; 
       setTimeout(() => {
         img.style.opacity = '1';
-        // Gerakkan ke posisi akhir
-        img.style.left = `${finalLeft}%`;
-        img.style.top = `${finalTop}%`;
-        // Putar dan besarkan
-        img.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg) scale(${finalScale})`;
+        // Eksekusi pergerakan menggunakan translate3d
+        img.style.transform = `translate3d(calc(-50% + ${translateX}vw), calc(-50% + ${translateY}vh), 0) rotate(${finalRotation}deg) scale(${finalScale})`;
         spawned++;
         
         if (spawned === totalFlowers) {
-          // Speed up hold time from 3000ms to 1200ms
           setTimeout(() => {
-            // Speed up fade out from 2.5s to 1.5s
             container.style.transition = 'opacity 1.5s ease-in-out';
             container.style.opacity = '0';
-            
             resolveTransition();
-            
             setTimeout(() => container.remove(), 1500);
           }, 1200); 
         }
