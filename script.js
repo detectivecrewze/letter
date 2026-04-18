@@ -143,7 +143,10 @@ async function init() {
 
   // Transition to letter
   showState('letter');
-  await _delay(500); // Wait for envelope to vanish
+  
+  // Tunggu sejenak saja agar transisinya terlihat pas (sekitar 1.2 detik)
+  // Ini agar mulai mengetik saat bunga sudah mulai rontok
+  await _delay(1200);
 
   await _typewriteLetter(config);
 }
@@ -224,7 +227,7 @@ function _waitForEnvelopeOpen(config) {
       // 2. Add opening class — CSS handles flap + letter-peek animations
       wrapper.classList.add('is-opening');
 
-      // 3. iOS FIX: Start music immediately on user gesture
+      // 3. Langsung putar lagu saat amplop diklik (seperti sebelumnya)
       _loadTrack(0, true);
 
       // 4. After flap finishes (~1100ms), start flower transition
@@ -234,7 +237,7 @@ function _waitForEnvelopeOpen(config) {
         // Mulai transisi bunga
         await _playFlowerTransition(config.theme);
         
-        // Resolve (switch to letter state) berbarengan dengan bunga memudar
+        // Resolve (switch to letter state) SETELAH seluruh transisi bunga selesai
         resolve();
       }, 1100);
     }
@@ -289,7 +292,7 @@ async function _playFlowerTransition(theme) {
       const jitter = Math.random() * 200;
       const delay = rippleDelay + jitter;
 
-      flowers.push({ x, y, delay });
+      flowers.push({ x, y, delay, rippleDelay });
     }
   }
 
@@ -298,20 +301,21 @@ async function _playFlowerTransition(theme) {
   return new Promise(resolveTransition => {
     let bloomed = 0;
 
-    flowers.forEach(({ x, y, delay }, i) => {
+    flowers.forEach((f, i) => {
       const img = document.createElement('img');
+      f.img = img; // Simpan referensi gambar ke objek flower
       img.src = flowerAssets[i % flowerAssets.length];
       img.style.position = 'absolute';
 
       // Posisi TETAP — bunga tidak bergerak
-      img.style.left = `${x}px`;
-      img.style.top = `${y}px`;
+      img.style.left = `${f.x}px`;
+      img.style.top = `${f.y}px`;
 
       const rotation = Math.random() * 360;
       // Berputar perlahan 180 hingga 360 derajat saat mekar
-      const finalRotation = rotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 180);
+      f.finalRotation = rotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 180);
       // Skala bervariasi agar tumpukan terlihat natural
-      const finalScale = 1.0 + Math.random() * 1.8;
+      f.finalScale = 1.0 + Math.random() * 1.8;
 
       // Mulai dari ukuran 0, diam di tempat
       img.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(0)`;
@@ -328,20 +332,48 @@ async function _playFlowerTransition(theme) {
       setTimeout(() => {
         // Tumbuh (mekar) di tempat tanpa pindah posisi
         img.style.opacity = '1';
-        img.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg) scale(${finalScale})`;
+        img.style.transform = `translate(-50%, -50%) rotate(${f.finalRotation}deg) scale(${f.finalScale})`;
         bloomed++;
 
         // Tunggu bunga TERAKHIR (yang paling jauh dari pusat) selesai mekar
         if (bloomed === totalFlowers) {
-          // Tahan sebentar agar bisa dinikmati
+          // 1. Resolve SEKARANG agar Surat (Kertas) & Lagu muncul di belakang tumpukan bunga
+          resolveTransition();
+
+          // 2. Mulai proses gugur setelah hold sejenak
           setTimeout(() => {
-            container.style.transition = 'opacity 1.5s ease-in-out';
-            container.style.opacity = '0';
-            resolveTransition();
-            setTimeout(() => container.remove(), 1500);
-          }, 1000);
+            
+            let maxFallDelay = 0;
+
+            // Animasi berguguran bergelombang (dari tengah ke pinggir)
+            flowers.forEach((flower) => {
+              // Delay gugur menggunakan pola rippleDelay agar pusat runtuh duluan
+              const fallDelay = flower.rippleDelay + Math.random() * 100;
+              if (fallDelay > maxFallDelay) maxFallDelay = fallDelay;
+
+              setTimeout(() => {
+                // Transisi memudar dan melayang turun perlahan
+                const fallDuration = 2.0 + Math.random();
+                flower.img.style.transition = `transform ${fallDuration}s ease-in, opacity ${fallDuration - 0.5}s ease-in-out`;
+                flower.img.style.opacity = '0';
+                
+                // Jatuh ke bawah 100-250px dan sedikit berputar tambahan
+                const fallY = 100 + Math.random() * 150;
+                const extraRotation = (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 30);
+                
+                flower.img.style.transform = `translate(-50%, calc(-50% + ${fallY}px)) rotate(${flower.finalRotation + extraRotation}deg) scale(${flower.finalScale})`;
+              }, fallDelay);
+            });
+
+            // Hapus container dan beri sinyal bahwa layar sudah bersih
+            setTimeout(() => {
+              container.remove();
+              window.dispatchEvent(new CustomEvent('flowers-gone'));
+            }, maxFallDelay + 2500); 
+
+          }, 600); // Waktu tahan (hold)
         }
-      }, delay);
+      }, f.delay);
     });
   });
 }
