@@ -227,13 +227,16 @@ function _waitForEnvelopeOpen(config) {
       // 3. iOS FIX: Start music immediately on user gesture
       _loadTrack(0, true);
 
-      // 4. After flap finishes (~1100ms), start exit fade
-      setTimeout(() => {
+      // 4. After flap finishes (~1100ms), start flower transition
+      setTimeout(async () => {
         if (scene) scene.classList.add('is-exit');
+        
+        // Mulai transisi bunga
+        await _playFlowerTransition(config.theme);
+        
+        // Resolve (switch to letter state) berbarengan dengan bunga memudar
+        resolve();
       }, 1100);
-
-      // 5. Resolve (switch to letter state) after exit animation
-      setTimeout(resolve, 2000);
     }
 
     function onKeydown(e) {
@@ -242,6 +245,82 @@ function _waitForEnvelopeOpen(config) {
 
     wrapper.addEventListener('click', openEnvelope);
     wrapper.addEventListener('keydown', onKeydown);
+  });
+}
+
+async function _playFlowerTransition(theme) {
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.inset = '0';
+  container.style.zIndex = '9999';
+  container.style.pointerEvents = 'none';
+  container.style.overflow = 'hidden';
+  document.body.appendChild(container);
+
+  let flowerAssets = ['./assets/flower1.png', './assets/flower2.png'];
+  
+  // Gunakan aset berbeda jika tema adalah midnight
+  if (theme && theme.toLowerCase().includes('midnight')) {
+    flowerAssets = ['./assets/flower_midnight1.png', './assets/flower_midnight2.png'];
+  }
+  const totalFlowers = 60; // Sedikit dikurangi agar lebih cepat namun tetap penuh
+
+  return new Promise(resolveTransition => {
+    let spawned = 0;
+    for (let i = 0; i < totalFlowers; i++) {
+      const img = document.createElement('img');
+      img.src = flowerAssets[i % flowerAssets.length];
+      img.style.position = 'absolute';
+      
+      // Posisi AWAL: tepat di tengah layar (lokasi amplop)
+      img.style.left = '50%';
+      img.style.top = '50%';
+
+      // Menentukan posisi AKHIR yang acak
+      const finalLeft = Math.random() * 120 - 10; 
+      const finalTop = Math.random() * 120 - 10;
+
+      // Rotasi dan ukuran
+      const initialRotation = Math.random() * 360;
+      // Berputar 180 hingga 540 derajat secara acak selama perjalanan
+      const finalRotation = initialRotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 360);
+      const finalScale = 1.2 + Math.random() * 2.5; 
+
+      img.style.transform = `translate(-50%, -50%) rotate(${initialRotation}deg) scale(0)`;
+      img.style.opacity = '0';
+      // Animasikan left, top, transform, dan opacity bersamaan dengan efek meledak (ease-out)
+      img.style.transition = 'left 1.5s cubic-bezier(0.25, 1, 0.5, 1), top 1.5s cubic-bezier(0.25, 1, 0.5, 1), transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-in';
+      img.style.width = '150px'; 
+      img.style.height = 'auto';
+      img.style.filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.15))';
+      
+      container.appendChild(img);
+
+      // Delay sangat singkat (burst/ledakan) maksimal 400ms agar menyebar serentak
+      const delay = Math.random() * 400; 
+      setTimeout(() => {
+        img.style.opacity = '1';
+        // Gerakkan ke posisi akhir
+        img.style.left = `${finalLeft}%`;
+        img.style.top = `${finalTop}%`;
+        // Putar dan besarkan
+        img.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg) scale(${finalScale})`;
+        spawned++;
+        
+        if (spawned === totalFlowers) {
+          // Speed up hold time from 3000ms to 1200ms
+          setTimeout(() => {
+            // Speed up fade out from 2.5s to 1.5s
+            container.style.transition = 'opacity 1.5s ease-in-out';
+            container.style.opacity = '0';
+            
+            resolveTransition();
+            
+            setTimeout(() => container.remove(), 1500);
+          }, 1200); 
+        }
+      }, delay);
+    }
   });
 }
 
