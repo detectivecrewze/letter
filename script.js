@@ -258,66 +258,91 @@ async function _playFlowerTransition(theme) {
   document.body.appendChild(container);
 
   let flowerAssets = ['./assets/flower1.png', './assets/flower2.png'];
-  
-  // Gunakan aset berbeda jika tema adalah midnight
   if (theme && theme.toLowerCase().includes('midnight')) {
     flowerAssets = ['./assets/flower_midnight1.png', './assets/flower_midnight2.png'];
   }
-  const totalFlowers = 45; // Dikurangi menjadi 45 karena ukurannya membesar, sudah cukup menutup layar
+
+  // === KONFIGURASI KERAPATAN ===
+  // Ukuran "slot" untuk setiap bunga — semakin kecil, semakin padat tumpukannya
+  const slotSize = 100; // px
+  const cols = Math.ceil(window.innerWidth / slotSize) + 2;
+  const rows = Math.ceil(window.innerHeight / slotSize) + 2;
+
+  // Buat daftar semua bunga beserta posisi dan delay-nya
+  const flowers = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      // Titik tengah slot + sedikit pengacakan agar tidak terlihat seperti grid
+      const x = (c - 0.5) * slotSize + (Math.random() - 0.5) * slotSize * 0.8;
+      const y = (r - 0.5) * slotSize + (Math.random() - 0.5) * slotSize * 0.8;
+
+      // Hitung jarak dari pusat layar untuk efek gelombang (ripple)
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const dist = Math.sqrt(Math.pow(x - cx, 2) + Math.pow(y - cy, 2));
+      const maxDist = Math.sqrt(Math.pow(cx, 2) + Math.pow(cy, 2));
+
+      // Delay berdasarkan jarak: pusat muncul dulu, tepi belakangan
+      // Ripple diperlambat menjadi 2500ms agar gelombangnya terasa lebih dramatis dan pelan
+      const rippleDelay = (dist / maxDist) * 2500;
+      // Tambahkan sedikit noise agar tidak terlalu rapi/mekanis
+      const jitter = Math.random() * 300;
+      const delay = rippleDelay + jitter;
+
+      flowers.push({ x, y, delay });
+    }
+  }
+
+  const totalFlowers = flowers.length;
 
   return new Promise(resolveTransition => {
-    let spawned = 0;
-    for (let i = 0; i < totalFlowers; i++) {
+    let bloomed = 0;
+
+    flowers.forEach(({ x, y, delay }, i) => {
       const img = document.createElement('img');
       img.src = flowerAssets[i % flowerAssets.length];
       img.style.position = 'absolute';
-      
-      // Posisi tetap di tengah, pergerakan akan diurus oleh transform (GPU Accelerated)
-      img.style.left = '50%';
-      img.style.top = '50%';
 
-      // Menentukan jarak lemparan (translasi) dalam satuan vw/vh
-      // Bergerak secara acak antara -75 hingga +75 vw/vh dari titik tengah
-      const translateX = (Math.random() - 0.5) * 150; 
-      const translateY = (Math.random() - 0.5) * 150; 
+      // Posisi TETAP — bunga tidak bergerak
+      img.style.left = `${x}px`;
+      img.style.top = `${y}px`;
 
-      // Rotasi dan ukuran
-      const initialRotation = Math.random() * 360;
-      const finalRotation = initialRotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 360);
-      const finalScale = 1.2 + Math.random() * 2.5; 
+      const rotation = Math.random() * 360;
+      // Mengembalikan efek putaran: berputar perlahan 180 hingga 360 derajat saat mekar
+      const finalRotation = rotation + (Math.random() > 0.5 ? 1 : -1) * (180 + Math.random() * 180);
+      // Skala bervariasi agar tumpukan terlihat natural
+      const finalScale = 1.0 + Math.random() * 1.8;
 
-      // Menggunakan translate3d untuk mengaktifkan Hardware Acceleration (memori GPU)
-      img.style.transform = `translate3d(-50%, -50%, 0) rotate(${initialRotation}deg) scale(0)`;
+      // Mulai dari ukuran 0, diam di tempat
+      img.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(0)`;
       img.style.opacity = '0';
-      
-      // Beritahu browser untuk bersiap merender perubahan animasi ini di GPU
       img.style.willChange = 'transform, opacity';
       
-      // Animasi hanya pada transform dan opacity (sangat ringan)
-      img.style.transition = 'transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease-in';
-      img.style.width = '150px'; 
+      // Animasi membesar dan berputar dibuat jauh lebih pelan dan dramatis (2.5 detik)
+      img.style.transition = 'transform 2.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease-in-out';
+      img.style.width = '150px';
       img.style.height = 'auto';
-      // Catatan: filter: drop-shadow sengaja DHILANGKAN karena sangat membebani GPU HP
-      
+
       container.appendChild(img);
 
-      const delay = Math.random() * 400; 
       setTimeout(() => {
+        // Tumbuh (mekar) di tempat tanpa pindah posisi
         img.style.opacity = '1';
-        // Eksekusi pergerakan menggunakan translate3d
-        img.style.transform = `translate3d(calc(-50% + ${translateX}vw), calc(-50% + ${translateY}vh), 0) rotate(${finalRotation}deg) scale(${finalScale})`;
-        spawned++;
-        
-        if (spawned === totalFlowers) {
+        img.style.transform = `translate(-50%, -50%) rotate(${finalRotation}deg) scale(${finalScale})`;
+        bloomed++;
+
+        // Tunggu bunga TERAKHIR (yang paling jauh dari pusat) selesai mekar
+        if (bloomed === totalFlowers) {
+          // Tahan sebentar agar bisa dinikmati
           setTimeout(() => {
-            container.style.transition = 'opacity 1.5s ease-in-out';
+            container.style.transition = 'opacity 2s ease-in-out';
             container.style.opacity = '0';
             resolveTransition();
-            setTimeout(() => container.remove(), 1500);
-          }, 1200); 
+            setTimeout(() => container.remove(), 2000);
+          }, 1500);
         }
       }, delay);
-    }
+    });
   });
 }
 
