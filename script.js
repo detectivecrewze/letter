@@ -380,10 +380,11 @@ async function _playFlowerTransition(theme) {
             });
 
             // Hapus container dan beri sinyal bahwa layar sudah bersih
+            // Dipercepat agar surat muncul saat bunga-bunga terakhir masih memudar (overlap yang cantik)
             setTimeout(() => {
               container.remove();
               window.dispatchEvent(new CustomEvent('flowers-gone'));
-            }, maxFallDelay + 2500); 
+            }, maxFallDelay + 1200); 
 
           }, 600); // Waktu tahan (hold)
         }
