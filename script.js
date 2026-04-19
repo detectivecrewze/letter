@@ -277,6 +277,8 @@ async function _playFlowerTransition(theme) {
   let flowerAssets = ['./assets/flower1.png', './assets/flower2.png'];
   if (theme && theme.toLowerCase().includes('midnight')) {
     flowerAssets = ['./assets/flower_midnight1.png', './assets/flower_midnight2.png'];
+  } else if (theme && theme.toLowerCase().includes('sage')) {
+    flowerAssets = ['./assets/flowers_sage1.png', './assets/flowers_sage2.png'];
   }
 
   // === KONFIGURASI KERAPATAN ===
