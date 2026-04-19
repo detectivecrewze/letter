@@ -829,7 +829,7 @@ function _initMusicPlayer(config) {
   if (_playlist.length === 0) return;
 
   const audio = _audioEl();
-  audio.volume = 0.5; // Set backsound volume to 50%
+  audio.volume = 0.2; // Set backsound volume to 20% (diperlembut)
 
   _loadTrack(0, false);
 
