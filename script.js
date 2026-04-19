@@ -141,12 +141,26 @@ async function init() {
   showState('envelope');
   await _waitForEnvelopeOpen(config);
 
+  // TUNGGU sampai bunga benar-benar rontok dan hilang
+  await new Promise(resolve => {
+    window.addEventListener('flowers-gone', resolve, { once: true });
+  });
+
   // Transition to letter
   showState('letter');
-  
-  // Tunggu sejenak saja agar transisinya terlihat pas (sekitar 1.2 detik)
-  // Ini agar mulai mengetik saat bunga sudah mulai rontok
-  await _delay(1200);
+
+  // Trigger animasi "Rising from Depth" pada kertas surat
+  const paper = document.getElementById('letter-paper');
+  if (paper) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        paper.classList.add('is-revealing');
+      });
+    });
+  }
+
+  // Tunggu animasi paperRise selesai (1.3 detik) baru mulai mengetik
+  await _delay(1350);
 
   await _typewriteLetter(config);
 }

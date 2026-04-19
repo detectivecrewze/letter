@@ -685,7 +685,7 @@ body::before {
   padding-bottom: 8rem;
   /* space for music player */
   margin: 0 auto;
-  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  /* Animasi dikelola lewat .letter-paper.is-revealing untuk efek yang lebih dramatis */
 }
 
 @keyframes fadeUp {
@@ -745,7 +745,51 @@ body::before {
   background-position: 0 5.5rem;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   LETTER PAPER — ENTRY ANIMATION (Rising From Depth)
+   ══════════════════════════════════════════════════════════════ */
 
+/* Default state: tersembunyi sampai class ditambahkan oleh JS */
+.letter-paper {
+  opacity: 0;
+}
+
+/* Class ditambahkan oleh script.js sesaat setelah state letter tampil */
+.letter-paper.is-revealing {
+  animation: paperRise 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes paperRise {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(40px);
+    filter: blur(14px);
+    box-shadow:
+      0 1px 3px var(--shadow),
+      0 8px 32px var(--shadow),
+      0 0 0 rgba(212, 165, 165, 0);
+  }
+  40% {
+    opacity: 0.7;
+    filter: blur(4px);
+  }
+  70% {
+    /* Warm glow pulse seolah cahaya lilin menyorot */
+    box-shadow:
+      0 1px 3px var(--shadow),
+      0 8px 32px var(--shadow),
+      0 0 60px rgba(212, 165, 165, 0.25);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+    box-shadow:
+      0 1px 3px var(--shadow),
+      0 8px 32px var(--shadow),
+      0 32px 80px rgba(0, 0, 0, 0.04);
+  }
+}
 
 /* Washi Tape at Top Center */
 .letter-tape {
