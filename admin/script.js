@@ -164,6 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const songName = gift.playlist && gift.playlist[0] ? gift.playlist[0].title : 'Hening';
             const isCustom = gift.playlist && gift.playlist[0] && !gift.playlist[0].isLibrary;
 
+            const isMemoryEnabled = gift.secretMemoryEnabled === true;
+            const memoryBtnClass = isMemoryEnabled
+                ? 'bg-[#d4a373] text-white border-[#d4a373]'
+                : 'bg-slate-800/40 text-slate-500 border-white/10';
+            const memoryLabel = isMemoryEnabled ? '✓ Aktif' : '✗ Terkunci';
+
             return `
                 <tr class="${isSelected ? 'bg-white/5' : ''}">
                     <td class="p-5 border-b border-white/5 text-center">
@@ -198,12 +204,47 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${isStale ? '<span class="text-[7.5px] uppercase tracking-[0.1em] text-red-500 font-bold">Dormant</span>' : ''}
                         </div>
                     </td>
+                    <td class="p-5 border-b border-white/5 text-center">
+                        <button
+                            class="memory-toggle-btn text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-lg border transition-all ${memoryBtnClass}"
+                            data-id="${gift.id}"
+                            data-enabled="${isMemoryEnabled ? 'true' : 'false'}"
+                        >${memoryLabel}</button>
+                    </td>
                     <td class="p-5 border-b border-white/5">
                         <a href="${editorUrl}" target="_blank" class="bg-white/5 text-slate-300 border border-white/10 text-[9px] uppercase tracking-widest font-bold px-4 py-2 rounded-lg hover:bg-[#d4a373] hover:text-white transition-all whitespace-nowrap inline-block">Bongkar</a>
                     </td>
                 </tr>
             `;
         }).join('');
+    };
+
+    const toggleMemory = async (id, currentEnabled) => {
+        const newEnabled = !currentEnabled;
+        const secret = adminSecretInput ? adminSecretInput.value.trim() : '';
+        if (!secret) return alert('Access Key diperlukan.');
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/toggle-memory`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${secret}`
+                },
+                body: JSON.stringify({ id, enabled: newEnabled })
+            });
+            const data = await res.json();
+            if (data.success) {
+                // Update local data without full reload
+                const gift = allGiftsRaw.find(g => g.id === id);
+                if (gift) gift.secretMemoryEnabled = newEnabled;
+                applyFilters();
+            } else {
+                alert('Gagal: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            alert('Gagal terhubung ke server.');
+        }
     };
 
     const applyFilters = () => {
@@ -261,6 +302,17 @@ document.addEventListener('DOMContentLoaded', () => {
             else selectedIds.delete(id);
             renderTable(allGifts);
             updateBulkActionsUI();
+        }
+    });
+
+    tableBody.addEventListener('click', e => {
+        const btn = e.target.closest('.memory-toggle-btn');
+        if (btn) {
+            const id = btn.dataset.id;
+            const currentEnabled = btn.dataset.enabled === 'true';
+            btn.textContent = 'Memproses...';
+            btn.disabled = true;
+            toggleMemory(id, currentEnabled);
         }
     });
 

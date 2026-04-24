@@ -198,8 +198,22 @@ function _normalizeConfig(raw) {
 
     // Auth
     login_password: raw.login_password || '',
-    login_hint: raw.login_hint || ''
+    login_hint: raw.login_hint || '',
+    // Secret Memory — normalise into array of {url, caption}
+    secretMediaList: _normalizeMediaList(raw),
   };
+}
+
+function _normalizeMediaList(raw) {
+  // New format: secretMediaList = [{url, caption}, ...]
+  if (Array.isArray(raw.secretMediaList) && raw.secretMediaList.length) {
+    return raw.secretMediaList.slice(0, 10).filter(m => m && m.url);
+  }
+  // Legacy format: single secretMedia + secretCaption
+  if (raw.secretMedia || raw.secret_media) {
+    return [{ url: raw.secretMedia || raw.secret_media, caption: raw.secretCaption || raw.secret_caption || '' }];
+  }
+  return [];
 }
 
 function _demoConfig() {
@@ -211,6 +225,10 @@ function _demoConfig() {
     playlist: [],
     theme: 'blush-cream',
     show_watermark: true,
+    secretMediaList: [
+      { url: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=600&q=80', caption: 'Us. Always. ♡' },
+      { url: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=600&q=80', caption: 'Every moment ♡' },
+    ],
   });
 }
 
@@ -431,11 +449,23 @@ async function _typewriteLetter(config) {
 
     if (config.from) _setText('letter-from', config.from);
 
-    // Show download button instantly
+    // Show buttons instantly
     const saveBtnContainer = document.getElementById('save-letter-container');
+    const secretBtn = document.getElementById('btn-secret-memory');
     if (saveBtnContainer) {
+      if (config.secretMediaList && config.secretMediaList.length && secretBtn) {
+        secretBtn.style.display = 'inline-flex';
+      }
       saveBtnContainer.style.display = 'block';
       saveBtnContainer.style.opacity = '1';
+    }
+    _initSecretMemory(config);
+
+    if (params.get('openMemory') === '1' && config.secretMediaList && config.secretMediaList.length) {
+      setTimeout(() => {
+        document.getElementById('letter-end')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        if (secretBtn) secretBtn.click();
+      }, 100);
     }
     return;
   }
@@ -507,12 +537,31 @@ async function _typewriteLetter(config) {
     await _typewriteSimple('letter-from', config.from, 110);
   }
 
-  // 5. Show Download Button smoothly
+  // 5. Dramatic pause — let the reader breathe and absorb the last words
+  await _delay(1500);
+
+  // 6. Reveal the action buttons
   const saveBtnContainer = document.getElementById('save-letter-container');
+  const secretBtn = document.getElementById('btn-secret-memory');
+
   if (saveBtnContainer) {
-    await _delay(800);
+    // Only show the secret button if secretMediaList has items
+    if (config.secretMediaList && config.secretMediaList.length && secretBtn) {
+      secretBtn.style.display = 'inline-flex';
+    }
     saveBtnContainer.style.display = 'block';
     setTimeout(() => { saveBtnContainer.style.opacity = '1'; }, 50);
+  }
+
+  // 7. Init Secret Memory Modal
+  _initSecretMemory(config);
+
+  // 8. Auto-open Secret Memory
+  if (config.secretMediaList && config.secretMediaList.length && secretBtn) {
+    setTimeout(() => {
+      document.getElementById('letter-end')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      secretBtn.click();
+    }, 150);
   }
 }
 
@@ -526,6 +575,138 @@ async function _typewriteSimple(elId, text, speed) {
     el.textContent += ch;
     await _delay(speed);
   }
+}
+
+/* ════════════════════════════════════════════════════════════
+   SECRET MEMORY MODAL
+   ════════════════════════════════════════════════════════════ */
+function _initSecretMemory(config) {
+  const modal    = document.getElementById('modal-secret-memory');
+  const openBtn  = document.getElementById('btn-secret-memory');
+  const closeBtn = document.getElementById('btn-close-memory');
+  const mediaWrap = document.getElementById('polaroid-media-wrap');
+  const captionEl = document.getElementById('polaroid-caption');
+  const polaroid  = document.getElementById('polaroid-frame');
+  const prevBtn   = document.getElementById('btn-memory-prev');
+  const nextBtn   = document.getElementById('btn-memory-next');
+  const counterEl = document.getElementById('polaroid-counter');
+
+  const list = config.secretMediaList || [];
+  if (!modal || !openBtn || list.length === 0) return;
+
+  let currentIndex = 0;
+
+  function _renderSlide(idx) {
+    const item = list[idx];
+    if (!item) return;
+
+    // Stop any playing video first
+    const oldVid = mediaWrap.querySelector('video');
+    if (oldVid) oldVid.pause();
+    mediaWrap.innerHTML = '';
+
+    const isVideo = /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(item.url);
+    if (isVideo) {
+      const vid = document.createElement('video');
+      vid.src = item.url;
+      vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
+      vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;border-radius:1px;';
+      mediaWrap.appendChild(vid);
+      vid.play().catch(() => {});
+    } else {
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.alt = item.caption || 'Memory';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;border-radius:1px;';
+      mediaWrap.appendChild(img);
+    }
+
+    if (captionEl) captionEl.textContent = item.caption || '';
+
+    // Update counter
+    if (list.length > 1 && counterEl) {
+      counterEl.textContent = `${idx + 1} / ${list.length}`;
+      counterEl.style.display = 'block';
+    }
+
+    // Subtle polaroid slight rotation alternation per slide
+    const rot = idx % 2 === 0 ? '-2.5deg' : '2deg';
+    if (polaroid) polaroid.style.transform = `rotate(${rot}) translateY(0) scale(1)`;
+  }
+
+  function _goTo(idx) {
+    currentIndex = (idx + list.length) % list.length;
+    _renderSlide(currentIndex);
+  }
+
+  function _openModal() {
+    currentIndex = 0;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Show arrows only when multiple photos
+    if (list.length > 1) {
+      if (prevBtn) prevBtn.style.display = 'flex';
+      if (nextBtn) nextBtn.style.display = 'flex';
+    }
+
+    // Staggered: backdrop first, then polaroid rises
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        modal.style.background = 'rgba(10, 8, 6, 0.92)';
+        modal.style.backdropFilter = 'blur(12px)';
+        modal.style.webkitBackdropFilter = 'blur(12px)';
+      });
+    });
+
+    setTimeout(() => {
+      if (polaroid) {
+        polaroid.style.opacity = '1';
+        polaroid.style.filter = 'blur(0px)';
+      }
+      _renderSlide(0);
+    }, 120);
+  }
+
+  function _closeModal() {
+    if (polaroid) {
+      polaroid.style.transform = 'rotate(-2.5deg) translateY(40px) scale(0.88)';
+      polaroid.style.opacity = '0';
+      polaroid.style.filter = 'blur(8px)';
+    }
+    modal.style.background = 'rgba(10, 8, 6, 0)';
+    modal.style.backdropFilter = 'blur(0px)';
+    modal.style.webkitBackdropFilter = 'blur(0px)';
+    if (prevBtn) prevBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (counterEl) counterEl.style.display = 'none';
+
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      const vid = mediaWrap ? mediaWrap.querySelector('video') : null;
+      if (vid) vid.pause();
+      if (mediaWrap) mediaWrap.innerHTML = '';
+    }, 750);
+  }
+
+  openBtn.addEventListener('click', _openModal);
+  if (closeBtn) closeBtn.addEventListener('click', _closeModal);
+  if (prevBtn) prevBtn.addEventListener('click', () => _goTo(currentIndex - 1));
+  if (nextBtn) nextBtn.addEventListener('click', () => _goTo(currentIndex + 1));
+
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) _closeModal();
+  });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (modal.style.display === 'none') return;
+    if (e.key === 'Escape') _closeModal();
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') _goTo(currentIndex + 1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   _goTo(currentIndex - 1);
+  });
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -615,7 +796,19 @@ function _initDownloadButton(config) {
         backgroundColor: null,
         onclone: (clonedDoc) => {
           const currentTheme = document.documentElement.getAttribute('data-theme');
-          if (currentTheme) clonedDoc.documentElement.setAttribute('data-theme', currentTheme);
+          if (currentTheme) {
+            clonedDoc.documentElement.setAttribute('data-theme', currentTheme);
+            clonedDoc.body.setAttribute('data-theme', currentTheme);
+            const paper = clonedDoc.getElementById('letter-paper');
+            if (paper) {
+              paper.setAttribute('data-theme', currentTheme);
+              // CRITICAL: Remove filter/animation that breaks html2canvas text anti-aliasing!
+              paper.style.animation = 'none';
+              paper.style.filter = 'none';
+              paper.style.transform = 'none';
+              paper.style.opacity = '1';
+            }
+          }
 
           clonedDoc.querySelectorAll('svg path').forEach(el => {
             el.style.animation = 'none';

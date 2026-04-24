@@ -309,6 +309,136 @@
       </section>
 
       <!-- ══════════════════════════════════════
+           SECTION 4 — MEMORI RAHASIA (Polaroid)
+      ══════════════════════════════════════ -->
+      <section id="section-memory" class="section-card mb-12">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-[10px] uppercase tracking-[0.3em] text-gray-600 font-bold mb-1">Memori Rahasia <span
+                class="text-[#d4a373]">✦</span></h2>
+            <p class="text-[7px] text-[#d4a373] uppercase tracking-[0.2em] font-bold truncate">📸 Foto / Video di Akhir
+              Surat</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button id="btn-preview-memory"
+              class="text-[8px] uppercase tracking-[0.1em] px-3 py-1.5 bg-[#fdf9f4] text-[#b58756] border border-[#d4a373] rounded-full hover:bg-[#d4a373] hover:text-white transition shadow-sm whitespace-nowrap">
+              👁 Preview
+            </button>
+            <button class="section-collapse-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="section-body-inner">
+
+            <!-- ── PREMIUM LOCK OVERLAY (shown when secretMemoryEnabled=false) ── -->
+            <div id="memory-lock-overlay" class="hidden mb-4">
+              <div class="relative rounded-2xl overflow-hidden border border-dashed border-gray-200">
+                <!-- Blurred placeholder UI -->
+                <div class="opacity-25 pointer-events-none p-6 select-none">
+                  <div class="border-2 border-dashed border-[#d4a373]/30 rounded-2xl p-6 text-center">
+                    <div
+                      class="w-9 h-9 rounded-full bg-[#fdf9f4] border border-[#d4a373]/20 flex items-center justify-center mx-auto mb-2">
+                      <svg class="w-4 h-4 text-[#d4a373]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                    </div>
+                    <p class="text-[9px] font-bold text-gray-600 mb-0.5">Tambah Foto / Video</p>
+                    <p class="text-[7px] text-gray-400 uppercase tracking-wider">JPG · PNG · WEBP · MP4</p>
+                  </div>
+                </div>
+                <!-- Lock badge on top -->
+                <div
+                  class="absolute inset-0 flex flex-col items-center justify-center text-center bg-white/60 backdrop-blur-[2px] rounded-2xl">
+                  <div class="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center mb-2 shadow-sm">
+                    <span class="text-xl">🔒</span>
+                  </div>
+                  <p class="text-[10px] font-bold text-gray-700 uppercase tracking-widest mb-1">Fitur Premium</p>
+                  <p class="text-[8px] text-gray-400 leading-relaxed max-w-[200px]">
+                    Hubungi admin untuk<br>mengaktifkan fitur ini.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── ACTUAL CONTENT (hidden / pointer-events-none when locked) ── -->
+            <div id="memory-content-wrap" class="hidden">
+              <!-- Gallery List (rendered by JS) -->
+              <div id="memory-gallery-list" class="space-y-3 mb-4"></div>
+
+              <!-- Add Photo Button (hidden when 10 photos) -->
+              <div id="memory-add-wrap"
+                class="relative border-2 border-dashed border-[#d4a373]/30 rounded-2xl p-6 text-center cursor-pointer hover:border-[#d4a373]/60 hover:bg-[#fdf9f4]/50 transition-all group">
+                <input id="input-memory-file" type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" multiple />
+                <div
+                  class="w-9 h-9 rounded-full bg-[#fdf9f4] border border-[#d4a373]/20 flex items-center justify-center mx-auto mb-2 group-hover:border-[#d4a373]/40 transition-all">
+                  <svg class="w-4 h-4 text-[#d4a373]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <p class="text-[9px] font-bold text-gray-600 mb-0.5">Tambah Foto / Video</p>
+                <p class="text-[7px] text-gray-400 uppercase tracking-wider leading-relaxed">
+                  Maks. 10 File · Video Maks 15 MB (Ideal 1-10 Detik)<br>JPG · PNG · WEBP · MP4
+                </p>
+
+                <!-- Upload Progress -->
+                <div id="memory-upload-progress-wrap" class="hidden mt-3">
+                  <div class="w-full bg-gray-100 rounded-full h-1">
+                    <div id="memory-upload-progress-bar"
+                      class="bg-[#d4a373] h-1 rounded-full transition-all duration-300" style="width:0%"></div>
+                  </div>
+                  <p id="memory-upload-status"
+                    class="text-[7px] text-[#d4a373] font-bold uppercase tracking-widest mt-1.5">Mengupload...</p>
+                </div>
+              </div>
+
+              <!-- Counter -->
+              <p id="memory-count-label" class="text-[7px] text-gray-400 text-center mt-2 mb-4 hidden"></p>
+
+              <!-- Hint -->
+              <div
+                class="section-hint flex items-start gap-3 bg-[#fdf9f4]/50 p-4 rounded-2xl border border-[#d4a373]/10 mt-4">
+                <svg class="w-4 h-4 text-[#d4a373] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
+                  <strong>Optional:</strong> Kosongkan jika tidak ingin menambahkan foto/video. Jika diisi, Polaroid
+                  akan muncul otomatis di akhir surat — penerima bisa swipe antar foto dengan tombol panah.
+                </p>
+              </div>
+            </div>
+
+            <!-- Reference Link Button — ALWAYS visible for FOMO -->
+            <div class="mt-8 flex flex-col items-center gap-2">
+              <a href="https://letter.for-you-always.my.id/index.html?to=letter-test&skipTW=1&skipAuth=1&openMemory=1"
+                id="link-example-memory"
+                target="_blank"
+                class="flex items-center gap-1.5 text-[8px] uppercase tracking-widest font-bold px-5 py-2.5 rounded-full border border-[#d4a373]/40 text-[#b58756] bg-[#fdf9f4] hover:bg-[#d4a373] hover:text-white transition-all shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                Lihat Contoh Hasil Jadi
+              </a>
+              <p class="text-[7px] text-gray-400 italic uppercase tracking-widest font-medium opacity-80">
+                (Hanya sebagai referensi / contoh hasil akhir)
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ══════════════════════════════════════
            PUBLISH BUTTONS
       ══════════════════════════════════════ -->
       <div id="publish-container" class="text-center mt-12 pb-12 space-y-3">

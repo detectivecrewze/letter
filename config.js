@@ -27,12 +27,14 @@ window.STANDALONE_CONFIG = {
   ],
   "theme": "dusty-rose",
   "status": "published",
-  "is_active": false,
+  "is_active": true,
   "show_watermark": true,
   "isPremium": false,
   "_meta": {
     "theme_folder": "letter"
   },
   "publishedAt": "2026-04-15T09:23:04.043Z",
-  "requestedAt": "2026-04-15T09:24:14.010Z"
+  "requestedAt": "2026-04-15T09:24:14.010Z",
+  "secretMedia": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80",
+  "secretCaption": "Us. Always. ♡"
 };

@@ -87,6 +87,13 @@ const Autosave = (() => {
       playlist: Music.getPlaylistArray(),
       theme:    Studio.getActiveTheme(),
 
+      // Section 4 — Memori Rahasia (multi-photo carousel)
+      // Only include if admin has whitelisted this letter for secret memory
+      secretMediaList: Studio.isMemoryEnabled() ? Studio.getMediaList() : [],
+
+      // Preserve the secretMemoryEnabled flag — never overwrite it from studio
+      secretMemoryEnabled: Auth.getInitialConfig()?.secretMemoryEnabled || false,
+
       // Meta
       status:         Auth.getInitialConfig()?.status || 'draft',
       is_active:      true,
