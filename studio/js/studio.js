@@ -31,6 +31,11 @@ const Studio = (() => {
     const isEnabled = config.secretMemoryEnabled === true;
     _applyMemoryLock(isEnabled);
 
+    // Premium locks — theme, password, music
+    const isPrem = config.isPremium === true;
+    _applyPremiumLock(isPrem);
+    Music.setPremiumMode(isPrem);
+
     const existingList = config.secretMediaList || [];
     if (isEnabled && existingList.length) {
       setTimeout(() => {
@@ -85,6 +90,42 @@ const Studio = (() => {
         showToast(`Tema '${_activeTheme}' dipilih`);
       });
     });
+  }
+
+  function _applyPremiumLock(isPrem) {
+    // ── Password section — show content but block interaction ──
+    const passSection = document.getElementById('password-lock-section');
+    if (passSection) {
+      passSection.querySelector('.password-lock-badge')?.remove();
+      if (!isPrem) {
+        // Make inputs visible but non-interactable
+        passSection.querySelectorAll('input').forEach(el => {
+          el.style.pointerEvents = 'none';
+          el.style.opacity = '0.45';
+          el.readOnly = true;
+        });
+        // Small premium badge at top-right of section
+        const badge = document.createElement('div');
+        badge.className = 'password-lock-badge';
+        badge.style.cssText = [
+          'position:absolute', 'top:12px', 'right:14px',
+          'display:flex', 'align-items:center', 'gap:5px',
+          'background:#f3f4f6', 'border:1px solid #e5e7eb',
+          'border-radius:999px', 'padding:3px 10px 3px 6px',
+          'font-size:8px', 'font-weight:700', 'letter-spacing:0.12em',
+          'text-transform:uppercase', 'color:#6b7280', 'z-index:10',
+          'pointer-events:none', 'user-select:none'
+        ].join(';');
+        badge.innerHTML = `<span style="font-size:12px;">🔒</span> Fitur Premium`;
+        passSection.appendChild(badge);
+      } else {
+        passSection.querySelectorAll('input').forEach(el => {
+          el.style.pointerEvents = '';
+          el.style.opacity = '';
+          el.readOnly = false;
+        });
+      }
+    }
   }
 
   function _applyMemoryLock(isEnabled) {
@@ -301,11 +342,14 @@ const Studio = (() => {
   function isMemoryEnabled() {
     return (Auth.getInitialConfig()?.secretMemoryEnabled === true);
   }
+  function isPremium() {
+    return (Auth.getInitialConfig()?.isPremium === true);
+  }
 
   function getStudioPassword() { return _studioPassword; }
   function getActiveTheme() { return _activeTheme; }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getMediaList, isMemoryEnabled };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getMediaList, isMemoryEnabled, isPremium };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {

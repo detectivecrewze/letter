@@ -196,6 +196,30 @@ var index_default = {
 
       try {
         const body = await request.json();
+
+        // ── Free-tier sanitization (server-side guard) ──────────
+        // Read existing config to get the authoritative isPremium flag
+        const existingRaw = await env.LETTER_DATA.get(id);
+        const existingConfig = existingRaw ? JSON.parse(existingRaw) : {};
+        const isPremium = existingConfig.isPremium === true;
+
+        // Preserve server-controlled flags (client must never overwrite them)
+        body.isPremium           = existingConfig.isPremium           ?? false;
+        body.secretMemoryEnabled = existingConfig.secretMemoryEnabled ?? false;
+
+        if (!isPremium) {
+          // Strip password lock
+          body.login_password = '';
+          body.login_hint     = '';
+          // Strip any custom-uploaded audio — allow library tracks only
+          if (Array.isArray(body.playlist)) {
+            body.playlist = body.playlist.filter(t => t.isLibrary === true);
+          }
+          // Strip secret memory photos
+          body.secretMediaList = [];
+        }
+        // ────────────────────────────────────────────────────────
+
         await env.LETTER_DATA.put(id, JSON.stringify(body));
 
         return new Response(JSON.stringify({
@@ -497,6 +521,54 @@ var index_default = {
         return new Response(JSON.stringify({
           success: true,
           id,
+          secretMemoryEnabled: config.secretMemoryEnabled,
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+      } catch (err) {
+        return new Response(JSON.stringify({ success: false, error: err.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ── POST /admin/toggle-premium ────────────────────────────
+    // Enable / disable isPremium + secretMemoryEnabled flags (admin only)
+    if (request.method === 'POST' && url.pathname === '/admin/toggle-premium') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.ADMIN_SECRET;
+
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Akses ditolak.' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const { id, enabled } = await request.json();
+        if (!id) {
+          return new Response(JSON.stringify({ success: false, error: 'ID diperlukan.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const existing = await env.LETTER_DATA.get(id);
+        if (!existing) {
+          return new Response(JSON.stringify({ success: false, error: `Letter '${id}' tidak ditemukan.` }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const config = JSON.parse(existing);
+        config.isPremium           = enabled === true;
+        // When premium is enabled, secret memory is also enabled (and vice versa)
+        config.secretMemoryEnabled = enabled === true;
+        config.updated_at = new Date().toISOString();
+        await env.LETTER_DATA.put(id, JSON.stringify(config));
+
+        return new Response(JSON.stringify({
+          success: true,
+          id,
+          isPremium: config.isPremium,
           secretMemoryEnabled: config.secretMemoryEnabled,
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 

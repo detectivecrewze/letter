@@ -170,6 +170,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 : 'bg-slate-800/40 text-slate-500 border-white/10';
             const memoryLabel = isMemoryEnabled ? '✓ Aktif' : '✗ Terkunci';
 
+            const isPremiumEnabled = gift.isPremium === true;
+            const premiumBtnClass = isPremiumEnabled
+                ? 'bg-amber-500 text-white border-amber-500'
+                : 'bg-slate-800/40 text-slate-500 border-white/10';
+            const premiumLabel = isPremiumEnabled ? '⭐ Premium' : '○ Free';
+
             return `
                 <tr class="${isSelected ? 'bg-white/5' : ''}">
                     <td class="p-5 border-b border-white/5 text-center">
@@ -211,6 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             data-enabled="${isMemoryEnabled ? 'true' : 'false'}"
                         >${memoryLabel}</button>
                     </td>
+                    <td class="p-5 border-b border-white/5 text-center">
+                        <button
+                            class="premium-toggle-btn text-[9px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-lg border transition-all ${premiumBtnClass}"
+                            data-id="${gift.id}"
+                            data-enabled="${isPremiumEnabled ? 'true' : 'false'}"
+                        >${premiumLabel}</button>
+                    </td>
                     <td class="p-5 border-b border-white/5">
                         <a href="${editorUrl}" target="_blank" class="bg-white/5 text-slate-300 border border-white/10 text-[9px] uppercase tracking-widest font-bold px-4 py-2 rounded-lg hover:bg-[#d4a373] hover:text-white transition-all whitespace-nowrap inline-block">Bongkar</a>
                     </td>
@@ -235,9 +248,39 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const data = await res.json();
             if (data.success) {
-                // Update local data without full reload
                 const gift = allGiftsRaw.find(g => g.id === id);
                 if (gift) gift.secretMemoryEnabled = newEnabled;
+                applyFilters();
+            } else {
+                alert('Gagal: ' + (data.error || 'Unknown error'));
+            }
+        } catch (e) {
+            alert('Gagal terhubung ke server.');
+        }
+    };
+
+    const togglePremium = async (id, currentEnabled) => {
+        const newEnabled = !currentEnabled;
+        const secret = adminSecretInput ? adminSecretInput.value.trim() : '';
+        if (!secret) return alert('Access Key diperlukan.');
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/admin/toggle-premium`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${secret}`
+                },
+                body: JSON.stringify({ id, enabled: newEnabled })
+            });
+            const data = await res.json();
+            if (data.success) {
+                // Update both flags locally since toggle-premium sets both
+                const gift = allGiftsRaw.find(g => g.id === id);
+                if (gift) {
+                    gift.isPremium = newEnabled;
+                    gift.secretMemoryEnabled = newEnabled;
+                }
                 applyFilters();
             } else {
                 alert('Gagal: ' + (data.error || 'Unknown error'));
@@ -306,13 +349,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     tableBody.addEventListener('click', e => {
-        const btn = e.target.closest('.memory-toggle-btn');
-        if (btn) {
-            const id = btn.dataset.id;
-            const currentEnabled = btn.dataset.enabled === 'true';
-            btn.textContent = 'Memproses...';
-            btn.disabled = true;
+        const memBtn = e.target.closest('.memory-toggle-btn');
+        if (memBtn) {
+            const id = memBtn.dataset.id;
+            const currentEnabled = memBtn.dataset.enabled === 'true';
+            memBtn.textContent = 'Memproses...';
+            memBtn.disabled = true;
             toggleMemory(id, currentEnabled);
+        }
+
+        const premBtn = e.target.closest('.premium-toggle-btn');
+        if (premBtn) {
+            const id = premBtn.dataset.id;
+            const currentEnabled = premBtn.dataset.enabled === 'true';
+            premBtn.textContent = 'Memproses...';
+            premBtn.disabled = true;
+            togglePremium(id, currentEnabled);
         }
     });
 

@@ -91,17 +91,26 @@ const Autosave = (() => {
       // Only include if admin has whitelisted this letter for secret memory
       secretMediaList: Studio.isMemoryEnabled() ? Studio.getMediaList() : [],
 
-      // Preserve the secretMemoryEnabled flag — never overwrite it from studio
+      // Preserve server-controlled flags — never overwrite from studio
       secretMemoryEnabled: Auth.getInitialConfig()?.secretMemoryEnabled || false,
+      isPremium:           Auth.getInitialConfig()?.isPremium           || false,
 
       // Meta
       status:         Auth.getInitialConfig()?.status || 'draft',
       is_active:      true,
       show_watermark: true,
-      isPremium:      Auth.getInitialConfig()?.isPremium || false,
       _meta:          { theme_folder: 'letter' },
       publishedAt:    Auth.getInitialConfig()?.publishedAt || null,
     };
+
+    // Client-side free-tier guard (worker also enforces this server-side)
+    if (!Studio.isPremium()) {
+      state.login_password = '';
+      state.login_hint     = '';
+      state.playlist = state.playlist.filter(t => t.isLibrary);
+    }
+
+    return state;
   }
 
   return { init, trigger, cancel, saveNow, buildState };

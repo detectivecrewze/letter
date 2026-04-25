@@ -11,6 +11,7 @@ const Music = (() => {
   let playlist      = [];
   let _kurasiFetched = false;
   let _kurasiData   = [];
+  let _isPremium    = false; // set by Studio after auth
 
   // ── Init ─────────────────────────────────────────────────
   function init(existingConfig) {
@@ -102,7 +103,10 @@ const Music = (() => {
       <!-- Tab Bar -->
       <div class="flex bg-gray-50 rounded-lg p-1 mb-5 max-w-xs">
         <button class="tab-library flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold ${isLib ? 'bg-white shadow-sm text-black' : 'text-gray-400 hover:text-black'} rounded-md transition-all">Song Library</button>
-        <button class="tab-upload flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold ${!isLib ? 'bg-white shadow-sm text-black' : 'text-gray-400 hover:text-black'} rounded-md transition-all">Upload MP3</button>
+        ${_isPremium
+          ? `<button class="tab-upload flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold ${!isLib ? 'bg-white shadow-sm text-black' : 'text-gray-400 hover:text-black'} rounded-md transition-all">Upload MP3</button>`
+          : `<button class="tab-upload-locked flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-300 rounded-md cursor-not-allowed relative" disabled title="Fitur Premium">Upload MP3 🔒</button>`
+        }
       </div>
 
       <!-- LIBRARY MODE -->
@@ -175,7 +179,10 @@ const Music = (() => {
     if (!el) return;
 
     el.querySelector('.tab-library')?.addEventListener('click', () => { track.mode = 'library'; renderAll(); Autosave.trigger(); });
-    el.querySelector('.tab-upload')?.addEventListener('click',  () => { track.mode = 'upload';  renderAll(); Autosave.trigger(); });
+    // Only bind upload tab if premium
+    if (_isPremium) {
+      el.querySelector('.tab-upload')?.addEventListener('click',  () => { track.mode = 'upload';  renderAll(); Autosave.trigger(); });
+    }
 
     el.querySelector('.btn-remove-track')?.addEventListener('click', () => {
       if (!confirm('Hapus lagu ini dari surat?')) return;
@@ -328,25 +335,22 @@ const Music = (() => {
         return;
       }
 
-      // Shared preview audio for library menggunakan libAudio dari scope atas
-
-
       list.innerHTML = songs.map((song, i) => `
-      <div class="library-song-item flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0" data-idx="${i}">
-        <button class="lib-play-btn w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 hover:bg-[#d4a373] hover:text-white transition-all" data-idx="${i}">
-          <span class="play-icon text-[10px] ml-0.5">▶</span>
-        </button>
-        <div class="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-          ${song.coverUrl ? `<img src="${song.coverUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-300 text-base\\'>🎵</div>'">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base">🎵</div>`}
-        </div>
-        <div class="flex-1 min-w-0 pointer-events-none">
-          <p class="text-[11px] font-bold text-gray-800 truncate">${song.title}</p>
-          <p class="text-[9px] text-gray-400 mt-0.5">${song.artist} · ${song.genre || ''}</p>
-        </div>
-        <div class="song-check w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0 transition-all pointer-events-none">
-          <span class="check-icon text-[8px] text-white hidden">✓</span>
-        </div>
-      </div>`).join('');
+        <div class="library-song-item relative flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0" data-idx="${i}">
+          <button class="lib-play-btn w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 hover:bg-[#d4a373] hover:text-white transition-all" data-idx="${i}">
+            <span class="play-icon text-[10px] ml-0.5">▶</span>
+          </button>
+          <div class="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 relative">
+            ${song.coverUrl ? `<img src="${song.coverUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-300 text-base\\'>🎵</div>'">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base">🎵</div>`}
+          </div>
+          <div class="flex-1 min-w-0 pointer-events-none">
+            <p class="text-[11px] font-bold text-gray-800 truncate">${song.title}</p>
+            <p class="text-[9px] text-gray-400 mt-0.5">${song.artist} · ${song.genre || ''}</p>
+          </div>
+          <div class="song-check w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0 transition-all pointer-events-none">
+            <span class="check-icon text-[8px] text-white hidden">✓</span>
+          </div>
+        </div>`).join('');
 
       list.querySelectorAll('.library-song-item').forEach(item => {
         const idx = parseInt(item.dataset.idx);
@@ -393,6 +397,7 @@ const Music = (() => {
 
     };
 
+    // Show all songs in library, but they will be greyed out inside renderSongs
     if (_kurasiFetched && _kurasiData.length > 0) {
       renderSongs(_kurasiData);
     } else {
@@ -443,9 +448,17 @@ const Music = (() => {
     }));
   }
 
+  function setPremiumMode(isPrem) {
+    _isPremium = isPrem === true;
+    // If not premium and current track is in upload mode, switch it to library
+    if (!_isPremium) {
+      playlist.forEach(t => { if (t.mode === 'upload' && !t.audio.url) t.mode = 'library'; });
+    }
+  }
+
   function isUploading() {
     return playlist.some(t => t.uploading);
   }
 
-  return { init, fetchKurasi, getPlaylistArray, isUploading };
+  return { init, fetchKurasi, getPlaylistArray, isUploading, setPremiumMode };
 })();
