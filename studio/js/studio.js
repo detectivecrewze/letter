@@ -93,7 +93,31 @@ const Studio = (() => {
   }
 
   function _applyPremiumLock(isPrem) {
-    // ── Password section — show content but block interaction ──
+    // ── 1. Premium Upgrade Button vs Badge & VIP Link ──────────
+    const upgSection = document.getElementById('premium-upgrade-section');
+    const actBadge   = document.getElementById('premium-active-badge');
+    const btnVip     = document.getElementById('btn-publish-vip');
+
+    if (upgSection && actBadge && btnVip) {
+      const lockIcon = btnVip.querySelector('.vip-lock-icon');
+      if (isPrem) {
+        upgSection.classList.add('hidden');
+        actBadge.classList.remove('hidden');
+        btnVip.disabled = false;
+        btnVip.style.opacity = '1';
+        btnVip.style.pointerEvents = 'auto';
+        if (lockIcon) lockIcon.classList.add('hidden');
+      } else {
+        upgSection.classList.remove('hidden');
+        actBadge.classList.add('hidden');
+        btnVip.disabled = true;
+        btnVip.style.opacity = '0.5';
+        btnVip.style.pointerEvents = 'none';
+        if (lockIcon) lockIcon.classList.remove('hidden');
+      }
+    }
+
+    // ── 2. Password section — show content but block interaction ──
     const passSection = document.getElementById('password-lock-section');
     if (passSection) {
       passSection.querySelector('.password-lock-badge')?.remove();
@@ -104,20 +128,20 @@ const Studio = (() => {
           el.style.opacity = '0.45';
           el.readOnly = true;
         });
-        // Small premium badge at top-right of section
+        // Small premium badge inserted nicely below the header
         const badge = document.createElement('div');
-        badge.className = 'password-lock-badge';
-        badge.style.cssText = [
-          'position:absolute', 'top:12px', 'right:14px',
-          'display:flex', 'align-items:center', 'gap:5px',
-          'background:#f3f4f6', 'border:1px solid #e5e7eb',
-          'border-radius:999px', 'padding:3px 10px 3px 6px',
-          'font-size:8px', 'font-weight:700', 'letter-spacing:0.12em',
-          'text-transform:uppercase', 'color:#6b7280', 'z-index:10',
-          'pointer-events:none', 'user-select:none'
-        ].join(';');
-        badge.innerHTML = `<span style="font-size:12px;">🔒</span> Fitur Premium`;
-        passSection.appendChild(badge);
+        badge.className = 'password-lock-badge mb-4 inline-flex items-center gap-1.5 bg-gray-800 text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full shadow-md pointer-events-none';
+        badge.innerHTML = `<span class="text-[10px]">🔒</span> Fitur Premium`;
+        
+        const header = passSection.querySelector('.flex.items-center');
+        if (header) {
+          // Reset any flexWrap we might have added before
+          header.style.flexWrap = '';
+          // Insert right after the header
+          header.insertAdjacentElement('afterend', badge);
+        } else {
+          passSection.insertBefore(badge, passSection.firstChild);
+        }
       } else {
         passSection.querySelectorAll('input').forEach(el => {
           el.style.pointerEvents = '';
@@ -126,6 +150,45 @@ const Studio = (() => {
         });
       }
     }
+
+    // ── 3. Theme Locking ───────────────────────────────────────
+    const premiumThemes = ['dusty-rose', 'midnight'];
+    document.querySelectorAll('.theme-option').forEach(btn => {
+      const theme = btn.dataset.theme;
+      // Remove existing locks
+      const existingLock = btn.querySelector('.theme-lock-badge');
+      if (existingLock) existingLock.remove();
+
+      if (!isPrem && premiumThemes.includes(theme)) {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.5';
+        
+        // Add lock badge to the premium themes
+        const badge = document.createElement('div');
+        badge.className = 'theme-lock-badge';
+        badge.style.cssText = [
+          'position:absolute', 'top:-6px', 'right:-6px',
+          'background:#1f2937', 'color:white', 'font-size:7px',
+          'padding:2px 4px', 'border-radius:999px', 'font-weight:bold',
+          'box-shadow:0 2px 4px rgba(0,0,0,0.2)', 'z-index:10'
+        ].join(';');
+        badge.innerHTML = '🔒 PRO';
+        btn.appendChild(badge);
+
+        // Revert to blush-cream if currently active theme is premium
+        if (btn.classList.contains('active')) {
+           btn.classList.remove('active');
+           const defaultThemeBtn = document.querySelector('.theme-option[data-theme="blush-cream"]');
+           if (defaultThemeBtn) defaultThemeBtn.classList.add('active');
+           _activeTheme = 'blush-cream';
+           // Don't trigger Autosave immediately to avoid infinite loop on load,
+           // just change visually. Autosave handles its own validation.
+        }
+      } else {
+        btn.style.pointerEvents = 'auto';
+        btn.style.opacity = '1';
+      }
+    });
   }
 
   function _applyMemoryLock(isEnabled) {

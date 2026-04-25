@@ -217,6 +217,10 @@ var index_default = {
           }
           // Strip secret memory photos
           body.secretMediaList = [];
+          // Lock premium themes
+          if (['dusty-rose', 'midnight'].includes(body.theme)) {
+            body.theme = 'blush-cream';
+          }
         }
         // ────────────────────────────────────────────────────────
 
@@ -299,6 +303,7 @@ var index_default = {
         const body = await request.json();
         const customId = body.id?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
         const studioPassword = body.studioPassword || null;
+        const isPremium = body.isPremium === true;
 
         if (!customId || customId.length < 3) {
           return new Response(JSON.stringify({ error: "ID minimal 3 karakter" }), { status: 400, headers: corsHeaders });
@@ -312,6 +317,7 @@ var index_default = {
         const initialConfig = {
           id: customId,
           studioPassword: studioPassword,
+          isPremium: isPremium,
           recipientName: "",
           letterTo: "",
           message: "",

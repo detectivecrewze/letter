@@ -13,9 +13,20 @@ const Publisher = (() => {
     document.getElementById('btn-confirm-name')?.addEventListener('click', _doPublish);
     document.getElementById('btn-cancel-name')?.addEventListener('click', () => _toggleModal('modal-name', false));
 
-    // VIP modal
+    // VIP & Premium Modals
     document.getElementById('btn-confirm-name-vip')?.addEventListener('click', _doVipSubmit);
     document.getElementById('btn-cancel-name-vip')?.addEventListener('click', () => _toggleModal('modal-name-vip', false));
+    
+    // Premium Upgrade Direct WhatsApp
+    document.getElementById('btn-upgrade-premium')?.addEventListener('click', () => {
+      const token = Auth.getToken();
+      const waMsg = encodeURIComponent(
+        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+10K)\n\n` +
+        `Letter ID: ${token}\n\n` +
+        `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Upload Musik dan Password Lock.`
+      );
+      window.open(`https://wa.me/6281381543981?text=${waMsg}`, '_blank');
+    });
 
     // Success modal
     document.getElementById('btn-copy-link')?.addEventListener('click', _handleCopyLink);
@@ -218,10 +229,10 @@ const Publisher = (() => {
 
   function _showVipSuccess(token, domain) {
     const waMsg = encodeURIComponent(
-      `REQUEST UPGRADE PREMIUM — LETTER EDITION (+10K)\n\n` +
+      `REQUEST LINK PERSONAL — LETTER EDITION (+10K)\n\n` +
       `Letter ID: ${token}\n` +
       `Request Domain: ${domain}.vercel.app\n\n` +
-      `Halo admin, saya ingin request upgrade akun Premium untuk surat digital saya.`
+      `Halo admin, saya ingin request link personal untuk surat digital saya.`
     );
     const waBtn = document.getElementById('btn-contact-admin-vip');
     if (waBtn) waBtn.href = `https://wa.me/6281381543981?text=${waMsg}`;

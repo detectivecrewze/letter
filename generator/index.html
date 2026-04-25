@@ -77,6 +77,12 @@
         <label for="auto-gen-id" class="text-[10px] text-gray-600 cursor-pointer">Auto-generate ID unik</label>
       </div>
 
+      <!-- Is Premium -->
+      <div class="flex items-center gap-3 pt-1 pb-2">
+        <input type="checkbox" id="gen-is-premium" class="w-3.5 h-3.5 accent-[#d4a373]">
+        <label for="gen-is-premium" class="text-[10px] text-gray-600 cursor-pointer flex items-center gap-1.5">Jadikan Akun Premium <span class="text-[8px] px-1.5 py-0.5 bg-[#d4a373]/10 text-[#b58756] rounded-md font-bold uppercase tracking-widest">PRO</span></label>
+      </div>
+
       <!-- Submit button -->
       <button id="btn-generate" class="w-full bg-[#d4a373] text-white py-3.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-[#c4956a] transition-colors shadow-sm mt-2">
         <span class="btn-text">Buat Link Sekarang</span>
@@ -281,6 +287,7 @@
 
       const id = idInput.value.trim();
       const studioPassword = passInput.value.trim() || null;
+      const isPremium = document.getElementById('gen-is-premium').checked;
 
       if (!id || id.length < 3) {
         errEl.textContent = 'ID minimal 3 karakter!';
@@ -299,7 +306,7 @@
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${_authToken}`
           },
-          body: JSON.stringify({ id, studioPassword })
+          body: JSON.stringify({ id, studioPassword, isPremium })
         });
         const data = await res.json();
 

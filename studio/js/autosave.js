@@ -108,6 +108,9 @@ const Autosave = (() => {
       state.login_password = '';
       state.login_hint     = '';
       state.playlist = state.playlist.filter(t => t.isLibrary);
+      if (['dusty-rose', 'midnight'].includes(state.theme)) {
+        state.theme = 'blush-cream';
+      }
     }
 
     return state;
