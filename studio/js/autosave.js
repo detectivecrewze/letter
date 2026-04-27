@@ -107,10 +107,17 @@ const Autosave = (() => {
     if (!Studio.isPremium()) {
       state.login_password = '';
       state.login_hint     = '';
-      state.playlist = state.playlist.filter(t => t.isLibrary);
+      state.playlist = (state.playlist || []).filter(t => t.isLibrary);
       if (['dusty-rose', 'midnight'].includes(state.theme)) {
         state.theme = 'blush-cream';
       }
+      // Strip media if not premium and not explicitly enabled
+      if (!Studio.isMemoryEnabled()) {
+        state.secretMediaList = [];
+      }
+    } else {
+      // Premium users ALWAYS send their media list
+      state.secretMediaList = Studio.getMediaList();
     }
 
     return state;

@@ -59,6 +59,7 @@ const Music = (() => {
       cover:      { url: data.coverUrl || null },
       title:      data.title || '',
       artist:     data.artist || '',
+      quotes:     data.quotes || '',
       isPlaying:  false,
       uploading:  false,
     };
@@ -321,6 +322,8 @@ const Music = (() => {
       track.mode       = 'library';
       track.title      = selectedSong.title;
       track.artist     = selectedSong.artist;
+      track.quotes     = selectedSong.quotes || '';
+      track.isLibrary  = true;
       track.cover.url  = selectedSong.coverUrl || null;
       track.audio.url  = selectedSong.audioUrl || null;
       track.audio.name = selectedSong.title;
@@ -463,6 +466,7 @@ const Music = (() => {
       coverUrl:   t.cover.url || null,
       title:      t.title.trim(),
       artist:     t.artist.trim(),
+      quotes:     t.quotes || null,
     }));
   }
 
