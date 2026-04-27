@@ -54,7 +54,7 @@ const Music = (() => {
   function _createTrack(data = {}) {
     return {
       id:         'track_' + Date.now() + '_' + Math.floor(Math.random() * 9999),
-      mode:       data.isLibrary ? 'library' : 'upload',
+      mode:       (data.isLibrary === true || !data.url) ? 'library' : 'upload',
       audio:      { url: data.url || data.src || null, name: data.audioName || data.name || null },
       cover:      { url: data.coverUrl || null },
       title:      data.title || '',
@@ -335,10 +335,12 @@ const Music = (() => {
         return;
       }
 
-      list.innerHTML = songs.map((song, i) => `
-        <div class="library-song-item relative flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0" data-idx="${i}">
+      list.innerHTML = songs.map((song, i) => {
+        const isLocked = !_isPremium && i > 9;
+        return `
+        <div class="library-song-item relative flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0 ${isLocked ? 'library-song-locked' : ''}" data-idx="${i}">
           <button class="lib-play-btn w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 hover:bg-[#d4a373] hover:text-white transition-all" data-idx="${i}">
-            <span class="play-icon text-[10px] ml-0.5">▶</span>
+            <span class="play-icon text-[10px] ml-0.5">${isLocked ? '🔒' : '▶'}</span>
           </button>
           <div class="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 relative">
             ${song.coverUrl ? `<img src="${song.coverUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-300 text-base\\'>🎵</div>'">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base">🎵</div>`}
@@ -347,25 +349,31 @@ const Music = (() => {
             <p class="text-[11px] font-bold text-gray-800 truncate">${song.title}</p>
             <p class="text-[9px] text-gray-400 mt-0.5">${song.artist} · ${song.genre || ''}</p>
           </div>
+          ${isLocked ? `<div class="premium-lock-badge">Premium</div>` : `
           <div class="song-check w-5 h-5 rounded-full border-2 border-gray-200 flex items-center justify-center flex-shrink-0 transition-all pointer-events-none">
             <span class="check-icon text-[8px] text-white hidden">✓</span>
-          </div>
-        </div>`).join('');
+          </div>`}
+        </div>`;
+      }).join('');
 
       list.querySelectorAll('.library-song-item').forEach(item => {
         const idx = parseInt(item.dataset.idx);
         const song = songs[idx];
+        const isLocked = !_isPremium && idx > 9;
         const playBtn = item.querySelector('.lib-play-btn');
 
         // Playback logic
         playBtn.addEventListener('click', (e) => {
           e.stopPropagation(); 
+          if (isLocked) return Studio.showToast('Lagu ini hanya untuk pengguna Premium 💎');
           
           if (libAudio.src !== song.audioUrl && song.audioUrl) libAudio.src = song.audioUrl;
 
           if (libAudio.paused) {
             document.querySelectorAll('audio').forEach(a => a.pause());
-            list.querySelectorAll('.play-icon').forEach(icon => icon.textContent = '▶');
+            list.querySelectorAll('.play-icon').forEach(icon => {
+               if (icon.textContent !== '🔒') icon.textContent = '▶';
+            });
             libAudio.play();
             playBtn.querySelector('.play-icon').textContent = '⏸';
           } else {
@@ -375,22 +383,32 @@ const Music = (() => {
         });
 
         libAudio.addEventListener('ended', () => {
-          playBtn.querySelector('.play-icon').textContent = '▶';
+          if (playBtn.querySelector('.play-icon').textContent !== '🔒') {
+            playBtn.querySelector('.play-icon').textContent = '▶';
+          }
         });
 
         // Selection logic
         item.addEventListener('click', () => {
+          if (isLocked) return Studio.showToast('Upgrade ke Premium untuk membuka semua lagu 💎');
+          
           selectedSong = song;
           list.querySelectorAll('.library-song-item').forEach(el => {
             el.classList.remove('bg-[#fdf9f4]');
             const chk = el.querySelector('.song-check');
-            chk.style.background = ''; chk.style.borderColor = '#e5e7eb';
-            el.querySelector('.check-icon').classList.add('hidden');
+            if (chk) {
+              chk.style.background = ''; chk.style.borderColor = '#e5e7eb';
+            }
+            const icon = el.querySelector('.check-icon');
+            if (icon) icon.classList.add('hidden');
           });
           item.classList.add('bg-[#fdf9f4]');
           const chk = item.querySelector('.song-check');
-          chk.style.background = '#d4a373'; chk.style.borderColor = '#d4a373';
-          item.querySelector('.check-icon').classList.remove('hidden');
+          if (chk) {
+            chk.style.background = '#d4a373'; chk.style.borderColor = '#d4a373';
+          }
+          const icon = item.querySelector('.check-icon');
+          if (icon) icon.classList.remove('hidden');
           modal.querySelector('#library-confirm-btn').disabled = false;
         });
       });

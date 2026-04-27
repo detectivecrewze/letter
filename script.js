@@ -149,6 +149,11 @@ async function init() {
   // Transition to letter
   showState('letter');
 
+  // Trigger Falling Particles
+  if (window.Particles) {
+    window.Particles.init(config.theme || 'blush-cream');
+  }
+
   // Trigger animasi "Rising from Depth" pada kertas surat
   const paper = document.getElementById('letter-paper');
   if (paper) {

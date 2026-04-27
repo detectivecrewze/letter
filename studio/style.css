@@ -834,3 +834,41 @@ textarea,
     height: 28px !important;
   }
 }
+
+/* ── Music Library Locked State ── */
+.library-song-locked {
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  background: #fafafa;
+}
+
+.library-song-locked:hover {
+  background: #fafafa !important;
+}
+
+.library-song-locked .lib-play-btn {
+  background: #eeeeee !important;
+  color: #cccccc !important;
+  cursor: not-allowed !important;
+}
+
+.library-song-locked img, 
+.library-song-locked .flex-shrink-0 {
+  filter: grayscale(1) opacity(0.5);
+}
+
+.premium-lock-badge {
+  position: absolute;
+  top: 50%;
+  right: 1.25rem;
+  transform: translateY(-50%);
+  background: #fdf2f2;
+  color: #dc2626;
+  font-size: 7px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid #fecaca;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
