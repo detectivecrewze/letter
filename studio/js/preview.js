@@ -84,7 +84,8 @@ const Preview = (() => {
 
     // Langsung buka dengan ?theme= override — tidak perlu save dulu.
     // Theme override dibaca di gift page (script.js) tanpa mengubah config tersimpan.
-    const previewUrl = `../index.html?to=${token}&skipTW=1&skipAuth=1&theme=${encodeURIComponent(theme)}`;
+    // ?previewOnly=1 → musik tidak dimainkan (free-user preview mode)
+    const previewUrl = `../index.html?to=${token}&skipTW=1&skipAuth=1&theme=${encodeURIComponent(theme)}&previewOnly=1`;
     previewWin.location.href = previewUrl;
   }
 

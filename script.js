@@ -111,21 +111,23 @@ async function init() {
 
   // Apply theme (Prioritize URL param for testing/preview)
   const themeOverride = params.get('theme');
+  const isPreviewOnly = params.get('previewOnly') === '1';
   const activeTheme = themeOverride || config.theme || 'blush-cream';
   applyTheme(activeTheme);
-
-  // Prebuffer first song
-  if (config.playlist && config.playlist.length > 0) {
-    const audio = _audioEl();
-    audio.src = config.playlist[0].src || config.playlist[0].url || '';
-    audio.load();
-  }
 
   // Render static skeleton (invisible until shown)
   _renderLetterSkeleton(config);
 
   // Initialize music player early (so it's ready for the iOS gesture trigger)
-  _initMusicPlayer(config);
+  // Skip jika ini adalah free-user theme preview (?previewOnly=1)
+  if (!isPreviewOnly) {
+    if (config.playlist && config.playlist.length > 0) {
+      const audio = _audioEl();
+      audio.src = config.playlist[0].src || config.playlist[0].url || '';
+      audio.load();
+    }
+    _initMusicPlayer(config);
+  }
 
   // Inject activeTheme ke config agar _initDownloadButton pakai tema yang benar
   // (termasuk saat ?theme= override aktif untuk free-user preview)
@@ -155,6 +157,23 @@ async function init() {
   }
 
   // Show envelope — wait for user tap
+  // Exception: ?openMemory=1 → skip amplop & bunga, langsung ke surat + memori
+  const isOpenMemory = params.get('openMemory') === '1';
+
+  if (isOpenMemory) {
+    // Langsung render surat (instant, tanpa typewriter)
+    config._forceSkipTW = true;
+    showState('letter');
+    if (window.Particles) window.Particles.init(activeTheme);
+    const paper = document.getElementById('letter-paper');
+    if (paper) {
+      requestAnimationFrame(() => requestAnimationFrame(() => paper.classList.add('is-revealing')));
+    }
+    await _delay(400);
+    await _typewriteLetter(config);
+    return;
+  }
+
   showState('envelope');
   await _waitForEnvelopeOpen(config, activeTheme);
 
@@ -458,7 +477,7 @@ function _renderLetterSkeleton(config) {
    ════════════════════════════════════════════════════════════ */
 async function _typewriteLetter(config) {
   const params = new URLSearchParams(window.location.search);
-  const skipTW = params.get('skipTW') === '1';
+  const skipTW = params.get('skipTW') === '1' || config._forceSkipTW === true;
 
   if (skipTW) {
     // ── Instant Render Mode ──────────────────────────────

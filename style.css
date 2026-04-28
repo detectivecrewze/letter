@@ -143,11 +143,11 @@
   --env-texture-opacity: 0.03; 
   --text: #e8dcc8; /* Goldish text */
 
-  /* Seal Midnight (Gold/Silver) */
-  --seal-bg: #c9a96e;
-  --seal-inner: #b39255;
-  --seal-accent: #f2e1c1;
-  --seal-text: #4a3820;
+  /* Seal Midnight (Deep Red) */
+  --seal-bg: #9b1c2e;
+  --seal-inner: #7a1220;
+  --seal-accent: #c94060;
+  --seal-text: #fde8e8;
 }
 
 /* ── Crimson Theme ────────────────────────────────────────────── */
