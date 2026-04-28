@@ -111,7 +111,8 @@ async function init() {
 
   // Apply theme (Prioritize URL param for testing/preview)
   const themeOverride = params.get('theme');
-  applyTheme(themeOverride || config.theme || 'blush-cream');
+  const activeTheme = themeOverride || config.theme || 'blush-cream';
+  applyTheme(activeTheme);
 
   // Prebuffer first song
   if (config.playlist && config.playlist.length > 0) {
@@ -125,6 +126,10 @@ async function init() {
 
   // Initialize music player early (so it's ready for the iOS gesture trigger)
   _initMusicPlayer(config);
+
+  // Inject activeTheme ke config agar _initDownloadButton pakai tema yang benar
+  // (termasuk saat ?theme= override aktif untuk free-user preview)
+  config.theme = activeTheme;
 
   // Initialize download button logic
   _initDownloadButton(config);
@@ -142,7 +147,7 @@ async function init() {
 
   // Show envelope — wait for user tap
   showState('envelope');
-  await _waitForEnvelopeOpen(config);
+  await _waitForEnvelopeOpen(config, activeTheme);
 
   // TUNGGU sampai bunga benar-benar rontok dan hilang
   await new Promise(resolve => {
@@ -154,7 +159,7 @@ async function init() {
 
   // Trigger Falling Particles
   if (window.Particles) {
-    window.Particles.init(config.theme || 'blush-cream');
+    window.Particles.init(activeTheme);
   }
 
   // Trigger animasi "Rising from Depth" pada kertas surat
@@ -245,7 +250,7 @@ function _demoConfig() {
    ════════════════════════════════════════════════════════════ */
 let _renderLetterTimeStart = 0;
 
-function _waitForEnvelopeOpen(config) {
+function _waitForEnvelopeOpen(config, activeTheme) {
   return new Promise(resolve => {
     const scene = document.getElementById('envelope-scene');
     const wrapper = document.getElementById('envelope-wrapper');
@@ -274,8 +279,8 @@ function _waitForEnvelopeOpen(config) {
       setTimeout(async () => {
         if (scene) scene.classList.add('is-exit');
 
-        // Mulai transisi bunga
-        await _playFlowerTransition(config.theme);
+        // Mulai transisi bunga — pakai activeTheme agar ?theme= override ikut
+        await _playFlowerTransition(activeTheme || config.theme);
 
         // Resolve (switch to letter state) SETELAH seluruh transisi bunga selesai
         resolve();
@@ -730,8 +735,6 @@ const _THEME_BG = {
   'dusty-rose': ['#f5dada', '#ead0d0'],
   'midnight': ['#1a1f2e', '#111624'],
   'blush-cream': ['#f5e8d8', '#ecdccb'],
-  'crimson': ['#2a0a10', '#1a0608'],
-  'obsidian': ['#0d1a12', '#081208'],
   'default': ['#f5e8d8', '#ecdccb'],
 };
 
