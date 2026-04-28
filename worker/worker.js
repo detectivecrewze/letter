@@ -218,7 +218,7 @@ var index_default = {
           // Strip secret memory photos
           body.secretMediaList = [];
           // Lock premium themes
-          if (['dusty-rose', 'midnight'].includes(body.theme)) {
+          if (['dusty-rose', 'midnight', 'crimson', 'obsidian'].includes(body.theme)) {
             body.theme = 'blush-cream';
           }
         }
@@ -325,7 +325,7 @@ var index_default = {
           playlist: [],
           status: "draft",
           is_active: true,
-          secretMemoryEnabled: false,
+          secretMemoryEnabled: isPremium,
           created_at: new Date().toISOString()
         };
 

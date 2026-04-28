@@ -43,6 +43,8 @@ const THEME_MAP = {
   'dusty-rose': 'dusty-rose',
   'midnight': 'midnight',
   'midnight-blue': 'midnight',
+  'crimson': 'crimson',
+  'obsidian': 'obsidian',
 };
 
 function applyTheme(theme) {
@@ -107,8 +109,9 @@ async function init() {
     return;
   }
 
-  // Apply theme
-  applyTheme(config.theme || 'blush-cream');
+  // Apply theme (Prioritize URL param for testing/preview)
+  const themeOverride = params.get('theme');
+  applyTheme(themeOverride || config.theme || 'blush-cream');
 
   // Prebuffer first song
   if (config.playlist && config.playlist.length > 0) {
@@ -270,10 +273,10 @@ function _waitForEnvelopeOpen(config) {
       // 4. After flap finishes (~1100ms), start flower transition
       setTimeout(async () => {
         if (scene) scene.classList.add('is-exit');
-        
+
         // Mulai transisi bunga
         await _playFlowerTransition(config.theme);
-        
+
         // Resolve (switch to letter state) SETELAH seluruh transisi bunga selesai
         resolve();
       }, 1100);
@@ -302,6 +305,10 @@ async function _playFlowerTransition(theme) {
     flowerAssets = ['./assets/flower_midnight1.png', './assets/flower_midnight2.png'];
   } else if (theme && theme.toLowerCase().includes('sage')) {
     flowerAssets = ['./assets/flowers_sage1.png', './assets/flowers_sage2.png'];
+  } else if (theme && theme.toLowerCase().includes('crimson')) {
+    flowerAssets = ['./assets/crimson1.png', './assets/crimson2.png'];
+  } else if (theme && theme.toLowerCase().includes('obsidian')) {
+    flowerAssets = ['./assets/obsidian1.png', './assets/obisidan2.png'];
   }
 
   // === KONFIGURASI KERAPATAN ===
@@ -360,7 +367,7 @@ async function _playFlowerTransition(theme) {
       img.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scale(0)`;
       img.style.opacity = '0';
       img.style.willChange = 'transform, opacity';
-      
+
       // Animasi membesar dan berputar dibuat lebih pas (1.2 detik)
       img.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-in-out';
       img.style.width = '150px';
@@ -381,7 +388,7 @@ async function _playFlowerTransition(theme) {
 
           // 2. Mulai proses gugur setelah hold sejenak
           setTimeout(() => {
-            
+
             let maxFallDelay = 0;
 
             // Animasi berguguran bergelombang (dari tengah ke pinggir)
@@ -395,11 +402,11 @@ async function _playFlowerTransition(theme) {
                 const fallDuration = 2.0 + Math.random();
                 flower.img.style.transition = `transform ${fallDuration}s ease-in, opacity ${fallDuration - 0.5}s ease-in-out`;
                 flower.img.style.opacity = '0';
-                
+
                 // Jatuh ke bawah 100-250px dan sedikit berputar tambahan
                 const fallY = 100 + Math.random() * 150;
                 const extraRotation = (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 30);
-                
+
                 flower.img.style.transform = `translate(-50%, calc(-50% + ${fallY}px)) rotate(${flower.finalRotation + extraRotation}deg) scale(${flower.finalScale})`;
               }, fallDelay);
             });
@@ -409,7 +416,7 @@ async function _playFlowerTransition(theme) {
             setTimeout(() => {
               container.remove();
               window.dispatchEvent(new CustomEvent('flowers-gone'));
-            }, maxFallDelay + 1200); 
+            }, maxFallDelay + 1200);
 
           }, 600); // Waktu tahan (hold)
         }
@@ -586,14 +593,14 @@ async function _typewriteSimple(elId, text, speed) {
    SECRET MEMORY MODAL
    ════════════════════════════════════════════════════════════ */
 function _initSecretMemory(config) {
-  const modal    = document.getElementById('modal-secret-memory');
-  const openBtn  = document.getElementById('btn-secret-memory');
+  const modal = document.getElementById('modal-secret-memory');
+  const openBtn = document.getElementById('btn-secret-memory');
   const closeBtn = document.getElementById('btn-close-memory');
   const mediaWrap = document.getElementById('polaroid-media-wrap');
   const captionEl = document.getElementById('polaroid-caption');
-  const polaroid  = document.getElementById('polaroid-frame');
-  const prevBtn   = document.getElementById('btn-memory-prev');
-  const nextBtn   = document.getElementById('btn-memory-next');
+  const polaroid = document.getElementById('polaroid-frame');
+  const prevBtn = document.getElementById('btn-memory-prev');
+  const nextBtn = document.getElementById('btn-memory-next');
   const counterEl = document.getElementById('polaroid-counter');
 
   const list = config.secretMediaList || [];
@@ -617,7 +624,7 @@ function _initSecretMemory(config) {
       vid.autoplay = true; vid.loop = true; vid.muted = true; vid.playsInline = true;
       vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;border-radius:1px;';
       mediaWrap.appendChild(vid);
-      vid.play().catch(() => {});
+      vid.play().catch(() => { });
     } else {
       const img = document.createElement('img');
       img.src = item.url;
@@ -710,7 +717,7 @@ function _initSecretMemory(config) {
     if (modal.style.display === 'none') return;
     if (e.key === 'Escape') _closeModal();
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') _goTo(currentIndex + 1);
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   _goTo(currentIndex - 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') _goTo(currentIndex - 1);
   });
 }
 
@@ -723,6 +730,8 @@ const _THEME_BG = {
   'dusty-rose': ['#f5dada', '#ead0d0'],
   'midnight': ['#1a1f2e', '#111624'],
   'blush-cream': ['#f5e8d8', '#ecdccb'],
+  'crimson': ['#2a0a10', '#1a0608'],
+  'obsidian': ['#0d1a12', '#081208'],
   'default': ['#f5e8d8', '#ecdccb'],
 };
 

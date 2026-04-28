@@ -59,6 +59,24 @@ window.Particles = (function () {
       sizeRange: [1, 3],
       wind: 0,
       opacityRange: [0.4, 0.85]
+    },
+    'crimson': {
+      count: 30,
+      type: 'petal',
+      colors: ['#a82035', '#c03050', '#8b1828', '#d04060', '#9a1a2e'],
+      speedRange: [-0.3, -0.9],
+      sizeRange: [5, 11],
+      wind: 0.15,
+      opacityRange: [0.35, 0.75]
+    },
+    'obsidian': {
+      count: 38,
+      type: 'star',
+      colors: ['#7ab89a', '#2d6a4f', '#a8d8c0', '#52a878', '#b5ddc8'],
+      speedRange: [-0.12, -0.48],
+      sizeRange: [1, 3],
+      wind: 0,
+      opacityRange: [0.35, 0.80]
     }
   };
 

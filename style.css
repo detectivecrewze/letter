@@ -57,6 +57,12 @@
   --env-border: rgba(180, 150, 130, 0.45);
   --env-shadow: rgba(160, 130, 110, 0.2);
   --env-texture-opacity: 0.08;
+
+  /* Default Seal Colors */
+  --seal-bg: #bf4c30;
+  --seal-inner: #8b2d1a;
+  --seal-accent: #a83a23;
+  --seal-text: #fde8e0;
 }
 
 /* ── Sage Theme ────────────────────────────────────────────────── */
@@ -136,6 +142,80 @@
   --env-shadow: rgba(0, 0, 0, 0.4);
   --env-texture-opacity: 0.03; 
   --text: #e8dcc8; /* Goldish text */
+
+  /* Seal Midnight (Gold/Silver) */
+  --seal-bg: #c9a96e;
+  --seal-inner: #b39255;
+  --seal-accent: #f2e1c1;
+  --seal-text: #4a3820;
+}
+
+/* ── Crimson Theme ────────────────────────────────────────────── */
+[data-theme="crimson"] {
+  --bg: #1a050a;
+  --bg-card: #250810;
+  --bg-card2: #2d0a14;
+  --text: #f8e8e0;
+  --text-light: #d4a090;
+  --text-faint: #8a4a40;
+  --accent: #c03050;
+  --accent-soft: #4d0f1a;
+  --gold: #d4a780;
+  --gold-soft: #5a2a1a;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --shadow-deep: rgba(0, 0, 0, 0.55);
+  --border: rgba(192, 48, 80, 0.25);
+  --tape-color: rgba(192, 48, 80, 0.3);
+
+  /* Envelope Crimson */
+  --env-bg: #250810;
+  --env-fold: #2d0a14;
+  --env-fold-bottom: #350c18;
+  --env-flap-open: #1a050a;
+  --env-label-bg: #250810;
+  --env-border: rgba(192, 48, 80, 0.28);
+  --env-shadow: rgba(0, 0, 0, 0.45);
+  --env-texture-opacity: 0.02;
+
+  /* Seal Crimson (Wine Red) */
+  --seal-bg: #a82035;
+  --seal-inner: #8b1828;
+  --seal-accent: #d04060;
+  --seal-text: #f8e8e0;
+}
+
+/* ── Obsidian Theme ───────────────────────────────────────────── */
+[data-theme="obsidian"] {
+  --bg: #050a07;
+  --bg-card: #0a100c;
+  --bg-card2: #0e1610;
+  --text: #d8e8d0;
+  --text-light: #6a9870;
+  --text-faint: #2a4830;
+  --accent: #2d6a4f;
+  --accent-soft: #0d2018;
+  --gold: #7ab89a;
+  --gold-soft: #152a1e;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --shadow-deep: rgba(0, 0, 0, 0.65);
+  --border: rgba(45, 106, 79, 0.22);
+  --tape-color: rgba(45, 106, 79, 0.28);
+
+  /* Envelope Obsidian */
+  --env-bg: #0a100c;
+  --env-fold: #0e1610;
+  --env-fold-bottom: #121c14;
+  --env-flap-open: #050a07;
+  --env-label-bg: #0a100c;
+  --env-border: rgba(45, 106, 79, 0.25);
+  --env-shadow: rgba(0, 0, 0, 0.55);
+  --env-texture-opacity: 0.03;
+
+  /* Seal Obsidian (Emerald/Gold) */
+  --seal-bg: #2d6a4f;
+  --seal-inner: #1b4332;
+  --seal-accent: #52b788;
+  --seal-text: #d8e8d0;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -382,8 +462,10 @@ body::before {
   overflow: hidden;
   transition: box-shadow 0.3s, transform 0.3s;
 
-  /* Hide white-spot pattern on midnight theme */
-  [data-theme="midnight"] & {
+  /* Hide white-spot pattern on dark themes */
+  [data-theme="midnight"] &,
+  [data-theme="crimson"] &,
+  [data-theme="obsidian"] & {
     background-image: none;
   }
 
@@ -740,9 +822,20 @@ body::before {
   /* Ruled lines — subtle */
   background-image: repeating-linear-gradient(var(--bg-card),
     var(--bg-card) 1.85rem,
-    rgba(212, 165, 165, 0.055) 1.85rem,
-    rgba(212, 165, 165, 0.055) 1.9rem);
+    rgba(212, 165, 165, 0.035) 1.85rem,
+    rgba(212, 165, 165, 0.035) 1.9rem);
   background-position: 0 5.5rem;
+
+  /* Disable Stack Effect and Ruled Lines on Dark Themes */
+  [data-theme="midnight"] &,
+  [data-theme="crimson"] &,
+  [data-theme="obsidian"] & {
+    &::before, &::after { display: none; }
+    background-image: none; /* Clean paper, no lines */
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Very faint border */
+    border-radius: 4px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -778,7 +871,7 @@ body::before {
     box-shadow:
       0 1px 3px var(--shadow),
       0 8px 32px var(--shadow),
-      0 0 60px rgba(212, 165, 165, 0.25);
+      0 0 60px var(--accent-soft);
   }
   100% {
     opacity: 1;
@@ -803,7 +896,7 @@ body::before {
   backdrop-filter: blur(1px);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   z-index: 20;
 }

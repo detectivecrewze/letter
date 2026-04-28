@@ -152,7 +152,7 @@ const Studio = (() => {
     }
 
     // ── 3. Theme Locking ───────────────────────────────────────
-    const premiumThemes = ['dusty-rose', 'midnight'];
+    const premiumThemes = ['dusty-rose', 'midnight', 'crimson', 'obsidian'];
     document.querySelectorAll('.theme-option').forEach(btn => {
       const theme = btn.dataset.theme;
       // Remove existing locks
