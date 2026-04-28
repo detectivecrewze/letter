@@ -131,6 +131,15 @@ async function init() {
   // (termasuk saat ?theme= override aktif untuk free-user preview)
   config.theme = activeTheme;
 
+  // Jika ?theme= override aktif → ini adalah free-user premium preview
+  // Sembunyikan tombol "Simpan Surat Ini" agar user tidak bisa screenshot tema premium
+  if (themeOverride) {
+    const saveContainer = document.getElementById('save-letter-container');
+    const saveBtn = document.getElementById('btn-save-letter');
+    if (saveBtn) saveBtn.style.display = 'none';
+    if (saveContainer) saveContainer.dataset.noSave = '1'; // flag untuk _initDownloadButton
+  }
+
   // Initialize download button logic
   _initDownloadButton(config);
 
@@ -313,7 +322,7 @@ async function _playFlowerTransition(theme) {
   } else if (theme && theme.toLowerCase().includes('crimson')) {
     flowerAssets = ['./assets/crimson1.png', './assets/crimson2.png'];
   } else if (theme && theme.toLowerCase().includes('obsidian')) {
-    flowerAssets = ['./assets/obsidian1.png', './assets/obisidan2.png'];
+    flowerAssets = ['./assets/obsidian1.png', './assets/obsidian2.png'];
   }
 
   // === KONFIGURASI KERAPATAN ===
@@ -735,6 +744,8 @@ const _THEME_BG = {
   'dusty-rose': ['#f5dada', '#ead0d0'],
   'midnight': ['#1a1f2e', '#111624'],
   'blush-cream': ['#f5e8d8', '#ecdccb'],
+  'crimson': ['#1a050a', '#120308'],
+  'obsidian': ['#050a07', '#0a100c'],
   'default': ['#f5e8d8', '#ecdccb'],
 };
 
@@ -898,7 +909,7 @@ function _initDownloadButton(config) {
       const drawX = Math.round((STORY_W - drawW) / 2);
       const drawY = Math.round((STORY_H - drawH) / 2);
 
-      const isDark = themeKey === 'midnight' || themeKey === 'midnight-blue';
+      const isDark = ['midnight', 'midnight-blue', 'crimson', 'obsidian'].includes(themeKey);
 
       // Soft drop shadow behind the letter card
       ctx.save();
@@ -966,7 +977,7 @@ function _initDownloadButton(config) {
 
     // ── Build modal overlay ───────────────────────────────────────
     const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
-    const isDark = themeKey === 'midnight' || themeKey === 'midnight-blue';
+    const isDark = ['midnight', 'midnight-blue', 'crimson', 'obsidian'].includes(themeKey);
     const accent = '#c9a96e';
     const bg = isDark ? 'rgba(12,14,26,0.96)' : 'rgba(252,242,232,0.96)';
     const textColor = isDark ? '#f5e8d8' : '#3a2012';
