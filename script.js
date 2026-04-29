@@ -111,9 +111,24 @@ async function init() {
 
   // Apply theme (Prioritize URL param for testing/preview)
   const themeOverride = params.get('theme');
+  const textureOverride = params.get('texture'); // 'handmade' or empty
   const isPreviewOnly = params.get('previewOnly') === '1';
   const activeTheme = themeOverride || config.theme || 'blush-cream';
   applyTheme(activeTheme);
+
+  // ── Apply Premium Paper texture if isPremium OR Overrides are active ──
+  const paperEl = document.getElementById('letter-paper');
+  const envWrapper = document.getElementById('envelope-wrapper');
+  
+  const showPremiumTexture = (config.isPremium === true) || 
+                             (config.paperTexture === 'handmade') || 
+                             (themeOverride) || 
+                             (textureOverride === 'handmade');
+
+  if (showPremiumTexture) {
+    if (paperEl) paperEl.classList.add('is-premium-paper');
+    if (envWrapper) envWrapper.classList.add('is-premium-envelope');
+  }
 
   // Render static skeleton (invisible until shown)
   _renderLetterSkeleton(config);
@@ -240,6 +255,7 @@ function _normalizeConfig(raw) {
     // Auth
     login_password: raw.login_password || '',
     login_hint: raw.login_hint || '',
+    isPremium: raw.isPremium === true || raw.is_premium === true,
     // Secret Memory — normalise into array of {url, caption}
     secretMediaList: _normalizeMediaList(raw),
   };

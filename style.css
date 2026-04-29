@@ -23,7 +23,8 @@
   --bg: #fdf6ee;
   --bg-card: #fef9f3;
   --bg-card2: #fffdf8;
-  --text: #2c1b14; /* Deep espresso / darker ink */
+  --text: #2c1b14;
+  /* Deep espresso / darker ink */
   --text-light: #7a5c4d;
   --text-faint: #c4a898;
   --accent: #d4a5a5;
@@ -50,8 +51,10 @@
 
   /* Envelope Default (Blush) */
   --env-bg: #ecdccb;
-  --env-fold: #d1bba4;        /* Darkened even more */
-  --env-fold-bottom: #c4ab92; /* Darkened even more */
+  --env-fold: #d1bba4;
+  /* Darkened even more */
+  --env-fold-bottom: #c4ab92;
+  /* Darkened even more */
   --env-flap-open: #dfcebd;
   --env-label-bg: #faf7f2;
   --env-border: rgba(180, 150, 130, 0.45);
@@ -95,7 +98,8 @@
   --bg: #fdf0f0;
   --bg-card: #fff5f5;
   --bg-card2: #fffafb;
-  --text: #2b1820; /* Deep blackberry / darker ink */
+  --text: #2b1820;
+  /* Deep blackberry / darker ink */
   --text-light: #804051;
   --text-faint: #c49898;
   --accent: #c4858a;
@@ -107,8 +111,10 @@
 
   /* Envelope Rose */
   --env-bg: #f2e4e4;
-  --env-fold: #dbbfbf;        /* Darkened even more */
-  --env-fold-bottom: #c9a9a9; /* Darkened even more */
+  --env-fold: #dbbfbf;
+  /* Darkened even more */
+  --env-fold-bottom: #c9a9a9;
+  /* Darkened even more */
   --env-flap-open: #dfcece;
   --env-label-bg: #fffafa;
   --env-border: rgba(196, 133, 138, 0.3);
@@ -140,8 +146,9 @@
   --env-label-bg: #141e35;
   --env-border: rgba(107, 140, 186, 0.2);
   --env-shadow: rgba(0, 0, 0, 0.4);
-  --env-texture-opacity: 0.03; 
-  --text: #e8dcc8; /* Goldish text */
+  --env-texture-opacity: 0.03;
+  --text: #e8dcc8;
+  /* Goldish text */
 
   /* Seal Midnight (Deep Red) */
   --seal-bg: #9b1c2e;
@@ -428,8 +435,15 @@ body::before {
 }
 
 @keyframes float-envelope {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 /* Wrapper — clickable */
@@ -827,15 +841,106 @@ body::before {
   background-position: 0 5.5rem;
 
   /* Disable Stack Effect and Ruled Lines on Dark Themes */
+  /* Disable Stack Effect and Ruled Lines on Dark Themes */
   [data-theme="midnight"] &,
   [data-theme="crimson"] &,
   [data-theme="obsidian"] & {
     &::before, &::after { display: none; }
-    background-image: none; /* Clean paper, no lines */
+    background-image: none !important; /* Clean paper, no lines */
     border: 1px solid rgba(255, 255, 255, 0.05); /* Very faint border */
     border-radius: 4px;
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
   }
+}
+
+/* ── Premium Handmade Paper Texture ───────────────────────────── */
+.letter-paper.is-premium-paper {
+  background-color: #fdfbf7 !important; /* Warm Bone/Cotton White */
+  background-image: 
+    /* Subtler ruled lines for premium */
+    repeating-linear-gradient(rgba(0,0,0,0),
+      rgba(0,0,0,0) 1.85rem,
+      rgba(60, 30, 20, 0.015) 1.85rem,
+      rgba(60, 30, 20, 0.015) 1.9rem),
+    /* Handmade fiber texture overlay */
+    url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
+  background-blend-mode: multiply;
+  border: none !important; /* Let clip-path handle the edge */
+  
+  /* Deckle Edge (Rough Torn Edge Effect) */
+  clip-path: polygon(
+    0% 1%, 5% 0%, 10% 1.2%, 15% 0%, 20% 0.8%, 25% 0%, 30% 1%, 35% 0%, 40% 1.1%, 45% 0%, 50% 0.9%, 55% 0%, 60% 1.2%, 65% 0%, 70% 1%, 75% 0%, 80% 1.1%, 85% 0%, 90% 0.8%, 95% 0%, 100% 1.5%,
+    99% 5%, 100% 10%, 98.5% 15%, 100% 20%, 99.2% 25%, 100% 30%, 98.8% 35%, 100% 40%, 99% 45%, 100% 50%, 98.6% 55%, 100% 60%, 99.1% 65%, 100% 70%, 98.7% 75%, 100% 80%, 99.2% 85%, 100% 90%, 98.9% 95%, 100% 99%,
+    95% 100%, 90% 98.8%, 85% 100%, 80% 99.1%, 75% 100%, 70% 98.7%, 65% 100%, 60% 99.2%, 55% 100%, 50% 98.9%, 45% 100%, 40% 99.1%, 35% 100%, 30% 98.8%, 25% 100%, 20% 99%, 15% 100%, 10% 98.7%, 5% 100%, 0% 98.5%,
+    1% 95%, 0% 90%, 1.2% 85%, 0% 80%, 0.8% 75%, 0% 70%, 1.1% 65%, 0% 60%, 0.9% 55%, 0% 50%, 1.2% 45%, 0% 40%, 1% 35%, 0% 30%, 1.1% 25%, 0% 20%, 0.8% 15%, 0% 10%, 1.5% 5%, 0% 0%
+  );
+
+  /* Deep Paper Shadow */
+  box-shadow: 
+    0 12px 40px rgba(60, 30, 20, 0.1),
+    0 2px 4px rgba(60, 30, 20, 0.05) !important;
+}
+
+/* ── Premium Envelope Styling ───────────────────────────────── */
+.is-premium-envelope .envelope-body {
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
+  background-blend-mode: multiply;
+}
+
+/* Premium Flap with Deckle Edge & Texture */
+.is-premium-envelope .env-flap {
+  border: none !important;
+  width: 100%;
+  height: 155px;
+  background-color: var(--env-flap-open);
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
+  background-blend-mode: multiply;
+  /* Rough triangular clip-path */
+  clip-path: polygon(
+    0% 0%, 100% 0%,
+    95% 10%, 90% 20%, 85% 30.5%, 80% 40%, 75% 50.8%, 70% 60%, 65% 70.2%, 60% 80%, 55% 90.5%, 50% 100%,
+    45% 90.8%, 40% 80%, 35% 70.5%, 30% 60%, 25% 50.2%, 20% 40%, 15% 30.8%, 10% 20%, 5% 10.5%, 0% 0%
+  );
+}
+
+/* Envelope Folds Premium Texture Overlay */
+.is-premium-envelope .env-folds::before,
+.is-premium-envelope .env-folds::after,
+.is-premium-envelope .env-bottom-fold {
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+  background-blend-mode: multiply;
+  background-size: 200px 200px;
+}
+
+/* Specific adjustment for dark premium themes */
+[data-theme="midnight"] .is-premium-envelope .envelope-body,
+[data-theme="midnight"] .is-premium-envelope .env-flap,
+[data-theme="crimson"] .is-premium-envelope .envelope-body,
+[data-theme="crimson"] .is-premium-envelope .env-flap,
+[data-theme="obsidian"] .is-premium-envelope .envelope-body,
+[data-theme="obsidian"] .is-premium-envelope .env-flap {
+  background-blend-mode: soft-light;
+}
+
+/* Ink absorption effect for text on premium paper */
+.letter-paper.is-premium-paper .letter-body p, 
+.letter-paper.is-premium-paper .letter-title, 
+.letter-paper.is-premium-paper .letter-to, 
+.letter-paper.is-premium-paper .letter-from {
+  /* Menghapus mix-blend-mode: multiply karena merusak visibilitas di tema gelap */
+  opacity: 1;
+  filter: contrast(1.1);
+  text-shadow: 0.3px 0.3px 0.5px rgba(0,0,0,0.05);
+}
+
+/* Specific adjustment for dark premium themes if needed */
+[data-theme="midnight"] .letter-paper.is-premium-paper,
+[data-theme="crimson"] .letter-paper.is-premium-paper,
+[data-theme="obsidian"] .letter-paper.is-premium-paper {
+  background-color: var(--bg-card) !important;
+  background-blend-mode: soft-light;
+  clip-path: none; /* Keep straight edges for dark modern look */
+  border: 1px solid rgba(255,255,255,0.08) !important;
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -862,10 +967,12 @@ body::before {
       0 8px 32px var(--shadow),
       0 0 0 rgba(212, 165, 165, 0);
   }
+
   40% {
     opacity: 0.7;
     filter: blur(4px);
   }
+
   70% {
     /* Warm glow pulse seolah cahaya lilin menyorot */
     box-shadow:
@@ -873,6 +980,7 @@ body::before {
       0 8px 32px var(--shadow),
       0 0 60px var(--accent-soft);
   }
+
   100% {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -950,7 +1058,7 @@ body::before {
   animation: drawOrnament 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 0.6s;
 }
 
-.letter-title-underline svg path[d*="L"], 
+.letter-title-underline svg path[d*="L"],
 .letter-title-underline svg circle {
   opacity: 0;
   transform: scale(0);
@@ -959,24 +1067,51 @@ body::before {
 }
 
 /* Diamond center */
-.letter-title-underline svg path[d*="L"] { animation-delay: 1.3s; transform-origin: 200px 32px; }
+.letter-title-underline svg path[d*="L"] {
+  animation-delay: 1.3s;
+  transform-origin: 200px 32px;
+}
 
 /* End points */
-.letter-title-underline svg circle:nth-child(3) { animation-delay: 1.5s; } /* Gold left */
-.letter-title-underline svg circle:nth-child(4) { animation-delay: 1.5s; } /* Gold right */
-.letter-title-underline svg circle:nth-child(6) { animation-delay: 1.7s; } /* Pink left */
-.letter-title-underline svg circle:nth-child(7) { animation-delay: 1.7s; } /* Pink right */
+.letter-title-underline svg circle:nth-child(3) {
+  animation-delay: 1.5s;
+}
+
+/* Gold left */
+.letter-title-underline svg circle:nth-child(4) {
+  animation-delay: 1.5s;
+}
+
+/* Gold right */
+.letter-title-underline svg circle:nth-child(6) {
+  animation-delay: 1.7s;
+}
+
+/* Pink left */
+.letter-title-underline svg circle:nth-child(7) {
+  animation-delay: 1.7s;
+}
+
+/* Pink right */
 
 @keyframes ornamentFadeUp {
-  to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes drawOrnament {
-  to { stroke-dashoffset: 0; }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes popPoint {
-  to { opacity: 1; transform: scale(1); }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .letter-date {
@@ -1374,7 +1509,8 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg); /* Fallback */
+  background: var(--bg);
+  /* Fallback */
   background: color-mix(in srgb, var(--bg), transparent 30%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -1534,11 +1670,22 @@ body::before {
 }
 
 @keyframes gateShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-10px);
+  }
+
+  75% {
+    transform: translateX(10px);
+  }
 }
 
 .gate-shake {
   animation: gateShake 0.4s ease-in-out !important;
 }
+
