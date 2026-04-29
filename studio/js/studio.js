@@ -236,10 +236,12 @@ const Studio = (() => {
 
     // ── 4. Texture Locking ──────────────────────────────────────
     document.querySelectorAll('.texture-option').forEach(btn => {
+      const texture = btn.dataset.texture;
       const existingLock = btn.querySelector('.texture-lock-badge');
       if (existingLock) existingLock.remove();
 
-      if (!isPrem) {
+      // Only lock 'handmade' for non-premium users
+      if (!isPrem && texture === 'handmade') {
         btn.style.pointerEvents = 'none';
         btn.style.opacity = '0.6';
         const lockBadge = document.createElement('div');
@@ -249,13 +251,14 @@ const Studio = (() => {
         btn.appendChild(lockBadge);
         
         // Revert to normal if currently active texture is handmade
-        if (btn.classList.contains('active') && btn.dataset.texture === 'handmade') {
+        if (btn.classList.contains('active')) {
           btn.classList.remove('active');
           const defaultBtn = document.querySelector('.texture-option[data-texture="normal"]');
           if (defaultBtn) defaultBtn.classList.add('active');
           _activeTexture = 'normal';
         }
       } else {
+        // 'normal' is always unlocked, 'handmade' is unlocked for premium
         btn.style.pointerEvents = 'auto';
         btn.style.opacity = '1';
       }
