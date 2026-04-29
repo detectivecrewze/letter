@@ -122,8 +122,7 @@ async function init() {
   
   const showPremiumTexture = (config.paperTexture === 'handmade') || 
                              (textureOverride === 'handmade') ||
-                             (themeOverride && config.paperTexture !== 'normal') ||
-                             (config.isPremium && config.paperTexture !== 'normal');
+                             (themeOverride && config.paperTexture === 'handmade');
 
   if (showPremiumTexture) {
     if (paperEl) paperEl.classList.add('is-premium-paper');

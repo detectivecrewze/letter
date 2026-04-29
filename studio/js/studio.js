@@ -51,8 +51,8 @@ const Studio = (() => {
       if (btn.dataset.theme === _activeTheme) btn.classList.add('active');
     });
 
-    // Texture Initial State
-    _activeTexture = config.paperTexture || (isPrem ? 'handmade' : 'normal');
+    // Texture Initial State (Default always 'normal' unless specifically saved as 'handmade')
+    _activeTexture = config.paperTexture || 'normal';
     document.querySelectorAll('.texture-option').forEach(btn => {
       btn.classList.remove('active');
       if (btn.dataset.texture === _activeTexture) btn.classList.add('active');
