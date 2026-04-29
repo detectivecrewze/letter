@@ -120,14 +120,17 @@ async function init() {
   const paperEl = document.getElementById('letter-paper');
   const envWrapper = document.getElementById('envelope-wrapper');
   
-  const showPremiumTexture = (config.isPremium === true) || 
-                             (config.paperTexture === 'handmade') || 
-                             (themeOverride) || 
-                             (textureOverride === 'handmade');
+  const showPremiumTexture = (config.paperTexture === 'handmade') || 
+                             (textureOverride === 'handmade') ||
+                             (themeOverride && config.paperTexture !== 'normal') ||
+                             (config.isPremium && config.paperTexture !== 'normal');
 
   if (showPremiumTexture) {
     if (paperEl) paperEl.classList.add('is-premium-paper');
     if (envWrapper) envWrapper.classList.add('is-premium-envelope');
+  } else {
+    if (paperEl) paperEl.classList.remove('is-premium-paper');
+    if (envWrapper) envWrapper.classList.remove('is-premium-envelope');
   }
 
   // Render static skeleton (invisible until shown)
@@ -258,6 +261,7 @@ function _normalizeConfig(raw) {
     isPremium: raw.isPremium === true || raw.is_premium === true,
     // Secret Memory — normalise into array of {url, caption}
     secretMediaList: _normalizeMediaList(raw),
+    paperTexture: raw.paperTexture || '',
   };
 }
 

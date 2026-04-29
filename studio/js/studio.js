@@ -5,6 +5,7 @@ const Studio = (() => {
 
   let _studioPassword = '';
   let _activeTheme = 'blush-cream';
+  let _activeTexture = 'normal';
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -49,6 +50,13 @@ const Studio = (() => {
     document.querySelectorAll('.theme-option').forEach(btn => {
       if (btn.dataset.theme === _activeTheme) btn.classList.add('active');
     });
+
+    // Texture Initial State
+    _activeTexture = config.paperTexture || (isPrem ? 'handmade' : 'normal');
+    document.querySelectorAll('.texture-option').forEach(btn => {
+      btn.classList.remove('active');
+      if (btn.dataset.texture === _activeTexture) btn.classList.add('active');
+    });
   }
 
   function _setVal(id, val) {
@@ -88,6 +96,17 @@ const Studio = (() => {
         _activeTheme = btn.dataset.theme;
         Autosave.trigger();
         showToast(`Tema '${_activeTheme}' dipilih`);
+      });
+    });
+
+    // Texture Selection Binding
+    document.querySelectorAll('.texture-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.texture-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        _activeTexture = btn.dataset.texture;
+        Autosave.trigger();
+        showToast(`Tekstur '${_activeTexture}' dipilih`);
       });
     });
   }
@@ -211,6 +230,30 @@ const Studio = (() => {
           const defaultThemeBtn = document.querySelector('.theme-option[data-theme="blush-cream"]');
           if (defaultThemeBtn) defaultThemeBtn.classList.add('active');
           _activeTheme = 'blush-cream';
+        }
+      }
+    });
+
+    // ── 4. Texture Locking ──────────────────────────────────────
+    document.querySelectorAll('.texture-option').forEach(btn => {
+      const existingLock = btn.querySelector('.texture-lock-badge');
+      if (existingLock) existingLock.remove();
+
+      if (!isPrem) {
+        btn.style.pointerEvents = 'none';
+        btn.style.opacity = '0.6';
+        const lockBadge = document.createElement('div');
+        lockBadge.className = 'texture-lock-badge';
+        lockBadge.style.cssText = 'position:absolute; top:-6px; right:-6px; background:#1f2937; color:white; font-size:7px; padding:2px 5px; border-radius:999px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; pointer-events:none;';
+        lockBadge.innerHTML = '🔒 PRO';
+        btn.appendChild(lockBadge);
+        
+        // Revert to normal if currently active texture is handmade
+        if (btn.classList.contains('active') && btn.dataset.texture === 'handmade') {
+          btn.classList.remove('active');
+          const defaultBtn = document.querySelector('.texture-option[data-texture="normal"]');
+          if (defaultBtn) defaultBtn.classList.add('active');
+          _activeTexture = 'normal';
         }
       } else {
         btn.style.pointerEvents = 'auto';
@@ -439,8 +482,9 @@ const Studio = (() => {
 
   function getStudioPassword() { return _studioPassword; }
   function getActiveTheme() { return _activeTheme; }
+  function getActiveTexture() { return _activeTexture; }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getMediaList, isMemoryEnabled, isPremium };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getMediaList, isMemoryEnabled, isPremium };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {
