@@ -860,11 +860,12 @@ body::before {
     /* Subtler ruled lines for premium */
     repeating-linear-gradient(rgba(0,0,0,0),
       rgba(0,0,0,0) 1.85rem,
-      rgba(60, 30, 20, 0.015) 1.85rem,
-      rgba(60, 30, 20, 0.015) 1.9rem),
+      rgba(60, 30, 20, 0.012) 1.85rem,
+      rgba(60, 30, 20, 0.012) 1.9rem),
     /* Handmade fiber texture overlay */
     url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
   background-blend-mode: multiply;
+  background-size: 450px auto !important; /* Fixed scale for high-DPI consistency */
   border: none !important; /* Let clip-path handle the edge */
   
   /* Deckle Edge (Rough Torn Edge Effect) */
@@ -938,7 +939,9 @@ body::before {
 [data-theme="crimson"] .letter-paper.is-premium-paper,
 [data-theme="obsidian"] .letter-paper.is-premium-paper {
   background-color: var(--bg-card) !important;
-  background-blend-mode: soft-light;
+  background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png") !important;
+  background-blend-mode: soft-light !important;
+  background-size: 500px auto !important;
   clip-path: none; /* Keep straight edges for dark modern look */
   border: 1px solid rgba(255,255,255,0.08) !important;
 }
