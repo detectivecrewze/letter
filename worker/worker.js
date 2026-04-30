@@ -441,6 +441,7 @@ var index_default = {
                 from: config.from || '',
                 status: config.status || 'unknown',
                 theme: config.theme || 'blush-cream',
+                paperTexture: config.paperTexture || 'normal',
                 playlist: config.playlist || [],
                 lastOpened: config.lastOpened || null,
                 isPremium: config.isPremium || false,

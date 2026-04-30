@@ -156,6 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (theme.includes('sage')) { badgeClass = 'badge-sage'; themeName = 'Sage'; }
             else if (theme.includes('rose')) { badgeClass = 'badge-rose'; themeName = 'Rose'; }
             else if (theme.includes('midnight')) { badgeClass = 'badge-midnight'; themeName = 'Midnight'; }
+            else if (theme.includes('crimson')) { badgeClass = 'badge-crimson'; themeName = 'Crimson'; }
+            else if (theme.includes('obsidian')) { badgeClass = 'badge-obsidian'; themeName = 'Obsidian'; }
+
+            const paperTexture = gift.paperTexture || 'normal';
+            const paperName = paperTexture === 'handmade' ? 'Kertas Handmade' : 'Kertas Biasa';
+            const paperClass = paperTexture === 'handmade' ? 'text-amber-500' : 'text-slate-400';
 
             const giftUrl = `${window.location.origin}/index.html?to=${gift.id}`;
             const editorUrl = `../studio/index.html?token=${gift.id}`;
@@ -193,6 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="p-5 border-b border-white/5">
                         <div class="flex flex-col gap-1.5 items-start">
                             <span class="badge-tag ${badgeClass}">${themeName}</span>
+                            <span class="text-[8px] ${paperClass} font-bold uppercase tracking-widest flex items-center gap-1">
+                                ${paperTexture === 'handmade' ? '📜 ' : '📄 '} ${paperName}
+                            </span>
                         </div>
                     </td>
                     <td class="p-5 border-b border-white/5">
