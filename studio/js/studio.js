@@ -15,6 +15,54 @@ const Studio = (() => {
     _bindInputs();
     _initCollapse();
     showToast('Studio siap ✨');
+
+    // Show premium discovery modal for first-time free users
+    const isPrem = config.isPremium === true;
+    if (!isPrem) {
+      const token = Auth.getToken() || 'default';
+      const storageKey = `premium_discovery_seen_${token}`;
+      if (!localStorage.getItem(storageKey)) {
+        setTimeout(() => _showPremiumDiscovery(storageKey), 1200);
+      }
+    }
+  }
+
+  function _showPremiumDiscovery(storageKey) {
+    const modal = document.getElementById('modal-premium-discovery');
+    const card = document.getElementById('premium-discovery-card');
+    const backdrop = document.getElementById('premium-discovery-backdrop');
+    const btnLater = document.getElementById('btn-discovery-later');
+    const btnUpgrade = document.getElementById('btn-discovery-upgrade');
+    if (!modal || !card) return;
+
+    // Show modal
+    modal.classList.remove('hidden');
+
+    // Animate card in after a tick
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        card.style.transform = 'translateY(0)';
+        card.style.opacity = '1';
+      });
+    });
+
+    function _close() {
+      card.style.transform = 'translateY(40px)';
+      card.style.opacity = '0';
+      setTimeout(() => modal.classList.add('hidden'), 400);
+      localStorage.setItem(storageKey, '1');
+    }
+
+    // Close on backdrop click
+    backdrop?.addEventListener('click', _close, { once: true });
+
+    // Close on "Nanti saja"
+    btnLater?.addEventListener('click', _close, { once: true });
+
+    // Also mark as seen when upgrade button is clicked (they've seen the offer)
+    btnUpgrade?.addEventListener('click', () => {
+      localStorage.setItem(storageKey, '1');
+    }, { once: true });
   }
 
   function _populate(config) {
