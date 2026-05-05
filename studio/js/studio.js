@@ -137,7 +137,11 @@ const Studio = (() => {
 
     function updateTextareaFont() {
       if (!letterMsg || !fontSelect || !sizeSelect) return;
-      letterMsg.classList.remove('font-caveat', 'font-cormorant', 'font-dmsans', 'font-sacramento', 'size-small', 'size-medium', 'size-large');
+      letterMsg.classList.remove(
+        'font-caveat', 'font-dancing', 'font-shadows', 'font-indie', 
+        'font-cormorant', 'font-dmsans', 'font-sacramento', 
+        'size-small', 'size-medium', 'size-large'
+      );
       letterMsg.classList.add(`font-${fontSelect.value}`, sizeSelect.value);
     }
 

@@ -15,6 +15,9 @@
 
 /* ── Typography Live Preview Utilities ── */
 .font-caveat { font-family: 'Caveat', cursive !important; }
+.font-dancing { font-family: 'Dancing Script', cursive !important; }
+.font-shadows { font-family: 'Shadows Into Light', cursive !important; }
+.font-indie { font-family: 'Indie Flower', cursive !important; }
 .font-cormorant { font-family: 'Cormorant Garamond', serif !important; }
 .font-dmsans { font-family: 'DM Sans', sans-serif !important; }
 .font-sacramento { font-family: 'Sacramento', cursive !important; font-size: 1.4em !important; }
