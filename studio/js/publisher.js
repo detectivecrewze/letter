@@ -118,12 +118,12 @@ const Publisher = (() => {
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.M
       });
-      setTimeout(() => {
-        const img = qrBox.querySelector('img');
-        const canvas = qrBox.querySelector('canvas');
-        if (img) { img.style.margin = '0 auto'; img.style.display = 'block'; img.style.borderRadius = '8px'; }
-        if (canvas) canvas.style.display = 'none';
-      }, 100);
+      
+      // Fix for mobile: qrcode.js might use canvas instead of img on some devices.
+      // Style both elements using CSS instead of unreliable timeouts.
+      const styleTag = document.createElement('style');
+      styleTag.textContent = '#qr-code-box img, #qr-code-box canvas { margin: 0 auto !important; display: block; border-radius: 8px; }';
+      qrBox.appendChild(styleTag);
     }
 
     // Bind Download QR Button
