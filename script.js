@@ -253,6 +253,10 @@ function _normalizeConfig(raw) {
     is_active: raw.is_active !== false,
     // Dedicated salutation for the letter body
     salutation: raw.letterTo || raw.salutation || raw.to || 'Dear,',
+    
+    // Typography
+    fontFamily: raw.fontFamily || 'caveat',
+    fontSize: raw.fontSize || 'size-medium',
 
     // Auth
     login_password: raw.login_password || '',
@@ -506,6 +510,9 @@ async function _typewriteLetter(config) {
 
     const bodyEl = document.getElementById('letter-body');
     if (bodyEl) {
+      if (config.fontFamily) bodyEl.classList.add(`font-${config.fontFamily}`);
+      if (config.fontSize) bodyEl.classList.add(config.fontSize);
+
       const raw = (config.letter_body || '').trim();
       const paragraphs = raw.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
       bodyEl.innerHTML = paragraphs.map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
@@ -556,6 +563,9 @@ async function _typewriteLetter(config) {
   // 3. Type Body
   const bodyEl = document.getElementById('letter-body');
   if (bodyEl) {
+    if (config.fontFamily) bodyEl.classList.add(`font-${config.fontFamily}`);
+    if (config.fontSize) bodyEl.classList.add(config.fontSize);
+
     const raw = (config.letter_body || '').trim();
     const paragraphs = raw.split(/\n{2,}/).map(p => p.trim()).filter(Boolean);
 

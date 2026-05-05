@@ -202,6 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="text-[8px] ${paperClass} font-bold uppercase tracking-widest flex items-center gap-1">
                                 ${paperTexture === 'handmade' ? '📜 ' : '📄 '} ${paperName}
                             </span>
+                            <span class="text-[7.5px] text-slate-500 uppercase font-bold tracking-tight mt-1">
+                                ✒️ ${gift.fontFamily || 'caveat'} · 📏 ${gift.fontSize?.replace('size-', '') || 'medium'}
+                            </span>
                         </div>
                     </td>
                     <td class="p-5 border-b border-white/5">

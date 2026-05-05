@@ -71,6 +71,8 @@ const Studio = (() => {
     _setVal('input-letter-title', config.title || '');
     _setVal('input-letter-date', config.date || '');
     _setVal('input-letter-to', config.letterTo || config.salutation || '');
+    _setVal('select-font-family', config.fontFamily || 'caveat');
+    _setVal('select-font-size', config.fontSize || 'size-medium');
     _setVal('input-letter-msg', config.message || config.letter_body || '');
     _setVal('input-letter-from', config.from || '');
     _setVal('input-login-password', config.login_password || '');
@@ -118,6 +120,8 @@ const Studio = (() => {
       'input-letter-title',
       'input-letter-date',
       'input-letter-to',
+      'select-font-family',
+      'select-font-size',
       'input-letter-msg',
       'input-letter-from',
       'input-login-password',
@@ -125,6 +129,22 @@ const Studio = (() => {
     ].forEach(id => {
       document.getElementById(id)?.addEventListener('input', () => Autosave.trigger());
     });
+
+    // Typography Live Preview
+    const fontSelect = document.getElementById('select-font-family');
+    const sizeSelect = document.getElementById('select-font-size');
+    const letterMsg = document.getElementById('input-letter-msg');
+
+    function updateTextareaFont() {
+      if (!letterMsg || !fontSelect || !sizeSelect) return;
+      letterMsg.classList.remove('font-caveat', 'font-cormorant', 'font-dmsans', 'font-sacramento', 'size-small', 'size-medium', 'size-large');
+      letterMsg.classList.add(`font-${fontSelect.value}`, sizeSelect.value);
+    }
+
+    if (fontSelect) fontSelect.addEventListener('change', updateTextareaFont);
+    if (sizeSelect) sizeSelect.addEventListener('change', updateTextareaFont);
+    // Initial apply
+    updateTextareaFont();
 
     // Upload binding
     _initMemoryUpload();
@@ -311,6 +331,36 @@ const Studio = (() => {
         btn.style.opacity = '1';
       }
     });
+    // ── 5. Typography Locking ─────────────────────────────────────
+    const fontSelect = document.getElementById('select-font-family');
+    const sizeSelect = document.getElementById('select-font-size');
+    const typoSection = document.getElementById('typography-section');
+    if (fontSelect && sizeSelect) {
+      if (!isPrem) {
+        fontSelect.disabled = true;
+        sizeSelect.disabled = true;
+        if (typoSection) typoSection.style.opacity = '0.6';
+        
+        // Force revert to default if somehow set
+        fontSelect.value = 'caveat';
+        sizeSelect.value = 'size-medium';
+        
+        // Add lock badge to the section title
+        const labelRow = typoSection?.querySelector('.flex.items-center');
+        if (labelRow && !labelRow.querySelector('.typo-lock-badge')) {
+           const lockBadge = document.createElement('div');
+           lockBadge.className = 'typo-lock-badge bg-[#1f2937] text-white text-[7px] px-1.5 py-0.5 rounded-full font-bold ml-2 shadow-sm';
+           lockBadge.innerHTML = '🔒 PRO';
+           labelRow.appendChild(lockBadge);
+        }
+      } else {
+        fontSelect.disabled = false;
+        sizeSelect.disabled = false;
+        if (typoSection) typoSection.style.opacity = '1';
+        const lockBadge = typoSection?.querySelector('.typo-lock-badge');
+        if (lockBadge) lockBadge.remove();
+      }
+    }
   }
 
   function _applyMemoryLock(isEnabled) {

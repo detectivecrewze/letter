@@ -259,6 +259,18 @@ body::before {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ══════════════════════════════════════════════════════════════ */
+.font-caveat { font-family: 'Caveat', cursive !important; }
+.font-cormorant { font-family: 'Cormorant Garamond', serif !important; }
+.font-dmsans { font-family: 'DM Sans', sans-serif !important; }
+.font-sacramento { font-family: 'Sacramento', cursive !important; font-size: 1.4em; } /* Sacramento needs to be slightly larger */
+
+.size-small { font-size: 1.15rem !important; line-height: 1.6 !important; }
+.size-medium { font-size: 1.42rem !important; line-height: 1.95 !important; }
+.size-large { font-size: 1.75rem !important; line-height: 2.1 !important; }
+
+/* ══════════════════════════════════════════════════════════════
    STATE SCREENS
    ══════════════════════════════════════════════════════════════ */
 .state-screen {

@@ -228,10 +228,13 @@ const Publisher = (() => {
   }
 
   function _showVipSuccess(token, domain) {
+    const state = Autosave.buildState();
     const waMsg = encodeURIComponent(
       `REQUEST LINK PERSONAL — LETTER EDITION (+10K)\n\n` +
       `Letter ID: ${token}\n` +
-      `Request Domain: ${domain}.vercel.app\n\n` +
+      `Request Domain: ${domain}.vercel.app\n` +
+      `Font: ${state.fontFamily}\n` +
+      `Size: ${state.fontSize}\n\n` +
       `Halo admin, saya ingin request link personal untuk surat digital saya.`
     );
     const waBtn = document.getElementById('btn-contact-admin-vip');
