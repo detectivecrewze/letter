@@ -1,0 +1,14 @@
+name = "birthday-retro"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "BIRTHDAY_DATA"
+id = "aa99267722f84f46a144b45e07e17117"
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "letter-assets"
+
+[vars]
+# Set secrets via: wrangler secret put ADMIN_SECRET / GENERATOR_SECRET

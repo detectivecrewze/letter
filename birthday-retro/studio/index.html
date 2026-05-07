@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎂 Birthday Studio — Windows 98 Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Fredoka:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ LOADING ═══ -->
+  <div id="loading-screen" class="screen-overlay">
+    <div class="win-dialog" style="width:320px;">
+      <div class="win-titlebar"><span class="win-title-text">⏳ Loading...</span></div>
+      <div class="win-body" style="text-align:center; padding:24px;">
+        <p style="font-size:1.2rem;">Memuat Studio...</p>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ AUTH GATE ═══ -->
+  <div id="auth-gate" class="screen-overlay hidden">
+    <div class="win-dialog" style="width:340px;">
+      <div class="win-titlebar"><span class="win-title-text">🔐 Studio Login</span></div>
+      <div class="win-body" style="padding:20px;">
+        <p style="margin-bottom:12px;">Enter studio password:</p>
+        <input id="studio-pass-input" type="password" class="win-input" placeholder="Password..." style="width:100%;margin-bottom:8px;">
+        <p id="studio-pass-error" class="hidden" style="color:red;font-size:0.9rem;">Wrong password!</p>
+        <div style="text-align:right;margin-top:12px;">
+          <button id="btn-unlock-studio" class="win-btn">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ERROR ═══ -->
+  <div id="error-screen" class="screen-overlay hidden">
+    <div class="win-dialog" style="width:380px;">
+      <div class="win-titlebar titlebar-error"><span class="win-title-text">⚠️ Error</span></div>
+      <div class="win-body" style="padding:20px;">
+        <p id="error-message">Terjadi kesalahan.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ STUDIO MAIN ═══ -->
+  <div id="studio-main" class="hidden">
+
+    <!-- Taskbar -->
+    <div class="studio-taskbar">
+      <span>🪟 <strong>Start</strong></span>
+      <div class="taskbar-sep"></div>
+      <span class="taskbar-active">🎂 Birthday Studio</span>
+      <span id="save-status" class="save-status" style="opacity:0;"></span>
+      <span id="premium-badge" class="premium-badge">Free</span>
+    </div>
+
+    <!-- Window frame -->
+    <div class="studio-window">
+      <div class="win-titlebar">
+        <span class="win-title-text">📝 Birthday Card Editor — Studio</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-menubar">File&ensp; Edit&ensp; Tools&ensp; Help</div>
+
+      <div class="studio-content">
+
+        <!-- ── Section 1: Penerima ── -->
+        <fieldset class="studio-section">
+          <legend>👤 Penerima</legend>
+          <div class="field-row">
+            <label for="input-recipient-name">Nama:</label>
+            <input id="input-recipient-name" type="text" class="win-input" placeholder="Nama penerima..." maxlength="50">
+          </div>
+          <div class="field-row">
+            <label for="input-age">Umur:</label>
+            <input id="input-age" type="text" class="win-input" placeholder="20" maxlength="3" style="width:80px;">
+          </div>
+        </fieldset>
+
+        <!-- ── Section 2: Stage 1 ── -->
+        <fieldset class="studio-section">
+          <legend>🎂 Stage 1 — Welcome</legend>
+          <div class="field-row">
+            <label for="input-stage1-heading">Heading:</label>
+            <input id="input-stage1-heading" type="text" class="win-input" placeholder="Happy 20th Birthday!" maxlength="80">
+          </div>
+          <p class="field-hint">Teks yang muncul dengan typing animation di Stage 1.</p>
+        </fieldset>
+
+        <!-- ── Section 3: Stage 2 ── -->
+        <fieldset class="studio-section">
+          <legend>❓ Stage 2 — Surprise Question</legend>
+          <div class="field-row">
+            <label for="input-stage2-question">Question:</label>
+            <textarea id="input-stage2-question" class="win-textarea" rows="2" placeholder="i have a surprise for&#10;you, wanna see it?"></textarea>
+          </div>
+          <p class="field-hint">Teks pertanyaan. Gunakan Enter untuk baris baru.</p>
+        </fieldset>
+
+        <!-- ── Section 4: Stage 4 ── -->
+        <fieldset class="studio-section">
+          <legend>🎉 Stage 4 — Reveal</legend>
+          <div class="field-row">
+            <label for="input-stage4-text">Reveal text:</label>
+            <input id="input-stage4-text" type="text" class="win-input" placeholder="it's a birthday surprise!! :D" maxlength="80">
+          </div>
+          <p class="field-hint">Teks yang muncul setelah hadiah dibuka (dengan confetti!).</p>
+        </fieldset>
+
+        <!-- ── Section 5: Stage 5 — Birthday Wishes ── -->
+        <fieldset class="studio-section">
+          <legend>📝 Stage 5 — Birthday Wishes</legend>
+          <div class="field-row field-row-full">
+            <label for="input-stage5-wishes">Pesan:</label>
+            <textarea id="input-stage5-wishes" class="win-textarea" rows="10" placeholder="Dear kamu,&#10;&#10;Happy birthday!! 🎂&#10;&#10;Tulis pesan birthday kamu di sini..."></textarea>
+          </div>
+          <p class="field-hint">Pesan ini muncul dalam Notepad dengan typing animation. Tidak ada batas kata!</p>
+        </fieldset>
+
+        <!-- ── Actions ── -->
+        <div class="studio-actions">
+          <button id="btn-preview" class="win-btn win-btn-primary">▶️ Preview Birthday Card</button>
+        </div>
+
+      </div><!-- /studio-content -->
+    </div><!-- /studio-window -->
+  </div><!-- /studio-main -->
+
+  <!-- ═══ TOAST ═══ -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/studio.js"></script>
+  <script src="js/autosave.js"></script>
+  <script src="js/preview.js"></script>
+</body>
+</html>

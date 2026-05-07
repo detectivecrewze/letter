@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>🎂 Birthday Card — Windows 98 Edition</title>
+  <meta name="description" content="A special birthday card, crafted just for you.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ada hadiah ulang tahun untukmu 🎁">
+  <meta property="og:description" content="Seseorang mengirimkan sesuatu yang spesial.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ TASKBAR ═══ -->
+  <div id="taskbar">
+    <button id="start-btn">🪟 <strong>Start</strong></button>
+    <div class="taskbar-sep"></div>
+    <button class="taskbar-win" id="taskbar-win-label">🎂 Birthday Card</button>
+    <div id="taskbar-clock"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       STAGE 1 — Welcome
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-1" class="stage active">
+    <div class="win-dialog stage1-dialog">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">🎂 birthday_card.exe</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-body stage1-body">
+        <div class="stage1-content">
+          <div id="stage1-text" class="stage1-heading"></div>
+          <div id="stage1-char" class="stage1-character">
+            <div class="pixel-cake">
+              <div class="cake-top">🎂</div>
+              <div class="cake-sparkle">✨ ✨ ✨</div>
+            </div>
+          </div>
+          <button id="btn-next-1" class="win-btn win-btn-pill" style="opacity:0;">
+            next :3
+          </button>
+        </div>
+      </div>
+      <div class="win-statusbar">Stage 1 of 5</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       STAGE 2 — Surprise question
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-2" class="stage">
+    <div class="win-dialog stage2-dialog">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">❓ Question</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-body stage2-body">
+        <div class="stage2-icon">❓</div>
+        <div class="stage2-content">
+          <div id="stage2-text" class="stage2-question"></div>
+          <div class="stage2-buttons">
+            <button id="btn-yes" class="win-btn win-btn-pill">yes!!</button>
+            <button id="btn-no" class="win-btn win-btn-pill">no thanks.</button>
+          </div>
+        </div>
+      </div>
+      <div class="win-statusbar">Stage 2 of 5</div>
+    </div>
+    <div id="stage2-gif" class="stage2-gif-area">
+      <div class="pixel-bunny">
+        <span class="bunny-bounce">🐰</span>
+        <span class="bunny-text">hehe~</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       STAGE 3 — Gift box
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-3" class="stage">
+    <div class="stage3-bg-overlay"></div>
+    <div class="win-dialog stage3-dialog">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">📁 C:\birthday\gift.exe</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-body stage3-body">
+        <p class="stage3-instruction">tap on the gift to open your present! 🎁</p>
+        <button id="btn-open-gift" class="stage3-gift-btn" aria-label="Open gift">
+          <div class="gift-box">
+            <div class="gift-lid">🎀</div>
+            <div class="gift-base">🎁</div>
+          </div>
+          <span class="gift-label">double_click.exe</span>
+        </button>
+      </div>
+      <div class="win-statusbar">Stage 3 of 5 — Click the gift!</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       STAGE 4 — Reveal
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-4" class="stage">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="win-dialog stage4-dialog">
+      <div class="win-titlebar titlebar-party">
+        <span class="win-titlebar-text">🎉 surprise.exe — CONGRATS!</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-body stage4-body">
+        <p class="stage4-title" id="stage4-title"></p>
+        <div class="stage4-reveal">
+          <div class="reveal-item">🧸</div>
+          <div class="reveal-sparkle">✨🎊✨</div>
+        </div>
+        <button id="btn-wishes" class="win-btn win-btn-pill win-btn-accent">
+          my wishes
+        </button>
+      </div>
+      <div class="win-statusbar">Stage 4 of 5 — Surprise!</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       STAGE 5 — Birthday Wishes (Notepad)
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-5" class="stage">
+    <div class="win-dialog stage5-dialog">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">📝 wishes.txt — Notepad</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-menubar">File&ensp; Edit&ensp; Format&ensp; View&ensp; Help</div>
+      <div class="win-body stage5-body">
+        <div id="stage5-message" class="stage5-notepad"></div>
+      </div>
+      <div class="win-statusbar">
+        <span id="stage5-status">Ln 1, Col 1</span>
+        <span>— with love ♡</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ NO THANKS DIALOG ═══ -->
+  <div id="no-dialog" class="stage">
+    <div class="win-dialog no-dialog-box">
+      <div class="win-titlebar titlebar-error">
+        <span class="win-titlebar-text">⚠️ Error</span>
+        <span class="win-controls">✕</span>
+      </div>
+      <div class="win-body no-body">
+        <div class="no-icon">⚠️</div>
+        <div class="no-text">
+          <p><strong>ACCESS DENIED.</strong></p>
+          <p>Wrong answer! You MUST see the surprise!</p>
+          <p style="font-size:0.85rem; color:#808080; margin-top:6px;">(there is no escape)</p>
+        </div>
+      </div>
+      <div style="text-align:center; padding: 8px 16px 14px;">
+        <button id="btn-no-ok" class="win-btn">OK, fine 😤</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
