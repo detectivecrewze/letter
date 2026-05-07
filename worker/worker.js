@@ -221,6 +221,9 @@ var index_default = {
           if (['dusty-rose', 'midnight', 'crimson', 'obsidian'].includes(body.theme)) {
             body.theme = 'blush-cream';
           }
+          // Lock premium fonts & sizes
+          body.fontFamily = 'caveat';
+          body.fontSize   = 'size-medium';
         }
         // ────────────────────────────────────────────────────────
 
@@ -445,6 +448,8 @@ var index_default = {
                 playlist: config.playlist || [],
                 lastOpened: config.lastOpened || null,
                 isPremium: config.isPremium || false,
+                fontFamily: config.fontFamily || 'caveat',
+                fontSize: config.fontSize || 'size-medium',
                 secretMemoryEnabled: config.secretMemoryEnabled === true,
                 publishedAt: config.publishedAt || config.createdAt || null,
               };
