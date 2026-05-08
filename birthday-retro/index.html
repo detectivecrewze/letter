@@ -28,6 +28,11 @@
     <div id="taskbar-clock"></div>
   </div>
 
+
+
+  <!-- Hidden audio element -->
+  <audio id="bday-audio" preload="none"></audio>
+
   <!-- ═══════════════════════════════════════════════
        STAGE 1 — Welcome
   ═══════════════════════════════════════════════ -->
@@ -42,7 +47,7 @@
           <div id="stage1-text" class="stage1-heading"></div>
           <div id="stage1-char" class="stage1-character">
             <div class="pixel-cake">
-              <div class="cake-top">🎂</div>
+              <img src="https://media1.tenor.com/m/tPJaogUqo8wAAAAC/happy-birthday.gif" class="cake-gif" alt="Happy Birthday Cake">
               <div class="cake-sparkle">✨ ✨ ✨</div>
             </div>
           </div>
@@ -52,6 +57,56 @@
         </div>
       </div>
       <div class="win-statusbar">Stage 1 of 5</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       STAGE MUSIC — CD Player
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-music" class="stage">
+    <div class="win-dialog music-dialog">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">💿 cdplayer.exe</span>
+        <span class="win-controls">─ □ ✕</span>
+      </div>
+      <div class="win-menubar">Disc&ensp; View&ensp; Options&ensp; Help</div>
+      <div class="win-body cdplayer-body">
+        
+        <div class="cdplayer-top">
+          <div class="cdplayer-lcd">
+            <div class="lcd-track">Track <span id="cd-track-num">01</span></div>
+            <div class="lcd-time" id="cd-time">00:00</div>
+          </div>
+          <div class="cdplayer-disc-icon">
+            <div class="spinning-cd paused">💿</div>
+          </div>
+        </div>
+
+        <div class="cdplayer-controls">
+          <button class="win-btn cd-btn" id="cd-play" title="Play">▶</button>
+          <button class="win-btn cd-btn" id="cd-pause" title="Pause">⏸</button>
+          <button class="win-btn cd-btn" id="cd-stop" title="Stop">⏹</button>
+          <button class="win-btn cd-btn" id="cd-prev" title="Prev">⏮</button>
+          <button class="win-btn cd-btn" id="cd-next" title="Next">⏭</button>
+        </div>
+
+        <div class="cdplayer-info">
+          Artist: <span id="cd-artist">Unknown</span><br>
+          Title: <span id="cd-title">Audio CD</span>
+        </div>
+
+        <div style="text-align:right; margin-top:20px;">
+          <button id="btn-next-music" class="win-btn win-btn-pill">next &gt;</button>
+        </div>
+      </div>
+      <div class="win-statusbar">Now Playing</div>
+    </div>
+    
+    <div class="music-gif-area">
+      <div class="pixel-cat">
+        <span class="cat-bounce">🐱</span>
+        <span class="cat-text">meow~</span>
+      </div>
     </div>
   </div>
 
@@ -121,8 +176,7 @@
       <div class="win-body stage4-body">
         <p class="stage4-title" id="stage4-title"></p>
         <div class="stage4-reveal">
-          <div class="reveal-item">🧸</div>
-          <div class="reveal-sparkle">✨🎊✨</div>
+          <img src="https://media.tenor.com/63IENW605s0AAAAi/dudu-twisting-dance.gif" class="reveal-gif" alt="Dancing bear">
         </div>
         <button id="btn-wishes" class="win-btn win-btn-pill win-btn-accent">
           my wishes
@@ -145,12 +199,13 @@
       <div class="win-body stage5-body">
         <div id="stage5-message" class="stage5-notepad"></div>
       </div>
-      <div class="win-statusbar">
+      <div class="win-statusbar" style="display: flex; align-items: center; justify-content: space-between;">
         <span id="stage5-status">Ln 1, Col 1</span>
         <span>— with love ♡</span>
       </div>
     </div>
   </div>
+
 
   <!-- ═══ NO THANKS DIALOG ═══ -->
   <div id="no-dialog" class="stage">

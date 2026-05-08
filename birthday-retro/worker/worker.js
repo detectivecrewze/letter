@@ -20,7 +20,7 @@
  * R2: BUCKET
  */
 
-const CDN_URL = 'https://birthday-assets.for-you-always.my.id';
+const CDN_URL = 'https://birthday-cdn.for-you-always.my.id';
 
 var index_default = {
   async fetch(request, env) {

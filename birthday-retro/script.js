@@ -34,7 +34,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   initStage1(cfg);
   bindNavigation(cfg);
+  initCDPlayer(cfg);
 });
+
 
 /* ═══════════════════════════════════════════════
    CLOCK
@@ -223,17 +225,18 @@ async function initStage5(cfg) {
   const cols = wishes.split('\n').pop().length;
   const status = document.getElementById('stage5-status');
   if (status) status.textContent = `Ln ${lines}, Col ${cols}`;
+
 }
+
+
 
 /* ═══════════════════════════════════════════════
    NAVIGATION BINDINGS
 ═══════════════════════════════════════════════ */
 function bindNavigation(cfg) {
   // Stage 1 → Stage 2
-  document.getElementById('btn-next-1')?.addEventListener('click', () => {
-    goToStage('stage-2');
-    initStage2(cfg);
-  });
+  // Stage 1 → Stage Music (handled dynamically by CD Player engine)
+  // if no music, skips to Stage 2.
 
   // Stage 2 — Yes → Stage 3
   document.getElementById('btn-yes')?.addEventListener('click', () => {
@@ -261,4 +264,82 @@ function bindNavigation(cfg) {
     goToStage('stage-5');
     initStage5(cfg);
   });
+
+}
+
+/* ═══════════════════════════════════════════════
+   CD PLAYER ENGINE
+═══════════════════════════════════════════════ */
+function initCDPlayer(cfg) {
+  const playlist = Array.isArray(cfg.playlist) ? cfg.playlist.filter(t => t && (t.url || t.audioUrl || t.src)) : [];
+  const audio = document.getElementById('bday-audio');
+  let currentIdx = 0;
+  
+  // If no music, btn-next-1 goes straight to question
+  if (playlist.length === 0) {
+    document.getElementById('btn-next-1')?.addEventListener('click', () => {
+      goToStage('stage-2');
+      initStage2(cfg);
+    });
+    return;
+  }
+
+  // Bind btn-next-1 to open CD Player
+  document.getElementById('btn-next-1')?.addEventListener('click', () => {
+    goToStage('stage-music');
+    // Auto play first track if browser allows
+    if (audio.paused) playTrack(0);
+  });
+
+  // Next button inside CD player goes to question
+  document.getElementById('btn-next-music')?.addEventListener('click', () => {
+    goToStage('stage-2');
+    initStage2(cfg);
+  });
+
+  const timeEl = document.getElementById('cd-time');
+  const trackEl = document.getElementById('cd-track-num');
+  const artistEl = document.getElementById('cd-artist');
+  const titleEl = document.getElementById('cd-title');
+  const discIcon = document.querySelector('.spinning-cd');
+
+  function playTrack(idx) {
+    const t = playlist[idx];
+    if (!t) return;
+    audio.src = t.url || t.audioUrl || t.src;
+    audio.play().catch(()=>{}); // Catch autoplay policy errors
+    
+    trackEl.textContent = String(idx + 1).padStart(2, '0');
+    artistEl.textContent = t.artist || 'Unknown Artist';
+    titleEl.textContent = t.title || 'Track ' + (idx + 1);
+  }
+
+  audio.addEventListener('play', () => discIcon?.classList.remove('paused'));
+  audio.addEventListener('pause', () => discIcon?.classList.add('paused'));
+  
+  audio.addEventListener('timeupdate', () => {
+    if (!audio.duration) return;
+    const m = Math.floor(audio.currentTime / 60);
+    const s = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+    if(timeEl) timeEl.textContent = `${m.toString().padStart(2, '0')}:${s}`;
+  });
+
+  audio.addEventListener('ended', () => {
+    currentIdx = (currentIdx + 1) % playlist.length;
+    playTrack(currentIdx);
+  });
+
+  document.getElementById('cd-play')?.addEventListener('click', () => { if(audio.paused) audio.play(); else if(!audio.src) playTrack(0); });
+  document.getElementById('cd-pause')?.addEventListener('click', () => audio.pause());
+  document.getElementById('cd-stop')?.addEventListener('click', () => { audio.pause(); audio.currentTime = 0; });
+  document.getElementById('cd-prev')?.addEventListener('click', () => { currentIdx = (currentIdx - 1 + playlist.length) % playlist.length; playTrack(currentIdx); });
+  document.getElementById('cd-next')?.addEventListener('click', () => { currentIdx = (currentIdx + 1) % playlist.length; playTrack(currentIdx); });
+
+  // Initialize UI without playing
+  const first = playlist[0];
+  if(first) {
+    trackEl.textContent = '01';
+    artistEl.textContent = first.artist || 'Unknown Artist';
+    titleEl.textContent = first.title || 'Track 1';
+  }
 }

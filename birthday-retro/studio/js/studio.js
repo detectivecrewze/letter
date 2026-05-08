@@ -7,7 +7,7 @@ const Studio = (() => {
   let _playlist = [];
 
   function isPremium() { return _isPremium; }
-  function getPlaylistArray() { return _playlist; }
+  function getPlaylistArray() { return typeof Music !== 'undefined' ? Music.getPlaylistArray() : _playlist; }
 
   function showToast(msg) {
     const el = document.getElementById('toast');
@@ -35,7 +35,11 @@ const Studio = (() => {
     _setVal('input-stage4-text', cfg.stage4_reveal_text || "it's a birthday surprise!! :D");
     _setVal('input-stage5-wishes', cfg.stage5_wishes);
 
-    _playlist = cfg.playlist || [];
+    // Initialize Music Manager
+    if (typeof Music !== 'undefined') {
+      Music.setPremiumMode(_isPremium);
+      Music.init(cfg);
+    }
 
     // Auto-generate heading when name/age changes
     const nameInput = document.getElementById('input-recipient-name');
