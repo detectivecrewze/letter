@@ -307,15 +307,31 @@ function initCDPlayer(cfg) {
     const t = playlist[idx];
     if (!t) return;
     audio.src = t.url || t.audioUrl || t.src;
-    audio.play().catch(()=>{}); // Catch autoplay policy errors
+    
+    // Reset time to 0 to ensure it plays from start if switching tracks
+    audio.currentTime = 0;
+    
+    audio.play().catch(e => {
+      console.warn('Autoplay blocked or load failed:', e);
+    });
     
     trackEl.textContent = String(idx + 1).padStart(2, '0');
     artistEl.textContent = t.artist || 'Unknown Artist';
     titleEl.textContent = t.title || 'Track ' + (idx + 1);
   }
 
-  audio.addEventListener('play', () => discIcon?.classList.remove('paused'));
-  audio.addEventListener('pause', () => discIcon?.classList.add('paused'));
+  // Use a function to get the element dynamically in case it wasn't ready or changed
+  function getDiscIcon() {
+    return document.querySelector('.spinning-cd');
+  }
+
+  audio.addEventListener('play', () => {
+    getDiscIcon()?.classList.remove('paused');
+  });
+  
+  audio.addEventListener('pause', () => {
+    getDiscIcon()?.classList.add('paused');
+  });
   
   audio.addEventListener('timeupdate', () => {
     if (!audio.duration) return;
@@ -329,11 +345,37 @@ function initCDPlayer(cfg) {
     playTrack(currentIdx);
   });
 
-  document.getElementById('cd-play')?.addEventListener('click', () => { if(audio.paused) audio.play(); else if(!audio.src) playTrack(0); });
-  document.getElementById('cd-pause')?.addEventListener('click', () => audio.pause());
-  document.getElementById('cd-stop')?.addEventListener('click', () => { audio.pause(); audio.currentTime = 0; });
-  document.getElementById('cd-prev')?.addEventListener('click', () => { currentIdx = (currentIdx - 1 + playlist.length) % playlist.length; playTrack(currentIdx); });
-  document.getElementById('cd-next')?.addEventListener('click', () => { currentIdx = (currentIdx + 1) % playlist.length; playTrack(currentIdx); });
+  document.getElementById('cd-play')?.addEventListener('click', () => {
+    const icon = getDiscIcon();
+    if (!audio.src || audio.src === window.location.href) {
+      playTrack(currentIdx);
+    } else {
+      audio.play().catch(e => {
+        console.error("Play failed:", e);
+        // If play fails, maybe try to reload the track as fallback
+        playTrack(currentIdx);
+      });
+    }
+  });
+
+  document.getElementById('cd-pause')?.addEventListener('click', () => {
+    audio.pause();
+  });
+
+  document.getElementById('cd-stop')?.addEventListener('click', () => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+
+  document.getElementById('cd-prev')?.addEventListener('click', () => {
+    currentIdx = (currentIdx - 1 + playlist.length) % playlist.length;
+    playTrack(currentIdx);
+  });
+
+  document.getElementById('cd-next')?.addEventListener('click', () => {
+    currentIdx = (currentIdx + 1) % playlist.length;
+    playTrack(currentIdx);
+  });
 
   // Initialize UI without playing
   const first = playlist[0];

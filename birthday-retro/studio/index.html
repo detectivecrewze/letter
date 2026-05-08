@@ -131,21 +131,84 @@
 
 
         <!-- ── Actions ── -->
-        <div class="studio-actions">
-          <button id="btn-preview" class="win-btn win-btn-primary">▶️ Preview Birthday Card</button>
+        <div class="studio-actions" style="display:flex; gap:12px;">
+          <button id="btn-preview" class="win-btn win-btn-primary">▶️ Preview Card</button>
+          <button id="btn-publish" class="win-btn win-btn-primary" style="font-weight:bold;">🌐 Publikasikan Kado</button>
         </div>
 
       </div><!-- /studio-content -->
     </div><!-- /studio-window -->
   </div><!-- /studio-main -->
 
+  <!-- ═══ MODAL SUCCESS PUBLISH ═══ -->
+  <div id="modal-success" class="screen-overlay hidden">
+    <div class="win-dialog" style="width:400px; max-width:95vw;">
+      <div class="win-titlebar">
+        <span class="win-title-text">🎉 Publikasi Berhasil!</span>
+        <span class="win-controls" id="btn-close-success" style="cursor:pointer;">✕</span>
+      </div>
+      <div class="win-body" style="padding:20px; text-align:center;">
+        <p style="margin-bottom:16px; font-size:1.1rem; font-weight:bold;">Kado Ulang Tahunmu sudah online!</p>
+        
+        <!-- ═══ Aesthetic Retro QR Code ═══ -->
+        <div style="display: flex; justify-content: center; margin-bottom: 24px;">
+          <div id="qr-export-container"
+            style="background-color: #d4d0c8; padding: 4px; border: 2px solid; border-color: #dfdfdf #808080 #808080 #dfdfdf; position: relative; max-width: 220px; width: 100%; box-sizing: border-box;">
+            
+            <!-- Inner border for Win98 double border effect -->
+            <div style="border: 1px solid; border-color: #ffffff #404040 #404040 #ffffff; padding: 6px;">
+              
+              <!-- Title bar -->
+              <div style="background: linear-gradient(90deg, #000082 0%, #1b5fd9 100%); padding: 2px 4px; display: flex; justify-content: space-between; align-items: center; color: white; font-family: 'VT323', 'Courier New', monospace; font-size: 1.1rem; margin-bottom: 8px;">
+                <span style="display:flex; align-items:center; gap:4px; color:white;">🎁 barcode.exe</span>
+                <span style="font-size:0.9rem; letter-spacing:1px; margin-right:2px; color:white;">─ □ ✕</span>
+              </div>
+
+              <div style="text-align: center;">
+                <p style="font-family: 'VT323', 'Courier New', monospace; font-size: 1.2rem; color: #000000 !important; margin-bottom: 10px; text-shadow: 1px 1px 0 #ffffff;">
+                  Scan to Open Gift!
+                </p>
+                
+                <!-- QR Code -->
+                <div id="qr-code-box"
+                  style="background-color: #ffffff !important; padding: 8px; display: flex; justify-content: center; align-items: center; min-height: 148px; width: 148px; margin: 0 auto; border: 2px solid; border-color: #808080 #dfdfdf #dfdfdf #808080;">
+                </div>
+                
+                <!-- Bottom text -->
+                <p style="font-family: 'VT323', 'Courier New', monospace; font-size: 1.1rem; color: #404040 !important; margin-top: 10px; text-transform: uppercase;">
+                  BIRTHDAY EDITION
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-bottom:8px; font-size:0.9rem;">Link Kado:</p>
+        <div style="background:#fff; border:2px inset #d4d0c8; padding:8px; margin-bottom:16px; user-select:all; font-weight:bold; word-break:break-all; font-family:monospace;" id="modal-gift-url">
+          https://birthday.for-you-always.my.id/?to=...
+        </div>
+
+        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+          <button id="btn-copy-link" class="win-btn">📋 Salin Link</button>
+          <a id="btn-view-gift" href="#" target="_blank" class="win-btn" style="text-decoration:none; color:inherit; display:flex; align-items:center;">👁 Buka</a>
+          <button id="btn-download-qr" class="win-btn">💾 Download QR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ TOAST ═══ -->
   <div id="toast" class="toast hidden"></div>
+
+  <!-- QR Code Library + html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script src="js/auth.js"></script>
   <script src="js/music.js"></script>
   <script src="js/studio.js"></script>
   <script src="js/autosave.js"></script>
   <script src="js/preview.js"></script>
+  <script src="js/publisher.js"></script>
 </body>
 </html>
