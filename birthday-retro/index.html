@@ -34,6 +34,27 @@
   <audio id="bday-audio" preload="none"></audio>
 
   <!-- ═══════════════════════════════════════════════
+       STAGE LOGIN — Security Gate
+  ═══════════════════════════════════════════════ -->
+  <div id="stage-login" class="stage">
+    <div class="win-dialog" style="max-width: 350px;">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">🔒 secret_gift.exe</span>
+        <span class="win-controls">✕</span>
+      </div>
+      <div class="win-body" style="padding: 16px;">
+        <p style="margin-bottom: 10px;">🔑 Kado ini dilindungi password. Masukkan password untuk membuka:</p>
+        <input type="password" id="login-password-input" class="win-input" style="width: 100%; margin-bottom: 8px;" placeholder="Password...">
+        <p id="login-hint-text" style="font-size: 0.85em; color: #555; margin-bottom: 12px; font-style: italic;"></p>
+        <p id="login-error-msg" style="color: #d00; font-weight: bold; margin-bottom: 12px; display: none;">❌ Password salah!</p>
+        <div style="text-align: right;">
+          <button id="btn-login-submit" class="win-btn" style="padding: 4px 16px;">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
        STAGE 1 — Welcome
   ═══════════════════════════════════════════════ -->
   <div id="stage-1" class="stage active">

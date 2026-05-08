@@ -62,6 +62,10 @@ const Autosave = (() => {
       studioPassword: Auth.getInitialConfig()?.studioPassword || null,
       // Theme
       theme: document.getElementById('input-theme')?.value || 'classic',
+      
+      // Login Gate
+      giftPassword: document.getElementById('input-gift-password')?.value.trim() || null,
+      giftHint: document.getElementById('input-gift-hint')?.value.trim() || null,
 
       // Recipient
       recipientName: document.getElementById('input-recipient-name')?.value.trim() || '',

@@ -45,7 +45,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyTheme(cfg.theme);
   }
 
-  initStage1(cfg);
+  function initLoginStage(cfg) {
+    goToStage('stage-login');
+    const hintText = document.getElementById('login-hint-text');
+    if (cfg.giftHint && cfg.giftHint.trim() !== '') {
+      hintText.textContent = `Hint: ${cfg.giftHint}`;
+      hintText.style.display = 'block';
+    } else {
+      hintText.style.display = 'none';
+    }
+
+    const input = document.getElementById('login-password-input');
+    const btn = document.getElementById('btn-login-submit');
+    const errorMsg = document.getElementById('login-error-msg');
+
+    function checkPassword() {
+      if (input.value === cfg.giftPassword) {
+        errorMsg.style.display = 'none';
+        goToStage('stage-1');
+        initStage1(cfg);
+      } else {
+        errorMsg.style.display = 'block';
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    btn.addEventListener('click', checkPassword);
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkPassword();
+    });
+    input.focus();
+  }
+
+  if (cfg.giftPassword && cfg.giftPassword.trim().length > 0) {
+    initLoginStage(cfg);
+  } else {
+    initStage1(cfg);
+  }
+
   bindNavigation(cfg);
   initCDPlayer(cfg);
 });
@@ -73,6 +111,7 @@ function goToStage(id) {
 
   // Update taskbar label
   const labels = {
+    'stage-login': '🔐 Security check',
     'stage-1': '🎂 Birthday Card',
     'stage-2': '❓ Question',
     'stage-3': '📁 gift.exe',

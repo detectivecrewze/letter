@@ -67,6 +67,24 @@ const Studio = (() => {
       if (themeOverlay) themeOverlay.classList.add('hidden');
       if (themeInput) themeInput.disabled = false;
     }
+    
+    // Login & Premium Lock
+    const loginOverlay = document.getElementById('login-lock-overlay');
+    const passwordInput = document.getElementById('input-gift-password');
+    const hintInput = document.getElementById('input-gift-hint');
+    
+    _setVal('input-gift-password', cfg.giftPassword || '');
+    _setVal('input-gift-hint', cfg.giftHint || '');
+    
+    if (!_isPremium) {
+      if (loginOverlay) loginOverlay.classList.remove('hidden');
+      if (passwordInput) passwordInput.disabled = true;
+      if (hintInput) hintInput.disabled = true;
+    } else {
+      if (loginOverlay) loginOverlay.classList.add('hidden');
+      if (passwordInput) passwordInput.disabled = false;
+      if (hintInput) hintInput.disabled = false;
+    }
 
     // Auto-generate heading when name/age changes
     const nameInput = document.getElementById('input-recipient-name');
