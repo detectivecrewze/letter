@@ -32,11 +32,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  function applyTheme(theme) {
+    let color = '#008080';
+    if (theme === 'rosepink') color = '#e8a8b8';
+    else if (theme === 'y2k') color = '#c8bfe7';
+    else if (theme === 'sky') color = '#99b4d1';
+    else if (theme === 'midnight') color = '#1a252c';
+    document.documentElement.style.setProperty('--desktop', color);
+  }
+  
+  if (cfg.theme) {
+    applyTheme(cfg.theme);
+  }
+
   initStage1(cfg);
   bindNavigation(cfg);
   initCDPlayer(cfg);
 });
-
 
 /* ═══════════════════════════════════════════════
    CLOCK

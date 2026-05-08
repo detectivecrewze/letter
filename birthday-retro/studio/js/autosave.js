@@ -60,6 +60,8 @@ const Autosave = (() => {
       studioToken: token,
       giftId: token,
       studioPassword: Auth.getInitialConfig()?.studioPassword || null,
+      // Theme
+      theme: document.getElementById('input-theme')?.value || 'classic',
 
       // Recipient
       recipientName: document.getElementById('input-recipient-name')?.value.trim() || '',

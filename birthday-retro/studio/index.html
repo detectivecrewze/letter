@@ -69,6 +69,28 @@
 
       <div class="studio-content">
 
+        <!-- ── Section 0: Tema & Background (Premium) ── -->
+        <fieldset class="studio-section" id="section-theme" style="position: relative;">
+          <legend>✨ Theme & Background</legend>
+          
+          <div id="theme-lock-overlay" class="hidden" style="position: absolute; inset: 0; background: rgba(212,208,200,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 4px; box-shadow: var(--raise); margin: 8px;">
+            <span style="font-size: 1.5rem; margin-bottom: 4px; text-shadow: 1px 1px 0 #fff;">🔒</span>
+            <span style="font-weight: bold; font-size: 1rem; color: #000; text-shadow: 1px 1px 0 #fff;">Fitur Premium</span>
+          </div>
+
+          <div class="field-row">
+            <label for="input-theme">Warna Desktop:</label>
+            <select id="input-theme" class="win-input" style="width: 100%;">
+              <option value="classic">Classic Windows (Teal)</option>
+              <option value="rosepink">Rose Pink (Soft Pink)</option>
+              <option value="y2k">Aesthetic Y2K (Lavender)</option>
+              <option value="sky">Sky Blue (Pastel Blue)</option>
+              <option value="midnight">Midnight (Dark Gray)</option>
+            </select>
+          </div>
+          <p class="field-hint">Pilih warna background utama kado ulang tahunmu.</p>
+        </fieldset>
+
         <!-- ── Section 1: Penerima ── -->
         <fieldset class="studio-section">
           <legend>👤 Penerima</legend>

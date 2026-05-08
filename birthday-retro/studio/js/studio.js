@@ -41,6 +41,33 @@ const Studio = (() => {
       Music.init(cfg);
     }
 
+    // Theme & Premium Lock
+    const themeOverlay = document.getElementById('theme-lock-overlay');
+    const themeInput = document.getElementById('input-theme');
+    
+    _setVal('input-theme', cfg.theme || 'classic');
+    
+    function applyStudioTheme() {
+      const val = themeInput?.value || 'classic';
+      let color = '#008080';
+      if (val === 'rosepink') color = '#e8a8b8';
+      else if (val === 'y2k') color = '#c8bfe7';
+      else if (val === 'sky') color = '#99b4d1';
+      else if (val === 'midnight') color = '#1a252c';
+      document.documentElement.style.setProperty('--desktop', color);
+    }
+    
+    applyStudioTheme(); // Apply immediately
+    themeInput?.addEventListener('change', applyStudioTheme);
+
+    if (!_isPremium) {
+      if (themeOverlay) themeOverlay.classList.remove('hidden');
+      if (themeInput) themeInput.disabled = true;
+    } else {
+      if (themeOverlay) themeOverlay.classList.add('hidden');
+      if (themeInput) themeInput.disabled = false;
+    }
+
     // Auto-generate heading when name/age changes
     const nameInput = document.getElementById('input-recipient-name');
     const ageInput = document.getElementById('input-age');
@@ -58,9 +85,12 @@ const Studio = (() => {
     ageInput?.addEventListener('input', () => { autoHeading(); Autosave.trigger(); });
     headingInput?.addEventListener('input', () => { headingInput.dataset.userEdited = '1'; Autosave.trigger(); });
 
-    // Bind autosave to all inputs
+    // Bind autosave to all inputs and selects
     document.querySelectorAll('#studio-main textarea, #studio-main input[type="text"]').forEach(el => {
       el.addEventListener('input', () => Autosave.trigger());
+    });
+    document.querySelectorAll('#studio-main select').forEach(el => {
+      el.addEventListener('change', () => Autosave.trigger());
     });
 
     // Premium badge
