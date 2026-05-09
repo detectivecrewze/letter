@@ -147,6 +147,37 @@ const Studio = (() => {
   let _mediaList = [];
   const MAX_PHOTOS = 10;
 
+  function _showWinConfirm(message, onConfirm) {
+    const modal = document.createElement('div');
+    modal.className = 'screen-overlay';
+    modal.style.zIndex = '300';
+    modal.innerHTML = `
+    <div class="win-dialog" style="width:300px;">
+      <div class="win-titlebar">
+        <span class="win-title-text">Confirm</span>
+        <button id="confirm-close" class="win-controls" style="background:none;border:none;color:#fff;cursor:pointer;">✕</button>
+      </div>
+      <div class="win-body" style="padding:15px; text-align:center;">
+        <p style="margin-bottom:15px;">${message}</p>
+        <div style="text-align:right;">
+          <button id="confirm-yes" class="win-btn" style="min-width:60px; margin-right:8px;">Yes</button>
+          <button id="confirm-no" class="win-btn" style="min-width:60px;">No</button>
+        </div>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+
+    const close = () => modal.remove();
+
+    modal.querySelector('#confirm-close')?.addEventListener('click', close);
+    modal.querySelector('#confirm-no')?.addEventListener('click', close);
+    modal.querySelector('#confirm-yes')?.addEventListener('click', () => {
+      onConfirm();
+      close();
+    });
+    modal.addEventListener('click', e => { if (e.target === modal) close(); });
+  }
+
   function _renderGallery() {
     const listEl = document.getElementById('memory-gallery-list');
     const addWrap = document.getElementById('memory-add-wrap');
@@ -183,11 +214,11 @@ const Studio = (() => {
       });
 
       div.querySelector(`[data-remove="${idx}"]`)?.addEventListener('click', () => {
-        if (confirm('Are you sure you want to delete this media?')) {
+        _showWinConfirm('Are you sure you want to delete this media?', () => {
           _mediaList.splice(idx, 1);
           _renderGallery();
           Autosave.trigger();
-        }
+        });
       });
 
       listEl.appendChild(div);
