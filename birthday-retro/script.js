@@ -45,6 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyTheme(cfg.theme);
   }
 
+  const skipAuth = params.get('skipAuth') === '1';
+  const openMemory = params.get('openMemory') === '1';
+
   function initLoginStage(cfg) {
     goToStage('stage-login');
     const hintText = document.getElementById('login-hint-text');
@@ -88,8 +91,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     input.focus();
   }
 
-  if (cfg.giftPassword && cfg.giftPassword.trim().length > 0) {
+  // ?skipAuth=1 → skip login gate (studio preview mode)
+  const hasPassword = cfg.giftPassword && cfg.giftPassword.trim().length > 0;
+  if (hasPassword && !skipAuth) {
     initLoginStage(cfg);
+  } else if (openMemory) {
+    // ?openMemory=1 → jump straight to stage-5, then auto-open secret modal
+    goToStage('stage-5');
+    initStage5(cfg).then(() => {
+      // After wishes typing completes, open the secret modal automatically
+      const secretMediaList = Array.isArray(cfg.secretMediaList) ? cfg.secretMediaList.filter(m => m && m.url) : [];
+      if (secretMediaList.length > 0) {
+        setTimeout(() => initStage6(cfg), 300);
+      }
+    });
   } else {
     initStage1(cfg);
   }
@@ -127,6 +142,7 @@ function goToStage(id) {
     'stage-3': '📁 gift.exe',
     'stage-4': '🎉 surprise.exe',
     'stage-5': '📝 wishes.txt — Notepad',
+    'stage-6': '🖼️ secret_memory.exe',
     'no-dialog': '⚠️ Error',
   };
   const win = document.getElementById('taskbar-win-label');
@@ -287,9 +303,129 @@ async function initStage5(cfg) {
   const status = document.getElementById('stage5-status');
   if (status) status.textContent = `Ln ${lines}, Col ${cols}`;
 
+  // Show 'secret_photo.exe' button OUTSIDE the Notepad if premium user has media
+  const secretMediaList = Array.isArray(cfg.secretMediaList) ? cfg.secretMediaList.filter(m => m && m.url) : [];
+  if (secretMediaList.length > 0) {
+    const wrap = document.getElementById('stage5-secret-btn-wrap');
+    if (wrap) wrap.style.display = 'block';
+  }
 }
 
 
+
+/* ═══════════════════════════════════════════════
+   STAGE 6 — Secret Media Modal
+═══════════════════════════════════════════════ */
+let _memoryModalInitialized = false;
+
+function initStage6(cfg) {
+  const mediaList = Array.isArray(cfg.secretMediaList) ? cfg.secretMediaList.filter(m => m && m.url) : [];
+  if (!mediaList.length) return;
+
+  const modal = document.getElementById('modal-secret-memory');
+  const closeBtn = document.getElementById('btn-close-memory');
+  const container = document.getElementById('stage6-media-container');
+  const captionEl = document.getElementById('stage6-caption');
+  const statusEl = document.getElementById('stage6-status');
+  const prevBtn = document.getElementById('btn-memory-prev');
+  const nextBtn = document.getElementById('btn-memory-next');
+  const controlsEl = document.getElementById('stage6-controls');
+
+  if (!modal) return;
+
+  let currentIdx = 0;
+
+  function renderMedia(idx) {
+    if (!container) return;
+    const item = mediaList[idx];
+
+    // Pause any playing video
+    const oldVid = container.querySelector('video');
+    if (oldVid) oldVid.pause();
+    container.innerHTML = '';
+
+    const isVideo = /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(item.url);
+    if (isVideo) {
+      const video = document.createElement('video');
+      video.src = item.url;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = false;
+      video.playsInline = true;
+      video.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;display:block;';
+      container.appendChild(video);
+      video.play().catch(() => {});
+    } else {
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.alt = item.caption || 'Secret';
+      img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;display:block;';
+      container.appendChild(img);
+    }
+
+    if (captionEl) captionEl.textContent = item.caption || '';
+    if (statusEl) statusEl.textContent = `${idx + 1} of ${mediaList.length}`;
+    if (controlsEl) controlsEl.style.display = mediaList.length > 1 ? 'flex' : 'none';
+  }
+
+  function openModal() {
+    currentIdx = 0;
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Backdrop fade in
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      modal.style.background = 'rgba(0,0,0,0.82)';
+    }));
+
+    // Render first slide after short delay
+    setTimeout(() => renderMedia(0), 80);
+  }
+
+  function closeModal() {
+    modal.style.background = 'rgba(0,0,0,0)';
+    const vid = container ? container.querySelector('video') : null;
+    if (vid) vid.pause();
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      if (container) container.innerHTML = '';
+    }, 400);
+  }
+
+  // Only bind listeners once
+  if (!_memoryModalInitialized) {
+    _memoryModalInitialized = true;
+
+    prevBtn?.addEventListener('click', () => {
+      currentIdx = (currentIdx - 1 + mediaList.length) % mediaList.length;
+      renderMedia(currentIdx);
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      currentIdx = (currentIdx + 1) % mediaList.length;
+      renderMedia(currentIdx);
+    });
+
+    closeBtn?.addEventListener('click', closeModal);
+
+    // Click backdrop to close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (modal.style.display === 'none' || !modal.style.display) return;
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowRight') { currentIdx = (currentIdx + 1) % mediaList.length; renderMedia(currentIdx); }
+      if (e.key === 'ArrowLeft') { currentIdx = (currentIdx - 1 + mediaList.length) % mediaList.length; renderMedia(currentIdx); }
+    });
+  }
+
+  // Open the modal (called when user clicks the button)
+  openModal();
+}
 
 /* ═══════════════════════════════════════════════
    NAVIGATION BINDINGS
@@ -323,9 +459,28 @@ function bindNavigation(cfg) {
   // Stage 4 → Stage 5
   document.getElementById('btn-wishes')?.addEventListener('click', () => {
     goToStage('stage-5');
-    initStage5(cfg);
+    initStage5(cfg).then(() => {
+      // After typing finishes, auto-open secret media modal if available
+      const secretMediaList = Array.isArray(cfg.secretMediaList) ? cfg.secretMediaList.filter(m => m && m.url) : [];
+      if (secretMediaList.length > 0) {
+        setTimeout(() => initStage6(cfg), 600);
+      }
+    });
   });
 
+  // Stage 5 → Stage 6 (Secret Media — modal, only if available & premium)
+  const secretMediaList = Array.isArray(cfg.secretMediaList) ? cfg.secretMediaList.filter(m => m && m.url) : [];
+  const btnViewSecret = document.getElementById('btn-view-secret');
+  if (secretMediaList.length > 0) {
+    // Init the modal listeners (but don't open yet)
+    // The modal will open when initStage6 is called from the button click
+    if (btnViewSecret) {
+      btnViewSecret.addEventListener('click', () => initStage6(cfg));
+    }
+  } else {
+    const wrap = document.getElementById('stage5-secret-btn-wrap');
+    if (wrap) wrap.style.display = 'none';
+  }
 }
 
 /* ═══════════════════════════════════════════════

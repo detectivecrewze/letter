@@ -170,6 +170,37 @@
           <p class="field-hint">Pesan ini muncul dalam Notepad dengan typing animation. Tidak ada batas kata!</p>
         </fieldset>
 
+        <!-- ── Section 6: Stage 6 — Secret Media (Premium) ── -->
+        <fieldset class="studio-section" id="section-memory" style="position: relative;">
+          <legend>📸 Stage 6 — Secret Media</legend>
+          <div id="memory-preview-btn-wrap" style="margin-bottom: 8px; text-align: right; display: none;">
+            <button id="btn-preview-memory" class="win-btn" style="font-size: 0.85rem;">👁 Preview Foto</button>
+          </div>
+          
+          <div id="memory-lock-overlay" class="hidden" style="position: absolute; inset: 0; background: rgba(212,208,200,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 4px; box-shadow: var(--raise); margin: 8px;">
+            <span style="font-size: 1.5rem; margin-bottom: 4px; text-shadow: 1px 1px 0 #fff;">🔒</span>
+            <span style="font-weight: bold; font-size: 1rem; color: #000; text-shadow: 1px 1px 0 #fff;">Fitur Premium</span>
+          </div>
+
+          <div id="memory-content-wrap">
+            <div id="memory-gallery-list" style="margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;"></div>
+            
+            <div id="memory-add-wrap" class="win-btn" style="text-align: center; padding: 12px; cursor: pointer; position: relative; display: block;">
+              <input id="input-memory-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" multiple>
+              <span style="font-size: 1.5rem;">📸</span>
+              <p style="margin: 4px 0 0 0; font-weight: bold;">Tambah Foto / Video</p>
+              <p style="margin: 2px 0 0 0; font-size: 0.8rem; color: #666;">Maks 10 File (JPG/PNG/MP4)</p>
+              
+              <div id="memory-upload-progress-wrap" class="hidden" style="margin-top: 8px; border: 2px inset #fff; border-color: #808080 #fff #fff #808080; height: 12px; background: #fff; width: 100%;">
+                <div id="memory-upload-progress-bar" style="background: #000080; height: 100%; width: 0%;"></div>
+              </div>
+              <p id="memory-upload-status" style="margin: 2px 0 0 0; font-size: 0.8rem; color: #000080;"></p>
+            </div>
+            <p id="memory-count-label" style="text-align: center; font-size: 0.8rem; margin-top: 4px; display: none;"></p>
+          </div>
+          <p class="field-hint" style="margin-top: 16px;">Media rahasia yang akan muncul di akhir kado (Setelah Notepad). Bisa diisi caption per foto.</p>
+        </fieldset>
+
 
 
         <!-- ── Actions ── -->

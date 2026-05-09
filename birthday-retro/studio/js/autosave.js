@@ -77,6 +77,9 @@ const Autosave = (() => {
       stage4_reveal_text: document.getElementById('input-stage4-text')?.value.trim() || "it's a birthday surprise!! :D",
       stage5_wishes: document.getElementById('input-stage5-wishes')?.value || '',
 
+      // Secret Media
+      secretMediaList: typeof Studio !== 'undefined' && Studio.getMediaList ? Studio.getMediaList() : [],
+
       // Music
       playlist: Studio.getPlaylistArray ? Studio.getPlaylistArray() : [],
 
