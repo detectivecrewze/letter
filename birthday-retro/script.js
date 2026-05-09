@@ -58,12 +58,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const input = document.getElementById('login-password-input');
     const btn = document.getElementById('btn-login-submit');
     const errorMsg = document.getElementById('login-error-msg');
+    
+    const dialogMain = document.getElementById('login-dialog-main');
+    const dialogSuccess = document.getElementById('login-dialog-success');
+    const btnSuccessOk = document.getElementById('btn-login-success-ok');
 
     function checkPassword() {
       if (input.value === cfg.giftPassword) {
         errorMsg.style.display = 'none';
-        goToStage('stage-1');
-        initStage1(cfg);
+        dialogMain.style.display = 'none';
+        dialogSuccess.style.display = 'block';
       } else {
         errorMsg.style.display = 'block';
         input.value = '';
@@ -75,6 +79,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     input.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') checkPassword();
     });
+    
+    btnSuccessOk.addEventListener('click', () => {
+      goToStage('stage-1');
+      initStage1(cfg);
+    });
+
     input.focus();
   }
 

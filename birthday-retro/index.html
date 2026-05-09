@@ -37,7 +37,8 @@
        STAGE LOGIN — Security Gate
   ═══════════════════════════════════════════════ -->
   <div id="stage-login" class="stage">
-    <div class="win-dialog" style="max-width: 350px;">
+    <!-- Main Login Dialog -->
+    <div id="login-dialog-main" class="win-dialog" style="max-width: 350px;">
       <div class="win-titlebar">
         <span class="win-titlebar-text">🔒 secret_gift.exe</span>
         <span class="win-controls">✕</span>
@@ -49,6 +50,26 @@
         <p id="login-error-msg" style="color: #d00; font-weight: bold; margin-bottom: 12px; display: none;">❌ Password salah!</p>
         <div style="text-align: right;">
           <button id="btn-login-submit" class="win-btn" style="padding: 4px 16px;">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Dialog (Initially Hidden) -->
+    <div id="login-dialog-success" class="win-dialog" style="max-width: 300px; display: none;">
+      <div class="win-titlebar">
+        <span class="win-titlebar-text">Information</span>
+        <span class="win-controls">✕</span>
+      </div>
+      <div class="win-body" style="padding: 16px;">
+        <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 20px;">
+          <!-- Authentic CSS Information Icon -->
+          <div style="width: 32px; height: 32px; background: #000080; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-family: 'Times New Roman', serif; font-size: 24px; font-weight: bold; font-style: italic; flex-shrink: 0;">i</div>
+          <div style="padding-top: 6px;">
+            <p style="margin: 0;">Password benar!</p>
+          </div>
+        </div>
+        <div style="text-align: center;">
+          <button id="btn-login-success-ok" class="win-btn" style="padding: 4px 24px; width: 80px;">OK</button>
         </div>
       </div>
     </div>
