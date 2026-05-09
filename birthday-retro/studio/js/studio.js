@@ -183,9 +183,11 @@ const Studio = (() => {
       });
 
       div.querySelector(`[data-remove="${idx}"]`)?.addEventListener('click', () => {
-        _mediaList.splice(idx, 1);
-        _renderGallery();
-        Autosave.trigger();
+        if (confirm('Are you sure you want to delete this media?')) {
+          _mediaList.splice(idx, 1);
+          _renderGallery();
+          Autosave.trigger();
+        }
       });
 
       listEl.appendChild(div);
@@ -271,7 +273,7 @@ const Studio = (() => {
       if (progressBar) progressBar.style.width = '90%';
       const data = await res.json();
       const rawUrl = data.url || data.publicUrl || '';
-      const cdnUrl = rawUrl.replace('letter-assets', 'arcade-assets') + '?v=' + timestamp;
+      const cdnUrl = rawUrl + '?v=' + timestamp;
 
       if (progressBar) progressBar.style.width = '100%';
       if (statusText) statusText.textContent = `Success ✓`;

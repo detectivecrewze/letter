@@ -285,7 +285,8 @@ const Music = (() => {
         <div id="library-songs-list" style="flex:1; overflow-y:auto; border:2px solid #808080; background:#fff; padding:2px; box-shadow:var(--sink);">
           <div style="padding:20px; text-align:center;">Loading...</div>
         </div>
-        <div style="margin-top:12px; text-align:right;">
+        <div style="margin-top:12px; text-align:right; display:flex; justify-content:flex-end; gap:8px;">
+          <button id="library-back-btn" class="win-btn">Kembali</button>
           <button id="library-confirm-btn" class="win-btn" disabled>Pilih</button>
         </div>
       </div>
@@ -302,6 +303,11 @@ const Music = (() => {
     };
 
     modal.querySelector('#library-modal-close')?.addEventListener('click', () => { 
+      stopPreview();
+      modal.remove(); 
+    });
+
+    modal.querySelector('#library-back-btn')?.addEventListener('click', () => { 
       stopPreview();
       modal.remove(); 
     });
