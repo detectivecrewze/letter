@@ -7,6 +7,17 @@ const Publisher = (() => {
   function init() {
     document.getElementById('btn-publish')?.addEventListener('click', _handlePublishClick);
 
+    // Premium Upgrade Direct WhatsApp
+    document.getElementById('btn-upgrade-premium')?.addEventListener('click', () => {
+      const token = Auth.getToken();
+      const waMsg = encodeURIComponent(
+        `REQUEST UPGRADE PREMIUM — BIRTHDAY RETRO EDITION (+10K)\n\n` +
+        `ID Kado: ${token}\n\n` +
+        `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Tema Spesial, Password Security, dan Secret Media.`
+      );
+      window.open(`https://wa.me/6281381543981?text=${waMsg}`, '_blank');
+    });
+
     // Success modal
     document.getElementById('btn-copy-link')?.addEventListener('click', _handleCopyLink);
     document.getElementById('btn-close-success')?.addEventListener('click', () => _toggleModal('modal-success', false));

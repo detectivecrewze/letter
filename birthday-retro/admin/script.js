@@ -102,7 +102,11 @@ async function loadCards() {
         <td>${g.recipientName || '—'}</td>
         <td>${g.age || '—'}</td>
         <td>${g.status || 'draft'}</td>
-        <td>${g.isPremium ? '✨ Yes' : 'No'}</td>
+        <td>
+          <button class="win-btn premium-toggle-btn" data-id="${g.id}" data-enabled="${g.isPremium ? 'true' : 'false'}" style="font-size: 0.8rem; padding: 2px 6px;">
+            ${g.isPremium ? '✨ Premium' : '○ Free'}
+          </button>
+        </td>
         <td>
           <a href="../index.html?to=${g.id}" target="_blank">👁 View</a> |
           <a href="../studio/?to=${g.id}" target="_blank">✏️ Edit</a>
@@ -148,6 +152,40 @@ function initCardActions() {
       alert('Error: ' + e.message);
     }
   });
+
+  // Toggle Premium
+  document.getElementById('cards-tbody')?.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.premium-toggle-btn');
+    if (!btn) return;
+
+    const id = btn.dataset.id;
+    const currentEnabled = btn.dataset.enabled === 'true';
+    const newEnabled = !currentEnabled;
+
+    btn.textContent = 'Memproses...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(`${WORKER_URL}/admin/toggle-premium`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${adminSecret}`
+        },
+        body: JSON.stringify({ id, enabled: newEnabled })
+      });
+      const data = await res.json();
+      if (data.success) {
+        loadCards();
+      } else {
+        alert('Gagal: ' + (data.error || 'Unknown error'));
+        loadCards();
+      }
+    } catch (err) {
+      alert('Gagal terhubung ke server.');
+      loadCards();
+    }
+  });
 }
 
 /* ═══════════════════════════════════════════════
@@ -179,6 +217,14 @@ function initGenerator() {
       error.textContent = 'Connection error.';
       error.classList.remove('hidden');
     }
+  });
+
+  // Auto ID
+  document.getElementById('btn-auto-id')?.addEventListener('click', () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let rand = '';
+    for (let i = 0; i < 8; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+    document.getElementById('gen-id').value = `bday-${rand}`;
   });
 
   // Generate link

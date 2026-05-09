@@ -439,6 +439,48 @@ var index_default = {
     }
 
     // ══════════════════════════════════════════════════════
+    //  POST /admin/toggle-premium — Toggle premium (admin)
+    // ══════════════════════════════════════════════════════
+    if (request.method === 'POST' && url.pathname === '/admin/toggle-premium') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.ADMIN_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Akses ditolak.' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      try {
+        const body = await request.json();
+        const { id, enabled } = body;
+        if (!id) {
+          return new Response(JSON.stringify({ success: false, error: 'ID is required.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        
+        const existingData = await env.BIRTHDAY_DATA.get(id);
+        if (!existingData) {
+          return new Response(JSON.stringify({ success: false, error: `ID '${id}' tidak ditemukan.` }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        
+        const data = JSON.parse(existingData);
+        data.isPremium = !!enabled;
+        
+        await env.BIRTHDAY_DATA.put(id, JSON.stringify(data));
+        
+        return new Response(JSON.stringify({ success: true, message: `Premium set to ${!!enabled} for ${id}` }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ success: false, error: err.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════
     //  POST /admin/delete-gifts — Batch delete (admin)
     // ══════════════════════════════════════════════════════
     if (request.method === 'POST' && url.pathname === '/admin/delete-gifts') {

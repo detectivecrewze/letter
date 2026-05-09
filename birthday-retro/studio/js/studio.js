@@ -130,6 +130,12 @@ const Studio = (() => {
     const badge = document.getElementById('premium-badge');
     if (badge) badge.textContent = _isPremium ? '✨ Premium' : 'Free';
 
+    // Premium Upgrade Offer
+    const upgradeSection = document.getElementById('premium-upgrade-section');
+    if (upgradeSection) {
+      upgradeSection.style.display = _isPremium ? 'none' : 'block';
+    }
+
     // Show studio
     document.getElementById('loading-screen')?.classList.add('hidden');
     document.getElementById('studio-main')?.classList.remove('hidden');
