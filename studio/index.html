@@ -536,14 +536,26 @@
         </div>
 
         <!-- VIP LINK SECTION -->
-        <button id="btn-publish-vip" class="btn-premium w-full shadow-[0_0_15px_rgba(212,163,115,0.4)] mt-2">
-          🌟 Request Link Pribadi <span class="vip-lock-icon hidden text-[10px] ml-1">🔒</span>
-        </button>
-        <p class="text-[9px] text-[#b58756] mt-4 leading-relaxed max-w-[280px] mx-auto opacity-90 italic font-medium">
-          Pilih <strong>Link Pribadi</strong> agar suratmu tersimpan aman, contoh : <em>kado-untuk-lisa.vercel.app</em>.
-          (Khusus
-          pengguna Premium)
-        </p>
+        <div class="mt-6">
+          <div class="relative">
+            <button id="btn-publish-vip" class="btn-premium w-full shadow-none opacity-30" style="pointer-events: none;">
+              🌟 Request Link Pribadi
+            </button>
+            
+            <!-- Maintenance Overlay (Button Only) -->
+            <div class="absolute inset-0 bg-white/20 backdrop-blur-[1px] border border-dashed border-[#d4a373] rounded-full flex items-center justify-center z-10 cursor-not-allowed">
+              <div class="bg-white/90 px-6 py-2 rounded-full shadow-[0_2px_10px_rgba(212,163,115,0.2)] border border-[#d4a373]/30">
+                <span class="text-[9px] uppercase tracking-[0.4em] font-black text-[#8b5e3c] flex items-center gap-2">
+                  <span class="animate-pulse">🛠</span> Maintenance
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <p class="text-[9px] text-[#b58756] mt-5 leading-relaxed max-w-[280px] mx-auto opacity-80 italic font-medium text-center">
+            Pilih <strong>Link Pribadi</strong> agar suratmu tersimpan aman, contoh : <em>kado-untuk-lisa.vercel.app</em>. (Khusus pengguna Premium)
+          </p>
+        </div>
 
         <div id="save-status"
           class="text-[8px] uppercase tracking-[0.2em] text-gray-500 font-bold mt-4 opacity-0 transition-opacity">
