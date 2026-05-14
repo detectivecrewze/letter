@@ -449,11 +449,15 @@ const Studio = (() => {
           class="input-minimal flex-1"
           style="font-family: 'Caveat', cursive; font-size: 1.15rem; color: #4a3f35;"
           data-idx="${idx}" />
-        <!-- Drag handle hint + Remove -->
-        <div class="flex flex-col items-center gap-1 flex-shrink-0">
+        <!-- Reorder and Remove -->
+        <div class="flex flex-col items-center gap-1 flex-shrink-0 mr-1">
+          ${idx > 0 ? `<button data-move-up="${idx}" class="text-gray-400 hover:text-gray-600 transition text-[12px] leading-none p-1" style="touch-action: manipulation;">▲</button>` : `<span style="height:20px;width:20px;"></span>`}
           <span class="text-gray-300 text-[9px] font-bold">${idx + 1}</span>
+          ${idx < _mediaList.length - 1 ? `<button data-move-down="${idx}" class="text-gray-400 hover:text-gray-600 transition text-[12px] leading-none p-1" style="touch-action: manipulation;">▼</button>` : `<span style="height:20px;width:20px;"></span>`}
+        </div>
+        <div class="flex flex-col items-center justify-center pl-2 border-l border-[#d4a373]/20 flex-shrink-0">
           <button data-remove="${idx}"
-            class="text-red-300 hover:text-red-500 transition text-[11px] font-bold leading-none">✕</button>
+            class="text-red-300 hover:text-red-500 transition text-[12px] font-bold leading-none p-2" style="touch-action: manipulation;">✕</button>
         </div>
       `;
 
@@ -464,12 +468,36 @@ const Studio = (() => {
         Autosave.trigger();
       });
 
+      // Move Up listener
+      div.querySelector(`[data-move-up="${idx}"]`)?.addEventListener('click', () => {
+        if (idx > 0) {
+          const temp = _mediaList[idx];
+          _mediaList[idx] = _mediaList[idx - 1];
+          _mediaList[idx - 1] = temp;
+          _renderGallery();
+          Autosave.trigger();
+        }
+      });
+
+      // Move Down listener
+      div.querySelector(`[data-move-down="${idx}"]`)?.addEventListener('click', () => {
+        if (idx < _mediaList.length - 1) {
+          const temp = _mediaList[idx];
+          _mediaList[idx] = _mediaList[idx + 1];
+          _mediaList[idx + 1] = temp;
+          _renderGallery();
+          Autosave.trigger();
+        }
+      });
+
       // Remove listener
       div.querySelector(`[data-remove="${idx}"]`)?.addEventListener('click', () => {
-        _mediaList.splice(idx, 1);
-        _renderGallery();
-        Autosave.trigger();
-        showToast('Foto dihapus');
+        if (confirm('Yakin ingin menghapus foto ini?')) {
+          _mediaList.splice(idx, 1);
+          _renderGallery();
+          Autosave.trigger();
+          showToast('Foto dihapus');
+        }
       });
 
       listEl.appendChild(div);
