@@ -21,7 +21,7 @@ const Publisher = (() => {
     document.getElementById('btn-upgrade-premium')?.addEventListener('click', () => {
       const token = Auth.getToken();
       const waMsg = encodeURIComponent(
-        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+10K)\n\n` +
+        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+7K)\n\n` +
         `Letter ID: ${token}\n\n` +
         `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Upload Musik dan Password Lock.`
       );
@@ -230,7 +230,7 @@ const Publisher = (() => {
   function _showVipSuccess(token, domain) {
     const state = Autosave.buildState();
     const waMsg = encodeURIComponent(
-      `REQUEST LINK PERSONAL — LETTER EDITION (+10K)\n\n` +
+      `REQUEST LINK PERSONAL — LETTER EDITION (+7K)\n\n` +
       `Letter ID: ${token}\n` +
       `Request Domain: ${domain}.vercel.app\n` +
       `Font: ${state.fontFamily}\n` +
