@@ -20,6 +20,18 @@
 // CDN domain untuk akses file R2 langsung (musik)
 const CDN_URL = 'https://letter-assets.for-you-always.my.id';
 
+// Helper: generate a unique bundle token (16-char alphanumeric)
+function _generateBundleToken() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let token = '';
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  for (let i = 0; i < 16; i++) {
+    token += chars[array[i] % chars.length];
+  }
+  return token;
+}
+
 var index_default = {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '*';
@@ -753,6 +765,250 @@ ATURAN WAJIB:
         return new Response(JSON.stringify({
           error: error.name === 'AbortError' ? 'AI terlalu lama merespons. Coba lagi.' : (error.message || 'Gagal menghubungi AI.'),
         }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  BUNDLE ENDPOINTS
+    // ══════════════════════════════════════════════════════════════
+
+    // ── POST /bundle/create — Admin: buat token bundle baru ─────
+    if (request.method === 'POST' && url.pathname === '/bundle/create') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.GENERATOR_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const body = await request.json();
+        const label = body.label?.trim();
+        const limit = parseInt(body.limit) || 5;
+        const isPremium = body.isPremium === true;
+
+        if (!label) {
+          return new Response(JSON.stringify({ error: 'Label wajib diisi.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        if (limit < 1 || limit > 100) {
+          return new Response(JSON.stringify({ error: 'Batas link harus antara 1-100.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Generate unique token
+        const token = _generateBundleToken();
+
+        const bundleData = {
+          token,
+          label,
+          limit,
+          used: 0,
+          isPremium,
+          generatedLinks: [],
+          created_at: new Date().toISOString(),
+        };
+
+        await env.LETTER_DATA.put(`bundle:${token}`, JSON.stringify(bundleData));
+
+        return new Response(JSON.stringify({ success: true, token, label, limit, isPremium }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ── POST /bundle/login — User: validasi token bundle ────────
+    if (request.method === 'POST' && url.pathname === '/bundle/login') {
+      if (!isAllowedOrigin(request)) {
+        return new Response(JSON.stringify({ error: 'Akses ditolak.' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const { token } = await request.json();
+        if (!token) {
+          return new Response(JSON.stringify({ success: false, error: 'Token wajib diisi.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const raw = await env.LETTER_DATA.get(`bundle:${token}`);
+        if (!raw) {
+          return new Response(JSON.stringify({ success: false, error: 'Token tidak valid atau sudah dihapus.' }), {
+            status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const bundle = JSON.parse(raw);
+        return new Response(JSON.stringify({ success: true, bundle }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ── POST /bundle/generate-link — User: buat link via bundle ─
+    if (request.method === 'POST' && url.pathname === '/bundle/generate-link') {
+      if (!isAllowedOrigin(request)) {
+        return new Response(JSON.stringify({ error: 'Akses ditolak.' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const body = await request.json();
+        const token = body.token;
+        const customId = body.id?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+        const studioPassword = body.studioPassword || null;
+
+        if (!token) {
+          return new Response(JSON.stringify({ error: 'Token wajib diisi.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Validate token
+        const raw = await env.LETTER_DATA.get(`bundle:${token}`);
+        if (!raw) {
+          return new Response(JSON.stringify({ error: 'Token tidak valid.' }), {
+            status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const bundle = JSON.parse(raw);
+
+        // Check quota
+        if (bundle.used >= bundle.limit) {
+          return new Response(JSON.stringify({ error: 'Kuota link sudah habis.' }), {
+            status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Validate ID
+        if (!customId || customId.length < 3) {
+          return new Response(JSON.stringify({ error: 'ID minimal 3 karakter.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Check ID existence
+        const existing = await env.LETTER_DATA.get(customId);
+        if (existing) {
+          return new Response(JSON.stringify({ error: `ID '${customId}' sudah digunakan.` }), {
+            status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const isPremium = bundle.isPremium === true;
+
+        // Create the letter config (same as /generate-link)
+        const initialConfig = {
+          id: customId,
+          studioPassword: studioPassword,
+          isPremium: isPremium,
+          recipientName: "",
+          letterTo: "",
+          message: "",
+          from: "",
+          playlist: [],
+          status: "draft",
+          is_active: true,
+          secretMemoryEnabled: isPremium,
+          bundleToken: token,
+          created_at: new Date().toISOString()
+        };
+
+        await env.LETTER_DATA.put(customId, JSON.stringify(initialConfig));
+
+        // Update bundle usage
+        bundle.used++;
+        bundle.generatedLinks.push({ id: customId, created_at: new Date().toISOString() });
+        await env.LETTER_DATA.put(`bundle:${token}`, JSON.stringify(bundle));
+
+        const domainUrl = 'https://letter.for-you-always.my.id';
+        return new Response(JSON.stringify({
+          success: true,
+          id: customId,
+          studioUrl: `${domainUrl}/studio/${customId}`,
+          giftUrl: `${domainUrl}/?to=${customId}`,
+          message: 'Link berhasil dibuat'
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ── GET /bundle/list — Admin: list semua bundle tokens ──────
+    if (request.method === 'GET' && url.pathname === '/bundle/list') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.GENERATOR_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const list = await env.LETTER_DATA.list({ prefix: 'bundle:' });
+        const bundles = [];
+
+        for (const key of list.keys) {
+          try {
+            const raw = await env.LETTER_DATA.get(key.name);
+            if (raw) bundles.push(JSON.parse(raw));
+          } catch (e) { /* skip */ }
+        }
+
+        return new Response(JSON.stringify({ success: true, bundles, count: bundles.length }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
+          status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // ── POST /bundle/delete — Admin: hapus bundle token ─────────
+    if (request.method === 'POST' && url.pathname === '/bundle/delete') {
+      const authHeader = request.headers.get('Authorization');
+      const secret = env.GENERATOR_SECRET;
+      if (!secret || authHeader !== `Bearer ${secret}`) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+          status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const { token } = await request.json();
+        if (!token) {
+          return new Response(JSON.stringify({ error: 'Token wajib diisi.' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        await env.LETTER_DATA.delete(`bundle:${token}`);
+        return new Response(JSON.stringify({ success: true, message: 'Token bundle berhasil dihapus.' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), {
           status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }

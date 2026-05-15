@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generator Bundle — Letter Edition</title>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="../../assets/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="../../assets/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="../../assets/favicon/site.webmanifest" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #fcfaf7; }
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+    .fade-in { animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+  <!-- LOGIN GATE -->
+  <div id="login-gate" class="w-full max-w-sm">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-light tracking-tight text-gray-900 mb-2">Bundle Generator</h1>
+      <p class="text-[9px] uppercase tracking-[0.4em] text-gray-400">Letter Edition — Admin Only</p>
+    </div>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <input id="gen-password" type="password" placeholder="Password Admin"
+        class="w-full border-b border-gray-200 py-3 text-sm focus:outline-none focus:border-gray-800 text-center transition-colors bg-transparent mb-6 placeholder-gray-300">
+      <button id="btn-login" class="w-full bg-gray-900 text-white py-3 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-black transition-colors">
+        Masuk
+      </button>
+      <p id="login-error" class="hidden text-[9px] text-rose-500 text-center mt-3 font-semibold">Password salah</p>
+    </div>
+  </div>
+
+  <!-- GENERATOR PANEL -->
+  <div id="generator-panel" class="hidden w-full max-w-md fade-in">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-light tracking-tight text-gray-900 mb-2">Bundle Generator</h1>
+      <p class="text-[9px] uppercase tracking-[0.4em] text-gray-400">Letter Edition — Buat & Kelola Token Bundle</p>
+    </div>
+
+    <!-- TAB NAVIGATION -->
+    <div class="flex items-center gap-2 mb-6 bg-white p-1.5 rounded-xl border border-gray-100 shadow-sm mx-auto max-w-md">
+      <button id="tab-create" class="flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold bg-[#fcfaf7] border border-[#d4a373]/20 text-[#b58756] rounded-lg shadow-sm transition-all pointer-events-none">Buat Token</button>
+      <button id="tab-list" class="flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 rounded-lg transition-all">Daftar Token</button>
+    </div>
+
+    <!-- PANEL CREATE TOKEN -->
+    <div id="panel-create" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5 fade-in">
+      <!-- Label / Nama Pembeli -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">Label / Nama Pembeli</label>
+        <input id="bundle-label" type="text" placeholder="e.g. Reseller Jakarta / Pak Budi"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+        <p class="text-[8px] text-gray-400 mt-1.5">Nama pembeli bundle untuk referensi Anda.</p>
+      </div>
+
+      <!-- Batas Link -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-2">Batas Generate Link</label>
+        <input id="bundle-limit" type="number" min="1" max="100" value="5" placeholder="5"
+          class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
+        <p class="text-[8px] text-gray-400 mt-1.5">Berapa banyak link studio yang boleh dibuat oleh pemegang token ini.</p>
+      </div>
+
+      <!-- Is Premium -->
+      <div class="flex items-center gap-3 pt-1 pb-2">
+        <input type="checkbox" id="bundle-is-premium" class="w-3.5 h-3.5 accent-[#d4a373]">
+        <label for="bundle-is-premium" class="text-[10px] text-gray-600 cursor-pointer flex items-center gap-1.5">Link yang dihasilkan otomatis Premium <span class="text-[8px] px-1.5 py-0.5 bg-[#d4a373]/10 text-[#b58756] rounded-md font-bold uppercase tracking-widest">PRO</span></label>
+      </div>
+
+      <!-- Submit -->
+      <button id="btn-create-bundle" class="w-full bg-[#d4a373] text-white py-3.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-[#c4956a] transition-colors shadow-sm mt-2">
+        <span class="btn-text">Buat Token Bundle</span>
+      </button>
+
+      <p id="create-error" class="hidden text-[9px] text-rose-500 text-center font-semibold"></p>
+    </div>
+
+    <!-- RESULT -->
+    <div id="result-card" class="hidden mt-6 bg-white rounded-2xl shadow-sm border border-emerald-100 p-8 space-y-5 fade-in">
+      <div class="flex items-center gap-2 mb-2">
+        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+        <p class="text-[9px] uppercase tracking-widest text-emerald-600 font-semibold">Token Bundle Berhasil Dibuat!</p>
+      </div>
+
+      <div>
+        <p class="text-[8px] uppercase tracking-widest text-gray-400 mb-2 font-semibold">Token</p>
+        <div class="flex gap-2">
+          <p id="result-token" class="flex-1 text-[11px] font-mono text-gray-800 bg-gray-50 rounded-lg px-3 py-2 break-all select-all"></p>
+          <button onclick="_copyText('result-token', this)" class="text-[8px] uppercase tracking-wider font-semibold text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap">Salin</button>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-[8px] uppercase tracking-widest text-gray-400 mb-2 font-semibold">Link Bundle (untuk Pembeli)</p>
+        <div class="flex gap-2">
+          <p id="result-bundle-url" class="flex-1 text-[10px] font-mono text-[#d4a373] bg-gray-50 rounded-lg px-3 py-2 break-all"></p>
+          <button onclick="_copyText('result-bundle-url', this)" class="text-[8px] uppercase tracking-wider font-semibold text-gray-500 hover:text-gray-900 transition-colors whitespace-nowrap">Salin</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-center">
+        <div class="bg-gray-50 rounded-lg p-3">
+          <p class="text-[8px] uppercase tracking-widest text-gray-400 font-semibold">Batas Link</p>
+          <p id="result-limit" class="text-lg font-bold text-gray-800 mt-1"></p>
+        </div>
+        <div class="bg-gray-50 rounded-lg p-3">
+          <p class="text-[8px] uppercase tracking-widest text-gray-400 font-semibold">Tipe</p>
+          <p id="result-type" class="text-lg font-bold mt-1"></p>
+        </div>
+      </div>
+
+      <button id="btn-create-another" class="w-full border border-gray-200 text-gray-600 py-3 rounded-xl text-[9px] font-semibold uppercase tracking-widest hover:border-gray-800 hover:text-gray-800 transition-colors">
+        + Buat Token Lainnya
+      </button>
+    </div>
+
+    <!-- PANEL LIST TOKENS -->
+    <div id="panel-list" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-4 fade-in">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold">Semua Token Bundle</p>
+        <button id="btn-refresh-list" class="text-[8px] uppercase tracking-wider font-semibold text-gray-400 hover:text-gray-900 transition-colors">↻ Refresh</button>
+      </div>
+      <div id="bundle-list-container" class="space-y-3">
+        <p class="text-[10px] text-gray-400 text-center py-8">Memuat...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full text-[9px] uppercase tracking-widest font-semibold shadow-lg z-50"></div>
+
+  <script>
+    const WORKER_URL = 'https://letter-edition.aldoramadhan16.workers.dev';
+    let _authToken = null;
+    let _toastTimer = null;
+
+    // ── Login ─────────────────────────────────────────────────────────
+    document.getElementById('gen-password').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click(); });
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const pass = document.getElementById('gen-password').value;
+      const btn = document.getElementById('btn-login');
+      const err = document.getElementById('login-error');
+
+      btn.textContent = 'Memverifikasi...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/generator-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pass })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          _authToken = pass;
+          document.getElementById('login-gate').style.display = 'none';
+          document.getElementById('generator-panel').classList.remove('hidden');
+        } else {
+          err.classList.remove('hidden');
+          document.getElementById('gen-password').classList.add('shake');
+          setTimeout(() => document.getElementById('gen-password').classList.remove('shake'), 500);
+        }
+      } catch (e) {
+        err.textContent = 'Gagal terhubung ke server.';
+        err.classList.remove('hidden');
+      }
+
+      btn.textContent = 'Masuk';
+      btn.disabled = false;
+    });
+
+    // ── Tab Navigation ───────────────────────────────────────────────
+    const tabCreate = document.getElementById('tab-create');
+    const tabList = document.getElementById('tab-list');
+
+    function setActiveTab(activeTabEl) {
+      [tabCreate, tabList].forEach(t => {
+        t.className = 'flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold text-gray-400 hover:text-gray-900 rounded-lg transition-all';
+        t.style.pointerEvents = 'auto';
+      });
+      activeTabEl.className = 'flex-1 py-1.5 px-2 text-[8px] uppercase tracking-widest font-bold bg-[#fcfaf7] border border-[#d4a373]/20 text-[#b58756] rounded-lg shadow-sm transition-all pointer-events-none';
+    }
+
+    tabCreate.addEventListener('click', () => {
+      setActiveTab(tabCreate);
+      document.getElementById('panel-list').classList.add('hidden');
+      document.getElementById('panel-create').classList.remove('hidden');
+      document.getElementById('result-card').classList.add('hidden');
+    });
+
+    tabList.addEventListener('click', () => {
+      setActiveTab(tabList);
+      document.getElementById('panel-create').classList.add('hidden');
+      document.getElementById('result-card').classList.add('hidden');
+      document.getElementById('panel-list').classList.remove('hidden');
+      _loadBundleList();
+    });
+
+    // ── Create Bundle Token ────────────────────────────────────────
+    document.getElementById('btn-create-bundle').addEventListener('click', async () => {
+      const label = document.getElementById('bundle-label').value.trim();
+      const limit = parseInt(document.getElementById('bundle-limit').value) || 5;
+      const isPremium = document.getElementById('bundle-is-premium').checked;
+      const btn = document.getElementById('btn-create-bundle');
+      const btnText = btn.querySelector('.btn-text');
+      const errEl = document.getElementById('create-error');
+
+      if (!label) {
+        errEl.textContent = 'Label / Nama pembeli wajib diisi!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (limit < 1 || limit > 100) {
+        errEl.textContent = 'Batas link harus antara 1 - 100!';
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      errEl.classList.add('hidden');
+      btnText.textContent = 'Membuat...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/bundle/create`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${_authToken}`
+          },
+          body: JSON.stringify({ label, limit, isPremium })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          const domainUrl = 'https://letter.for-you-always.my.id';
+          document.getElementById('result-token').textContent = data.token;
+          document.getElementById('result-bundle-url').textContent = `${domainUrl}/bundle/?token=${data.token}`;
+          document.getElementById('result-limit').textContent = limit;
+          document.getElementById('result-type').textContent = isPremium ? '✨ PRO' : 'Free';
+          document.getElementById('result-type').className = `text-lg font-bold mt-1 ${isPremium ? 'text-[#d4a373]' : 'text-gray-500'}`;
+          document.getElementById('result-card').classList.remove('hidden');
+          document.getElementById('result-card').scrollIntoView({ behavior: 'smooth' });
+
+          navigator.clipboard.writeText(data.token).then(() => {
+            _showToast('Token tersalin otomatis!');
+          });
+        } else {
+          errEl.textContent = data.error || 'Gagal membuat token.';
+          errEl.classList.remove('hidden');
+        }
+      } catch (e) {
+        errEl.textContent = 'Gagal terhubung ke server.';
+        errEl.classList.remove('hidden');
+      }
+
+      btnText.textContent = 'Buat Token Bundle';
+      btn.disabled = false;
+    });
+
+    // ── Create Another ────────────────────────────────────────────
+    document.getElementById('btn-create-another').addEventListener('click', () => {
+      document.getElementById('result-card').classList.add('hidden');
+      document.getElementById('bundle-label').value = '';
+      document.getElementById('bundle-limit').value = '5';
+      document.getElementById('bundle-is-premium').checked = false;
+    });
+
+    // ── Load Bundle List ──────────────────────────────────────────
+    document.getElementById('btn-refresh-list').addEventListener('click', _loadBundleList);
+
+    async function _loadBundleList() {
+      const container = document.getElementById('bundle-list-container');
+      container.innerHTML = '<p class="text-[10px] text-gray-400 text-center py-8">Memuat...</p>';
+
+      try {
+        const res = await fetch(`${WORKER_URL}/bundle/list`, {
+          headers: { 'Authorization': `Bearer ${_authToken}` }
+        });
+        const data = await res.json();
+
+        if (!data.success || !data.bundles?.length) {
+          container.innerHTML = '<p class="text-[10px] text-gray-400 text-center py-8">Belum ada token bundle.</p>';
+          return;
+        }
+
+        container.innerHTML = '';
+        data.bundles.forEach(b => {
+          const card = document.createElement('div');
+          card.className = 'border border-gray-100 rounded-xl p-4 space-y-2';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-semibold text-gray-800">${b.label}</span>
+              <span class="text-[7px] uppercase tracking-widest font-bold px-2 py-0.5 rounded-full ${b.isPremium ? 'bg-[#d4a373]/10 text-[#b58756]' : 'bg-gray-100 text-gray-400'}">${b.isPremium ? '✨ PRO' : 'FREE'}</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-[9px] font-mono text-gray-500 break-all flex-1">${b.token}</span>
+              <button onclick="_copyText(null, this, '${b.token}')" class="text-[8px] uppercase tracking-wider font-semibold text-gray-400 hover:text-gray-900 transition-colors whitespace-nowrap">Salin</button>
+            </div>
+            <div class="flex items-center gap-4 text-[9px] text-gray-400">
+              <span>Link: <strong class="text-gray-700">${b.used} / ${b.limit}</strong></span>
+              <span>•</span>
+              <span>${new Date(b.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            </div>
+            ${b.generatedLinks?.length ? `
+              <details class="mt-2">
+                <summary class="text-[8px] uppercase tracking-widest text-gray-400 font-semibold cursor-pointer hover:text-gray-600">Lihat Link (${b.generatedLinks.length})</summary>
+                <div class="mt-2 space-y-1.5">
+                  ${b.generatedLinks.map(link => `
+                    <div class="flex items-center gap-2 bg-gray-50 rounded-lg px-2.5 py-1.5">
+                      <span class="text-[9px] font-mono text-gray-600 flex-1 truncate">${link.id}</span>
+                      <span class="text-[8px] text-gray-400">${new Date(link.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </details>
+            ` : ''}
+            <div class="flex gap-2 mt-2">
+              <button onclick="_deleteBundle('${b.token}')" class="text-[8px] uppercase tracking-wider font-semibold text-red-400 hover:text-red-600 transition-colors">Hapus Token</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } catch (e) {
+        container.innerHTML = '<p class="text-[10px] text-rose-500 text-center py-8">Gagal memuat data.</p>';
+      }
+    }
+
+    // ── Delete Bundle Token ────────────────────────────────────────
+    async function _deleteBundle(token) {
+      if (!confirm('Yakin ingin menghapus token bundle ini? Link yang sudah dibuat TIDAK akan terhapus.')) return;
+
+      try {
+        const res = await fetch(`${WORKER_URL}/bundle/delete`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${_authToken}`
+          },
+          body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          _showToast('Token berhasil dihapus.');
+          _loadBundleList();
+        } else {
+          _showToast(data.error || 'Gagal menghapus.');
+        }
+      } catch (e) {
+        _showToast('Gagal terhubung ke server.');
+      }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────
+    function _copyText(elId, btn, directText) {
+      const text = directText || document.getElementById(elId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Tersalin!';
+        setTimeout(() => btn.textContent = orig, 2000);
+        _showToast('Tersalin!');
+      });
+    }
+
+    function _showToast(msg) {
+      const t = document.getElementById('toast');
+      if (_toastTimer) clearTimeout(_toastTimer);
+      t.textContent = msg;
+      t.classList.remove('hidden');
+      _toastTimer = setTimeout(() => t.classList.add('hidden'), 2500);
+    }
+  </script>
+</body>
+</html>
