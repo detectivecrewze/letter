@@ -160,6 +160,18 @@ const Studio = (() => {
       showToast('Draft berhasil disimpan! ✓');
     });
 
+    // Password toggle (show/hide)
+    document.getElementById('btn-toggle-password')?.addEventListener('click', () => {
+      const input = document.getElementById('input-login-password');
+      const iconShow = document.getElementById('eye-icon-show');
+      const iconHide = document.getElementById('eye-icon-hide');
+      if (!input) return;
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      iconShow?.classList.toggle('hidden', isHidden);
+      iconHide?.classList.toggle('hidden', !isHidden);
+    });
+
     // Theme Selection Binding
     document.querySelectorAll('.theme-option').forEach(btn => {
       btn.addEventListener('click', () => {
