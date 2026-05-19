@@ -75,10 +75,10 @@ const Preview = (() => {
     if (!previewWin) { Studio.showToast('Izinkan popup untuk preview tema.'); return; }
 
     const themeLabels = {
-      'dusty-rose': 'Dusty Rose 🌹',
-      'midnight': 'Midnight 🌙',
-      'crimson': 'Crimson 🍷',
-      'obsidian': 'Obsidian 🌿',
+      'dusty-rose': 'Dusty Rose',
+      'midnight': 'Midnight',
+      'crimson': 'Crimson',
+      'obsidian': 'Obsidian',
     };
     Studio.showToast(`Membuka preview ${themeLabels[theme] || theme}...`);
 

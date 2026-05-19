@@ -39,7 +39,7 @@ const Autosave = (() => {
       const data = await res.json();
 
       if (data.success) {
-        _setSaveStatus('Tersimpan Otomatis ✓');
+        _setSaveStatus('Tersimpan Otomatis');
         setTimeout(() => _setSaveStatus('', true), 2500);
       } else throw new Error(data.error || 'Unknown error');
 

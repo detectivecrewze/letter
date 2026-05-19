@@ -14,7 +14,7 @@ const Studio = (() => {
     Autosave.init();
     _bindInputs();
     _initCollapse();
-    showToast('Studio siap ✨');
+    showToast('Studio siap');
 
     // Show premium discovery modal for first-time free users
     const isPrem = config.isPremium === true;
@@ -237,7 +237,7 @@ const Studio = (() => {
         // Small premium badge inserted nicely below the header
         const badge = document.createElement('div');
         badge.className = 'password-lock-badge mb-4 inline-flex items-center gap-1.5 bg-gray-800 text-white text-[8px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full shadow-md pointer-events-none';
-        badge.innerHTML = `<span class="text-[10px]">🔒</span> Fitur Premium`;
+        badge.innerHTML = `<span class="material-symbols-outlined text-[10px] leading-none flex items-center">lock</span> Fitur Premium`;
 
         const header = passSection.querySelector('.flex.items-center');
         if (header) {
@@ -282,7 +282,7 @@ const Studio = (() => {
           'box-shadow:0 2px 4px rgba(0,0,0,0.2)', 'z-index:10',
           'pointer-events:none', 'white-space:nowrap'
         ].join(';');
-        lockBadge.innerHTML = '🔒 PRO';
+        lockBadge.innerHTML = '<span class="material-symbols-outlined text-[8px] leading-none align-middle mr-0.5" style="font-size: 8px;">lock</span>PRO';
         btn.appendChild(lockBadge);
 
         // Preview button — overlay di dalam button (kanan bawah), tidak overflow keluar
@@ -300,7 +300,7 @@ const Studio = (() => {
           'transition:background 0.2s',
           'letter-spacing:0.05em'
         ].join(';');
-        previewBadge.innerHTML = '👁 lihat';
+        previewBadge.innerHTML = '<span class="material-symbols-outlined text-[8px] leading-none align-middle mr-0.5" style="font-size: 8px;">visibility</span>lihat';
         previewBadge.title = `Preview tema ${theme}`;
 
         previewBadge.addEventListener('mouseenter', () => { previewBadge.style.background = 'rgba(181,135,86,0.95)'; });
@@ -334,7 +334,7 @@ const Studio = (() => {
         const lockBadge = document.createElement('div');
         lockBadge.className = 'texture-lock-badge';
         lockBadge.style.cssText = 'position:absolute; top:-6px; right:-6px; background:#1f2937; color:white; font-size:7px; padding:2px 5px; border-radius:999px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:10; pointer-events:none;';
-        lockBadge.innerHTML = '🔒 PRO';
+        lockBadge.innerHTML = '<span class="material-symbols-outlined text-[8px] leading-none align-middle mr-0.5" style="font-size: 8px;">lock</span>PRO';
         btn.appendChild(lockBadge);
         
         // Revert to normal if currently active texture is handmade
@@ -368,8 +368,8 @@ const Studio = (() => {
         const labelRow = typoSection?.querySelector('.flex.items-center');
         if (labelRow && !labelRow.querySelector('.typo-lock-badge')) {
            const lockBadge = document.createElement('div');
-           lockBadge.className = 'typo-lock-badge bg-[#1f2937] text-white text-[7px] px-1.5 py-0.5 rounded-full font-bold ml-2 shadow-sm';
-           lockBadge.innerHTML = '🔒 PRO';
+           lockBadge.className = 'typo-lock-badge bg-[#1f2937] text-white text-[7px] px-1.5 py-0.5 rounded-full font-bold ml-2 shadow-sm flex items-center gap-0.5';
+           lockBadge.innerHTML = '<span class="material-symbols-outlined text-[8px] leading-none align-middle" style="font-size: 8px;">lock</span>PRO';
            labelRow.appendChild(lockBadge);
         }
       } else {

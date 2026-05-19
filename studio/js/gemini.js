@@ -41,7 +41,7 @@ const GeminiAI = (() => {
   async function _generate() {
     const prompt  = document.getElementById('ai-prompt-input')?.value?.trim();
     const errorEl = document.getElementById('ai-error-msg');
-    if (!prompt) { if (errorEl) errorEl.textContent = 'Ceritakan dulu konteksnya ya 😊'; return; }
+    if (!prompt) { if (errorEl) errorEl.textContent = 'Ceritakan dulu konteksnya ya'; return; }
 
     _setView('loading');
 
@@ -70,7 +70,7 @@ const GeminiAI = (() => {
     textarea.value = text;
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
     _closeModal();
-    Studio.showToast('✨ Surat AI berhasil diterapkan!');
+    Studio.showToast('Surat AI berhasil diterapkan!');
     Autosave.trigger();
   }
 

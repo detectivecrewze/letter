@@ -106,7 +106,7 @@ const Music = (() => {
         <button class="tab-library flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold ${isLib ? 'bg-white shadow-sm text-black' : 'text-gray-400 hover:text-black'} rounded-md transition-all">Song Library</button>
         ${_isPremium
           ? `<button class="tab-upload flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold ${!isLib ? 'bg-white shadow-sm text-black' : 'text-gray-400 hover:text-black'} rounded-md transition-all">Upload MP3</button>`
-          : `<button class="tab-upload-locked flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-300 rounded-md cursor-not-allowed relative" disabled title="Fitur Premium">Upload MP3 🔒</button>`
+          : `<button class="tab-upload-locked flex-1 py-1.5 text-[9px] uppercase tracking-widest font-bold text-gray-300 rounded-md cursor-not-allowed relative flex items-center justify-center gap-1" disabled title="Fitur Premium">Upload MP3 <span class="material-symbols-outlined text-[10px]" style="font-size: 10px;">lock</span></button>`
         }
       </div>
 
@@ -115,7 +115,7 @@ const Music = (() => {
         ${track.title ? `
         <div class="flex items-center gap-3 p-3 bg-[#fdf9f4] border border-[#d4a373]/20 rounded-xl mb-3">
           <div class="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-            ${hasCover ? `<img src="${track.cover.url}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-lg">🎵</div>`}
+            ${hasCover ? `<img src="${track.cover.url}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base"><span class="material-symbols-outlined text-[16px]">music_note</span></div>`}
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-[11px] font-bold text-gray-800 truncate">${track.title}</p>
@@ -150,7 +150,7 @@ const Music = (() => {
         </div>
         <div class="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-xl mb-3 border border-gray-100">
           <button class="btn-play w-7 h-7 rounded-full bg-[#1a1a1a] flex items-center justify-center flex-shrink-0 hover:bg-gray-700 transition-colors">
-            <span class="text-white text-[8px] ml-0.5">▶</span>
+            <span class="text-white text-[12px] flex items-center justify-center"><span class="material-symbols-outlined text-[12px]">play_arrow</span></span>
           </button>
           <div class="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
             <div class="h-full bg-[#d4a373] rounded-full w-0 audio-progress"></div>
@@ -208,14 +208,14 @@ const Music = (() => {
       const f = e.target.files[0];
       if (!f) return;
       if (f.size > MAX_SIZE) return Studio.showToast('Audio maksimal 30MB.');
-      Studio.showToast('Mengupload lagu... 🎶');
+      Studio.showToast('Mengupload lagu...');
       track.uploading = true; renderAll();
       try {
         const url = await _uploadToR2(f);
         track.audio.url = url; track.audio.name = f.name;
         if (!track.title) track.title = f.name.replace(/\.[^/.]+$/, '');
         track.uploading = false; renderAll();
-        Studio.showToast('Lagu berhasil diupload! 🎶'); Autosave.trigger();
+        Studio.showToast('Lagu berhasil diupload!'); Autosave.trigger();
       } catch {
         track.uploading = false; renderAll();
         Studio.showToast('Gagal upload audio. Coba lagi.');
@@ -250,19 +250,19 @@ const Music = (() => {
         if (player.duration && bar) bar.style.width = (player.currentTime / player.duration * 100) + '%';
       });
       player.addEventListener('ended', () => {
-        plyBtn.innerHTML = '<span class="text-white text-[8px] ml-0.5">▶</span>';
+        plyBtn.innerHTML = '<span class="text-white text-[12px] flex items-center justify-center"><span class="material-symbols-outlined text-[12px]">play_arrow</span></span>';
         if (bar) bar.style.width = '0%';
       });
       plyBtn.addEventListener('click', () => {
         if (!player.src) return;
         document.querySelectorAll('audio').forEach(a => { if (a !== player) a.pause(); });
-        document.querySelectorAll('.btn-play').forEach(b => { if (b !== plyBtn) b.innerHTML = '<span class="text-white text-[8px] ml-0.5">▶</span>'; });
+        document.querySelectorAll('.btn-play').forEach(b => { if (b !== plyBtn) b.innerHTML = '<span class="text-white text-[12px] flex items-center justify-center"><span class="material-symbols-outlined text-[12px]">play_arrow</span></span>'; });
         if (player.paused) {
           player.play();
-          plyBtn.innerHTML = '<span class="text-white text-[8px]">⏸</span>';
+          plyBtn.innerHTML = '<span class="text-white text-[12px] flex items-center justify-center"><span class="material-symbols-outlined text-[12px]">pause</span></span>';
         } else {
           player.pause();
-          plyBtn.innerHTML = '<span class="text-white text-[8px] ml-0.5">▶</span>';
+          plyBtn.innerHTML = '<span class="text-white text-[12px] flex items-center justify-center"><span class="material-symbols-outlined text-[12px]">play_arrow</span></span>';
         }
       });
     }
@@ -328,7 +328,7 @@ const Music = (() => {
       track.audio.url  = selectedSong.audioUrl || null;
       track.audio.name = selectedSong.title;
       modal.remove(); renderAll(); Autosave.trigger();
-      Studio.showToast(`"${selectedSong.title}" dipilih! 🎶`);
+      Studio.showToast(`"${selectedSong.title}" dipilih!`);
     });
 
     const renderSongs = (songs) => {
@@ -343,10 +343,12 @@ const Music = (() => {
         return `
         <div class="library-song-item relative flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-b-0 ${isLocked ? 'library-song-locked' : ''}" data-idx="${i}">
           <button class="lib-play-btn w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 hover:bg-[#d4a373] hover:text-white transition-all" data-idx="${i}">
-            <span class="play-icon text-[10px] ml-0.5">${isLocked ? '🔒' : '▶'}</span>
+            <span class="play-icon text-[12px] flex items-center justify-center" ${isLocked ? 'data-locked="true"' : ''}>
+              ${isLocked ? '<span class="material-symbols-outlined text-[12px]">lock</span>' : '<span class="material-symbols-outlined text-[12px]">play_arrow</span>'}
+            </span>
           </button>
           <div class="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 relative">
-            ${song.coverUrl ? `<img src="${song.coverUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-300 text-base\\'>🎵</div>'">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base">🎵</div>`}
+            ${song.coverUrl ? `<img src="${song.coverUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-gray-300 text-base\\'><span class=\\'material-symbols-outlined text-[16px]\\'>music_note</span></div>'">` : `<div class="w-full h-full flex items-center justify-center text-gray-300 text-base"><span class="material-symbols-outlined text-[16px]">music_note</span></div>`}
           </div>
           <div class="flex-1 min-w-0 pointer-events-none">
             <p class="text-[11px] font-bold text-gray-800 truncate">${song.title}</p>
@@ -368,32 +370,35 @@ const Music = (() => {
         // Playback logic
         playBtn.addEventListener('click', (e) => {
           e.stopPropagation(); 
-          if (isLocked) return Studio.showToast('Lagu ini hanya untuk pengguna Premium 💎');
+          if (isLocked) return Studio.showToast('Lagu ini hanya untuk pengguna Premium');
           
           if (libAudio.src !== song.audioUrl && song.audioUrl) libAudio.src = song.audioUrl;
 
           if (libAudio.paused) {
             document.querySelectorAll('audio').forEach(a => a.pause());
             list.querySelectorAll('.play-icon').forEach(icon => {
-               if (icon.textContent !== '🔒') icon.textContent = '▶';
+               if (icon.getAttribute('data-locked') !== 'true') {
+                 icon.innerHTML = '<span class="material-symbols-outlined text-[12px]">play_arrow</span>';
+               }
             });
             libAudio.play();
-            playBtn.querySelector('.play-icon').textContent = '⏸';
+            playBtn.querySelector('.play-icon').innerHTML = '<span class="material-symbols-outlined text-[12px]">pause</span>';
           } else {
             libAudio.pause();
-            playBtn.querySelector('.play-icon').textContent = '▶';
+            playBtn.querySelector('.play-icon').innerHTML = '<span class="material-symbols-outlined text-[12px]">play_arrow</span>';
           }
         });
 
         libAudio.addEventListener('ended', () => {
-          if (playBtn.querySelector('.play-icon').textContent !== '🔒') {
-            playBtn.querySelector('.play-icon').textContent = '▶';
+          const icon = playBtn.querySelector('.play-icon');
+          if (icon && icon.getAttribute('data-locked') !== 'true') {
+            icon.innerHTML = '<span class="material-symbols-outlined text-[12px]">play_arrow</span>';
           }
         });
 
         // Selection logic
         item.addEventListener('click', () => {
-          if (isLocked) return Studio.showToast('Upgrade ke Premium untuk membuka semua lagu 💎');
+          if (isLocked) return Studio.showToast('Upgrade ke Premium untuk membuka semua lagu');
           
           selectedSong = song;
           list.querySelectorAll('.library-song-item').forEach(el => {

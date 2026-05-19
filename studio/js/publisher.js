@@ -21,7 +21,7 @@ const Publisher = (() => {
     document.getElementById('btn-upgrade-premium')?.addEventListener('click', () => {
       const token = Auth.getToken();
       const waMsg = encodeURIComponent(
-        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+5K)\n\n` +
+        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+10K)\n\n` +
         `Letter ID: ${token}\n\n` +
         `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Upload Musik dan Password Lock.`
       );
@@ -53,11 +53,11 @@ const Publisher = (() => {
 
     const letterMsg = document.getElementById('input-letter-msg')?.value.trim();
     if (!letterMsg) {
-      Studio.showToast('Isi surat tidak boleh kosong 📝');
+      Studio.showToast('Isi surat tidak boleh kosong');
       return;
     }
     if (Music.isUploading()) {
-      Studio.showToast('Tunggu upload musik selesai dulu ⏳');
+      Studio.showToast('Tunggu upload musik selesai dulu');
       return;
     }
 
@@ -104,7 +104,7 @@ const Publisher = (() => {
       Studio.showToast('Gagal publish: ' + e.message);
     } finally {
       _isPublishing = false;
-      if (submitText) submitText.textContent = 'Publikasikan Surat 💌';
+      if (submitText) submitText.textContent = 'Publikasikan Surat';
       if (submitBtn)  submitBtn.disabled = false;
     }
   }
@@ -118,7 +118,7 @@ const Publisher = (() => {
     if (urlEl)   urlEl.textContent = url;
     if (viewBtn) viewBtn.href = url;
     if (waBtn) {
-      const msg = encodeURIComponent(`💌 Ada surat untukmu...\n\n${url}`);
+      const msg = encodeURIComponent(`Ada surat untukmu...\n\n${url}`);
       waBtn.href = `https://wa.me/?text=${msg}`;
     }
 
@@ -208,7 +208,7 @@ const Publisher = (() => {
   // ── VIP Flow ───────────────────────────────────────────────
   function _handleVipClick() {
     if (Music.isUploading()) {
-      Studio.showToast('Tunggu upload musik selesai dulu ⏳');
+      Studio.showToast('Tunggu upload musik selesai dulu');
       return;
     }
     document.getElementById('input-request-domain').value = '';
@@ -217,7 +217,7 @@ const Publisher = (() => {
 
   async function _doVipSubmit() {
     const domainRaw = document.getElementById('input-request-domain')?.value.trim().toLowerCase();
-    if (!domainRaw) { Studio.showToast('Nama domain tidak boleh kosong! 🌐'); return; }
+    if (!domainRaw) { Studio.showToast('Nama domain tidak boleh kosong!'); return; }
 
     const domain = domainRaw.replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '');
     if (domain.length < 3) { Studio.showToast('Nama domain minimal 3 karakter.'); return; }
@@ -264,7 +264,7 @@ const Publisher = (() => {
 
   async function _doClaimBonus() {
     const bonusIdRaw = document.getElementById('input-bonus-id')?.value.trim().toLowerCase();
-    if (!bonusIdRaw) { Studio.showToast('ID surat tidak boleh kosong! 💌'); return; }
+    if (!bonusIdRaw) { Studio.showToast('ID surat tidak boleh kosong!'); return; }
 
     const newId = bonusIdRaw.replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '');
     if (newId.length < 3) { Studio.showToast('ID surat minimal 3 karakter.'); return; }
@@ -304,7 +304,7 @@ const Publisher = (() => {
     } catch (err) {
       Studio.showToast(err.message || 'Gagal membuat surat bonus. Coba lagi.');
     } finally {
-      if (btn) { btn.textContent = 'Buat Surat Premium'; btn.disabled = false; }
+      if (btn) { btn.textContent = 'Buat Surat Bonus'; btn.disabled = false; }
     }
   }
 
