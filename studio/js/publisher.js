@@ -21,7 +21,7 @@ const Publisher = (() => {
     document.getElementById('btn-upgrade-premium')?.addEventListener('click', () => {
       const token = Auth.getToken();
       const waMsg = encodeURIComponent(
-        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+7K)\n\n` +
+        `REQUEST UPGRADE PREMIUM — LETTER EDITION (+5K)\n\n` +
         `Letter ID: ${token}\n\n` +
         `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Upload Musik dan Password Lock.`
       );
@@ -31,6 +31,15 @@ const Publisher = (() => {
     // Success modal
     document.getElementById('btn-copy-link')?.addEventListener('click', _handleCopyLink);
     document.getElementById('btn-close-success')?.addEventListener('click', () => _toggleModal('modal-success', false));
+
+    // Bonus claim modal
+    const showClaimModal = () => {
+      document.getElementById('input-bonus-id').value = '';
+      _toggleModal('modal-bonus-claim', true);
+    };
+    document.getElementById('btn-sidebar-claim-bonus')?.addEventListener('click', showClaimModal);
+    document.getElementById('btn-confirm-bonus-claim')?.addEventListener('click', _doClaimBonus);
+    document.getElementById('btn-cancel-bonus-claim')?.addEventListener('click', () => _toggleModal('modal-bonus-claim', false));
   }
 
   function _toggleModal(id, show) {
@@ -80,6 +89,12 @@ const Publisher = (() => {
 
       if (data.success) {
         Autosave.cancel();
+        // Update local initial config status so that checks work properly
+        const config = Auth.getInitialConfig();
+        if (config) {
+          config.status = 'published';
+          config.publishedAt = state.publishedAt;
+        }
         const url = `${location.protocol}//${location.host}/${token}`;
         _showSuccessModal(url);
       } else {
@@ -132,6 +147,11 @@ const Publisher = (() => {
       const newBtn = downloadBtn.cloneNode(true);
       downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
       newBtn.addEventListener('click', _handleDownloadQR);
+    }
+
+    // Toggle sidebar bonus section/history visibility in real-time
+    if (typeof Studio !== 'undefined' && Studio.updateSidebarBonusStatus) {
+      Studio.updateSidebarBonusStatus();
     }
 
     _toggleModal('modal-success', true);
@@ -230,7 +250,7 @@ const Publisher = (() => {
   function _showVipSuccess(token, domain) {
     const state = Autosave.buildState();
     const waMsg = encodeURIComponent(
-      `REQUEST LINK PERSONAL — LETTER EDITION (+7K)\n\n` +
+      `REQUEST LINK PERSONAL — LETTER EDITION (+5K)\n\n` +
       `Letter ID: ${token}\n` +
       `Request Domain: ${domain}.vercel.app\n` +
       `Font: ${state.fontFamily}\n` +
@@ -240,6 +260,52 @@ const Publisher = (() => {
     const waBtn = document.getElementById('btn-contact-admin-vip');
     if (waBtn) waBtn.href = `https://wa.me/6281381543981?text=${waMsg}`;
     _toggleModal('modal-success-vip', true);
+  }
+
+  async function _doClaimBonus() {
+    const bonusIdRaw = document.getElementById('input-bonus-id')?.value.trim().toLowerCase();
+    if (!bonusIdRaw) { Studio.showToast('ID surat tidak boleh kosong! 💌'); return; }
+
+    const newId = bonusIdRaw.replace(/[^a-z0-9-]/g, '-').replace(/^-+|-+$/g, '');
+    if (newId.length < 3) { Studio.showToast('ID surat minimal 3 karakter.'); return; }
+
+    const btn = document.getElementById('btn-confirm-bonus-claim');
+    if (btn) { btn.textContent = 'Membuat...'; btn.disabled = true; }
+
+    try {
+      const parentId = Auth.getToken();
+      const res = await fetch(`${Auth.getWorkerUrl()}/create-bonus-letter`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ parentId, newId })
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Gagal membuat surat bonus.');
+
+      Studio.showToast('Surat bonus berhasil dibuat! Mengalihkan...');
+
+      // Update local configuration state
+      const initConfig = Auth.getInitialConfig();
+      if (initConfig) initConfig.bonusCreatedId = newId;
+
+      _toggleModal('modal-bonus-claim', false);
+      _toggleModal('modal-success', false);
+
+      if (typeof Studio !== 'undefined' && Studio.updateSidebarBonusStatus) {
+        Studio.updateSidebarBonusStatus();
+      }
+
+      // Redirect to the new studio URL
+      setTimeout(() => {
+        window.location.href = `${window.location.protocol}//${window.location.host}/studio/${newId}`;
+      }, 1500);
+
+    } catch (err) {
+      Studio.showToast(err.message || 'Gagal membuat surat bonus. Coba lagi.');
+    } finally {
+      if (btn) { btn.textContent = 'Buat Surat Premium'; btn.disabled = false; }
+    }
   }
 
   return { init };

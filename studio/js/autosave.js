@@ -60,7 +60,7 @@ const Autosave = (() => {
 
   function buildState() {
     const token = Auth.getToken();
-    return {
+    const state = {
       // Token
       studioToken:    token,
       giftId:         token,
@@ -97,6 +97,7 @@ const Autosave = (() => {
       // Preserve server-controlled flags — never overwrite from studio
       secretMemoryEnabled: Auth.getInitialConfig()?.secretMemoryEnabled || false,
       isPremium:           Auth.getInitialConfig()?.isPremium           || false,
+      bonusCreatedId:      Auth.getInitialConfig()?.bonusCreatedId      || null,
 
       // Meta
       status:         Auth.getInitialConfig()?.status || 'draft',

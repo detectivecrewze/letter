@@ -218,6 +218,8 @@ var index_default = {
         // Preserve server-controlled flags (client must never overwrite them)
         body.isPremium           = existingConfig.isPremium           ?? false;
         body.secretMemoryEnabled = existingConfig.secretMemoryEnabled ?? false;
+        body.bonusCreatedId      = existingConfig.bonusCreatedId      ?? null;
+        body.parentLetterId      = existingConfig.parentLetterId      ?? null;
 
         if (!isPremium) {
           // Strip password lock
@@ -253,6 +255,91 @@ var index_default = {
         return new Response(JSON.stringify({ error: error.message }), {
           status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
+      }
+    }
+
+    // ── POST /create-bonus-letter ─────────────────────────────
+    if (request.method === 'POST' && url.pathname === '/create-bonus-letter') {
+      if (!isAllowedOrigin(request)) {
+        return new Response(JSON.stringify({ error: 'Akses ditolak.' }), {
+          status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      try {
+        const body = await request.json();
+        const parentId = body.parentId?.trim();
+        const customId = body.newId?.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+
+        if (!parentId) {
+          return new Response(JSON.stringify({ error: 'ID Surat Utama (parentId) diperlukan.' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        if (!customId || customId.length < 3) {
+          return new Response(JSON.stringify({ error: 'ID baru minimal 3 karakter.' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        // 1. Fetch parent config
+        const parentRaw = await env.LETTER_DATA.get(parentId);
+        if (!parentRaw) {
+          return new Response(JSON.stringify({ error: 'Surat asal tidak ditemukan.' }), { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+        const parentConfig = JSON.parse(parentRaw);
+
+        // 2. Validate eligibility
+        if (parentConfig.isPremium !== true) {
+          return new Response(JSON.stringify({ error: 'Hanya pengguna Premium yang mendapatkan bonus surat.' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        if (parentConfig.status !== 'published') {
+          return new Response(JSON.stringify({ error: 'Publikasikan surat utama Anda terlebih dahulu sebelum mengklaim bonus.' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        if (parentConfig.bonusCreatedId) {
+          return new Response(JSON.stringify({ error: 'Bonus surat sudah pernah diklaim sebelumnya.' }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        // 3. Check if new ID already exists
+        const existing = await env.LETTER_DATA.get(customId);
+        if (existing) {
+          return new Response(JSON.stringify({ error: `ID '${customId}' sudah digunakan.` }), { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        }
+
+        // 4. Create new bonus config (status: draft)
+        const initialConfig = {
+          id: customId,
+          studioPassword: null,
+          isPremium: false,
+          recipientName: "",
+          letterTo: "",
+          message: "",
+          from: "",
+          playlist: [],
+          status: "draft",
+          is_active: true,
+          secretMemoryEnabled: false,
+          parentLetterId: parentId, // Back reference
+          created_at: new Date().toISOString()
+        };
+
+        // 5. Update parent config with the new bonus link ID
+        parentConfig.bonusCreatedId = customId;
+
+        // 6. Save both configs in KV
+        await env.LETTER_DATA.put(customId, JSON.stringify(initialConfig));
+        await env.LETTER_DATA.put(parentId, JSON.stringify(parentConfig));
+
+        const domainUrl = 'https://letter.for-you-always.my.id';
+        return new Response(JSON.stringify({
+          success: true,
+          id: customId,
+          studioUrl: `${domainUrl}/studio/${customId}`,
+          giftUrl: `${domainUrl}/?to=${customId}`,
+          message: 'Bonus surat berhasil dibuat!'
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+
+      } catch (error) {
+        return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
 

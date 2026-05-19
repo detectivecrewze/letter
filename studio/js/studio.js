@@ -25,6 +25,9 @@ const Studio = (() => {
         setTimeout(() => _showPremiumDiscovery(storageKey), 1200);
       }
     }
+
+    // Toggle Sidebar Bonus Claim & History banner visibility
+    updateSidebarBonusStatus();
   }
 
   function _showPremiumDiscovery(storageKey) {
@@ -629,7 +632,47 @@ const Studio = (() => {
   function getActiveTheme() { return _activeTheme; }
   function getActiveTexture() { return _activeTexture; }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getMediaList, isMemoryEnabled, isPremium };
+  function updateSidebarBonusStatus() {
+    const config = Auth.getInitialConfig() || {};
+    const isPrem = config.isPremium === true;
+    const isPublished = config.status === 'published';
+    const bonusCreatedId = config.bonusCreatedId || null;
+
+    const sidebarBonusSection = document.getElementById('sidebar-bonus-section');
+    const sidebarBonusClaimedSection = document.getElementById('sidebar-bonus-claimed-section');
+
+    if (sidebarBonusSection) {
+      if (isPrem && isPublished && !bonusCreatedId) {
+        sidebarBonusSection.classList.remove('hidden');
+      } else {
+        sidebarBonusSection.classList.add('hidden');
+      }
+    }
+
+    if (sidebarBonusClaimedSection) {
+      if (isPrem && isPublished && bonusCreatedId) {
+        sidebarBonusClaimedSection.classList.remove('hidden');
+        
+        const idText = document.getElementById('sidebar-bonus-id-text');
+        const liveLink = document.getElementById('sidebar-bonus-live-link');
+        const studioBtn = document.getElementById('link-sidebar-bonus-claimed');
+        
+        const liveUrl = `${window.location.protocol}//${window.location.host}/${bonusCreatedId}`;
+        const studioUrl = `${window.location.protocol}//${window.location.host}/studio/${bonusCreatedId}`;
+        
+        if (idText) idText.textContent = bonusCreatedId;
+        if (liveLink) {
+          liveLink.href = liveUrl;
+          liveLink.textContent = liveUrl;
+        }
+        if (studioBtn) studioBtn.href = studioUrl;
+      } else {
+        sidebarBonusClaimedSection.classList.add('hidden');
+      }
+    }
+  }
+
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {
