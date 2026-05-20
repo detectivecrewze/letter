@@ -551,6 +551,9 @@ var index_default = {
                 fontSize: config.fontSize || 'size-medium',
                 secretMemoryEnabled: config.secretMemoryEnabled === true,
                 publishedAt: config.publishedAt || config.createdAt || null,
+                isBonus: config.isBonus || false,
+                parentId: config.parentId || null,
+                bonusCreatedId: config.bonusCreatedId || null,
               };
             }
           } catch (e) { return null; }
