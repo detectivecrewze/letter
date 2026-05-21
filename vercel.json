@@ -25,6 +25,14 @@
             "destination": "/admin/index.html"
         },
         {
+            "source": "/airmail/:id",
+            "destination": "/themes/airmail/index.html"
+        },
+        {
+            "source": "/airmail",
+            "destination": "/themes/airmail/index.html"
+        },
+        {
             "source": "/:id",
             "destination": "/index.html"
         }

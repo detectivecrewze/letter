@@ -95,8 +95,11 @@ const Publisher = (() => {
           config.status = 'published';
           config.publishedAt = state.publishedAt;
         }
-        const url = `${location.protocol}//${location.host}/${token}`;
-        _showSuccessModal(url);
+        // Build URL based on template type
+        const templateType = state.templateType || 'classic';
+        const basePath = templateType === 'airmail' ? `/airmail/${token}` : `/${token}`;
+        const url = `${location.protocol}//${location.host}${basePath}`;
+        _showSuccessModal(url, templateType);
       } else {
         throw new Error(data.error || 'Server error');
       }
@@ -109,11 +112,12 @@ const Publisher = (() => {
     }
   }
 
-  function _showSuccessModal(url) {
+  function _showSuccessModal(url, templateType) {
     const urlEl   = document.getElementById('modal-gift-url');
     const viewBtn = document.getElementById('btn-view-gift');
     const waBtn   = document.getElementById('btn-share-whatsapp');
     const qrBox   = document.getElementById('qr-code-box');
+    const exportContainer = document.getElementById('qr-export-container');
 
     if (urlEl)   urlEl.textContent = url;
     if (viewBtn) viewBtn.href = url;
@@ -121,6 +125,8 @@ const Publisher = (() => {
       const msg = encodeURIComponent(`Ada surat untukmu...\n\n${url}`);
       waBtn.href = `https://wa.me/?text=${msg}`;
     }
+
+    // ── QR export card design remains static as defined in index.html ──
 
     // Generate QR Code
     if (qrBox && typeof QRCode !== 'undefined') {
@@ -135,7 +141,6 @@ const Publisher = (() => {
       });
       
       // Fix for mobile: qrcode.js might use canvas instead of img on some devices.
-      // Style both elements using CSS instead of unreliable timeouts.
       const styleTag = document.createElement('style');
       styleTag.textContent = '#qr-code-box img, #qr-code-box canvas { margin: 0 auto !important; display: block; border-radius: 8px; }';
       qrBox.appendChild(styleTag);
@@ -156,6 +161,7 @@ const Publisher = (() => {
 
     _toggleModal('modal-success', true);
   }
+
 
   async function _handleDownloadQR() {
     const exportNode = document.getElementById('qr-export-container');

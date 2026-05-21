@@ -89,6 +89,8 @@ const Autosave = (() => {
       playlist: Music.getPlaylistArray(),
       theme:    Studio.getActiveTheme(),
       paperTexture: Studio.getActiveTexture(),
+      templateType: Studio.getActiveTemplate(),
+      airmailTheme: Studio.getActiveAirmailTheme(),
 
       // Section 4 — Memori Rahasia (multi-photo carousel)
       // Only include if admin has whitelisted this letter for secret memory

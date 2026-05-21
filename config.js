@@ -27,7 +27,7 @@ window.STANDALONE_CONFIG = {
   ],
   "theme": "dusty-rose",
   "status": "published",
-  "is_active": false,
+  "is_active": true,
   "show_watermark": true,
   "isPremium": false,
   "_meta": {

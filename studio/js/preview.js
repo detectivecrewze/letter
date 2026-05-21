@@ -4,6 +4,11 @@
  */
 
 const Preview = (() => {
+  function _getBaseUrl(template) {
+    if (template === 'airmail') return '../themes/airmail/index.html';
+    return '../index.html';
+  }
+
   function init() {
     // Main Preview (bottom button) -> Normal with typewriter
     document.getElementById('btn-preview-letter')?.addEventListener('click', () => openPreview(false));
@@ -32,7 +37,8 @@ const Preview = (() => {
 
     try {
       await Autosave.saveNow();
-      let previewUrl = `../index.html?to=${token}`;
+      const base = _getBaseUrl(Studio.getActiveTemplate());
+      let previewUrl = `${base}?to=${token}`;
       if (skipTW) previewUrl += '&skipTW=1&skipAuth=1';
 
       previewWin.location.href = previewUrl;
@@ -53,8 +59,33 @@ const Preview = (() => {
 
     try {
       await Autosave.saveNow();
-      // skipTW=1 to render instantly, openMemory=1 to auto-open the modal
-      const previewUrl = `../index.html?to=${token}&skipTW=1&skipAuth=1&openMemory=1`;
+      const base = _getBaseUrl(Studio.getActiveTemplate());
+      const previewUrl = `${base}?to=${token}&skipTW=1&skipAuth=1&openMemory=1`;
+      previewWin.location.href = previewUrl;
+    } catch (e) {
+      previewWin.close();
+      Studio.showToast('Gagal membuka preview. Coba lagi.');
+    }
+  }
+
+  /**
+   * Opens a live preview for a specific template (without changing the saved config).
+   * Used by the "Preview" buttons inside the template selector cards.
+   */
+  async function openTemplatePreview(template) {
+    const token = Auth.getToken();
+    if (!token) { Studio.showToast('Token tidak ditemukan.'); return; }
+
+    const previewWin = window.open('about:blank', '_blank');
+    if (!previewWin) { Studio.showToast('Izinkan popup untuk preview template.'); return; }
+
+    const label = template === 'airmail' ? 'Vintage Airmail' : 'Classic Letter';
+    Studio.showToast(`Membuka preview ${label}...`);
+
+    try {
+      await Autosave.saveNow();
+      const base = _getBaseUrl(template);
+      const previewUrl = `${base}?to=${token}&skipTW=1&skipAuth=1`;
       previewWin.location.href = previewUrl;
     } catch (e) {
       previewWin.close();
@@ -89,7 +120,7 @@ const Preview = (() => {
     previewWin.location.href = previewUrl;
   }
 
-  return { init, openPreview, openMemoryPreview, openThemePreview };
+  return { init, openPreview, openMemoryPreview, openTemplatePreview, openThemePreview };
 })();
 
-document.addEventListener('DOMContentLoaded', Preview.init);
+document.addEventListener('DOMContentLoaded', Preview.init);

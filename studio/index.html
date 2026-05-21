@@ -66,6 +66,78 @@
         <p class="text-[10px] uppercase tracking-[0.4em] text-gray-400 mt-4">For You, Always.</p>
       </header>
 
+      <!-- hidden field to store which template is active -->
+      <input type="hidden" id="input-template-type" value="classic">
+
+      <!-- ══════════════════════════════════════
+           SECTION 0 — PILIH TEMPLATE
+      ══════════════════════════════════════ -->
+      <section id="section-template" class="section-card mb-12">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-[10px] uppercase tracking-[0.3em] text-gray-600 font-bold mb-1">Pilih Template</h2>
+            <p class="text-[7px] text-[#d4a373] uppercase tracking-[0.2em] font-bold truncate">Tampilan Amplop & Surat</p>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="section-body-inner p-8">
+
+            <!-- Premium Lock Overlay (shown for free users) -->
+            <div id="template-selector-lock" class="hidden">
+              <div class="lock-icon">
+                <span class="material-symbols-outlined" style="font-size:20px;color:#888">lock</span>
+              </div>
+              <p class="text-[10px] font-bold text-gray-700 uppercase tracking-[0.15em]">Fitur Premium</p>
+              <p class="text-[8px] text-gray-400 leading-relaxed max-w-[200px]">
+                Pilihan template tersedia untuk akun Premium.<br>Hubungi admin untuk mengaktifkan.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4" id="template-selector">
+
+              <!-- Classic Letter -->
+              <button class="template-card active" data-template="classic" id="tcard-classic">
+                <div class="template-card-inner">
+                  <!-- Mini visual: classic envelope -->
+                  <div class="template-thumb">
+                    <div class="thumb-classic">
+                      <div class="thumb-env-back"></div>
+                      <div class="thumb-paper"></div>
+                      <div class="thumb-env-front"></div>
+                    </div>
+                  </div>
+                  <div class="template-card-label">Classic Letter</div>
+                  <div class="template-card-sub">Timeless & Elegant</div>
+                  <div class="template-check" id="check-classic">✓</div>
+                </div>
+                <button class="template-preview-btn" data-template-preview="classic" type="button">Preview</button>
+              </button>
+
+              <!-- Vintage Airmail -->
+              <button class="template-card" data-template="airmail" id="tcard-airmail">
+                <div class="template-card-inner">
+                  <!-- Mini visual: airmail envelope -->
+                  <div class="template-thumb">
+                    <div class="thumb-airmail">
+                      <div class="thumb-airmail-stripes"></div>
+                      <div class="thumb-airmail-inner">
+                        <div class="thumb-airmail-stamp"></div>
+                        <div class="thumb-airmail-badge"></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="template-card-label">Vintage Airmail</div>
+                  <div class="template-card-sub">Retro Par Avion</div>
+                  <div class="template-check hidden" id="check-airmail">✓</div>
+                </div>
+                <button class="template-preview-btn" data-template-preview="airmail" type="button">Preview</button>
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- ══════════════════════════════════════
            SECTION 1 — PENERIMA SURAT
            (Untuk teks "Kepada" di amplop)
@@ -91,8 +163,9 @@
         <div class="section-body">
           <div class="section-body-inner p-8">
             <!-- Theme Selection -->
-            <div class="mb-10">
-              <label class="text-[7px] uppercase tracking-[0.3em] text-gray-400 font-bold block mb-4">Mood & Visual
+            <!-- Shown for Classic template -->
+            <div id="theme-selector-wrap" class="mb-10">
+              <label class="text-[7px] uppercase tracking-[0.3em] text-gray-400 font-bold block mb-4">Mood &amp; Visual
                 Theme</label>
               <div class="flex flex-wrap gap-4" id="theme-selector">
                 <!-- Blush Cream -->
@@ -153,8 +226,48 @@
               </div>
             </div>
 
-            <!-- Paper Texture Selection (Premium Only) -->
-            <div class="mb-10 pt-8 border-t border-gray-50">
+            <!-- Airmail: selectable colour chips (shown only for airmail template) -->
+             <div id="airmail-color-display" class="mb-10 field-hidden">
+              <label class="text-[7px] uppercase tracking-[0.3em] text-gray-400 font-bold block mb-4">Warna Template</label>
+              <div class="flex flex-wrap gap-4" id="airmail-theme-selector">
+
+                <!-- Parchment (default warm beige) -->
+                <button class="airmail-theme-option group relative active" data-airmail-theme="airmail-parchment">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent flex items-center justify-center p-1 shadow-sm transition-all" style="background:#f5ede0">
+                    <div class="w-full h-full rounded-full" style="background:repeating-linear-gradient(90deg,#c03030 0,#c03030 3px,#f5ede0 3px,#f5ede0 6px,#2a4c8a 6px,#2a4c8a 9px,#f5ede0 9px,#f5ede0 12px)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#b58756">Parchment</span>
+                </button>
+
+                <!-- Dusty Lilac -->
+                <button class="airmail-theme-option group relative" data-airmail-theme="airmail-lilac">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#9b7fb6] flex items-center justify-center p-1 shadow-sm transition-all" style="background:#f0e8f5">
+                    <div class="w-full h-full rounded-full" style="background:repeating-linear-gradient(90deg,#9b59b6 0,#9b59b6 3px,#f0e8f5 3px,#f0e8f5 6px,#5b4a8a 6px,#5b4a8a 9px,#f0e8f5 9px,#f0e8f5 12px)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest text-gray-400 mt-2 block text-center font-bold">Lilac</span>
+                </button>
+
+                <!-- Sage Mist -->
+                <button class="airmail-theme-option group relative" data-airmail-theme="airmail-sage">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#6a9e7e] flex items-center justify-center p-1 shadow-sm transition-all" style="background:#e8f2ec">
+                    <div class="w-full h-full rounded-full" style="background:repeating-linear-gradient(90deg,#3a7d54 0,#3a7d54 3px,#e8f2ec 3px,#e8f2ec 6px,#2a5c44 6px,#2a5c44 9px,#e8f2ec 9px,#e8f2ec 12px)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest text-gray-400 mt-2 block text-center font-bold">Sage</span>
+                </button>
+
+                <!-- Rosy Petal -->
+                <button class="airmail-theme-option group relative" data-airmail-theme="airmail-rose">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#c4858a] flex items-center justify-center p-1 shadow-sm transition-all" style="background:#fceef0">
+                    <div class="w-full h-full rounded-full" style="background:repeating-linear-gradient(90deg,#c04060 0,#c04060 3px,#fceef0 3px,#fceef0 6px,#8a3050 6px,#8a3050 9px,#fceef0 9px,#fceef0 12px)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest text-gray-400 mt-2 block text-center font-bold">Rose</span>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- Paper Texture Selection (Premium Only) — hidden for airmail -->
+            <div id="texture-section-wrap" class="mb-10 pt-8 border-t border-gray-50">
               <label class="text-[7px] uppercase tracking-[0.3em] text-gray-400 font-bold block mb-4">Paper Texture (Premium Option)</label>
               <div class="flex gap-4" id="texture-selector">
                 <button class="texture-option group relative flex-1" data-texture="normal">
@@ -261,11 +374,12 @@
         </div>
         <div class="section-body">
           <div class="section-body-inner">
-
-
-            <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Judul Surat</label>
-            <input id="input-letter-title" type="text" placeholder="e.g. Happy Birthday to my minion"
-              class="input-minimal mb-6" autocomplete="off" />
+            <!-- Title field — hidden for airmail template -->
+            <div id="title-field-wrap">
+              <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Judul Surat</label>
+              <input id="input-letter-title" type="text" placeholder="e.g. Happy Birthday to my minion"
+                class="input-minimal mb-6" autocomplete="off" />
+            </div>
 
             <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Tanggal Surat</label>
             <input id="input-letter-date" type="text" placeholder="e.g. 14 April 2026" class="input-minimal mb-6"

@@ -884,4 +884,301 @@ textarea,
   border: 1px solid #fecaca;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════
+   TEMPLATE SELECTOR CARDS
+   ═══════════════════════════════════════════════════ */
+
+#template-selector {
+  gap: 16px;
+}
+
+.template-card {
+  position: relative;
+  width: 100%;
+  background: #fdfaf7;
+  border: 1.5px solid rgba(212, 163, 115, 0.2);
+  border-radius: 12px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.template-card:hover {
+  border-color: rgba(212, 163, 115, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -8px rgba(212, 163, 115, 0.15);
+  background: #fff;
+}
+
+.template-card.active {
+  border-color: #d4a373;
+  background: #fff;
+  box-shadow: 0 8px 20px -6px rgba(212, 163, 115, 0.2);
+}
+
+.template-card-inner {
+  padding: 18px 16px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+}
+
+/* ── Thumbnail Visual ── */
+.template-thumb {
+  width: 100%;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Classic: simple envelope silhouette */
+.thumb-classic {
+  position: relative;
+  width: 60px;
+  height: 42px;
+  /* position:relative is required so absolute children stack correctly */
+}
+
+.thumb-env-back {
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 38px;
+  background: #e8dcc8;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.thumb-paper {
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 44px; height: 32px;
+  background: #fff;
+  border-radius: 1px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.thumb-env-front {
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 26px;
+  background: linear-gradient(to top, #f5ecd9, #fbf5ea);
+  border-radius: 0 0 2px 2px;
+  clip-path: polygon(0 100%, 100% 100%, 100% 0, 50% 35%, 0 0);
+  box-shadow: 0 -1px 3px rgba(0,0,0,0.03);
+}
+
+/* Airmail: colored stripe envelope */
+.thumb-airmail {
+  position: relative;
+  width: 68px;
+  height: 46px;
+  background: #fdfaf5;
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08), inset 0 0 0 1px rgba(139, 115, 85, 0.15);
+  overflow: hidden;
+  padding: 2.5px;
+}
+
+.thumb-airmail-stripes {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    #c0392b 0px, #c0392b 6px,
+    transparent 6px, transparent 12px,
+    #2c3e80 12px, #2c3e80 18px,
+    transparent 18px, transparent 24px
+  );
+  opacity: 0.85;
+}
+
+.thumb-airmail-inner {
+  position: absolute;
+  inset: 3px;
+  background: #fdfaf5;
+  border: 0.5px solid rgba(139, 115, 85, 0.2);
+  z-index: 1;
+}
+
+.thumb-airmail-stamp {
+  position: absolute;
+  top: 3px; right: 4px;
+  width: 10px; height: 13px;
+  background: #e8d5c0;
+  border: 1px dashed rgba(139,115,85,0.4);
+}
+
+.thumb-airmail-badge {
+  position: absolute;
+  top: 4px; left: 4px;
+  width: 16px; height: 6px;
+  border: 0.5px solid #2c3e80;
+  border-radius: 1px;
+}
+
+/* ── Card text ── */
+.template-card-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3d3228;
+}
+
+.template-card-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  color: #b0a090;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: -4px;
+}
+
+/* ── Checkmark badge ── */
+.template-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #d4a373;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(212,163,115,0.4);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.template-check.hidden {
+  display: none;
+}
+
+/* ── Preview button inside card ── */
+.template-preview-btn {
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-top: 1px solid rgba(212, 163, 115, 0.12);
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b58756;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  border-radius: 0 0 12px 12px;
+}
+
+.template-preview-btn:hover {
+  background: rgba(212, 163, 115, 0.08);
+  color: #a0723a;
+}
+
+/* ── Airmail theme option buttons ── */
+.airmail-theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  outline: none;
+}
+
+.airmail-theme-option.active > div:first-child {
+  border-color: currentColor !important;
+  box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.2);
+}
+
+/* Per-colour active ring colours */
+.airmail-theme-option[data-airmail-theme="airmail-parchment"].active > div:first-child {
+  border-color: #d4a373 !important;
+}
+.airmail-theme-option[data-airmail-theme="airmail-lilac"].active > div:first-child {
+  border-color: #9b7fb6 !important;
+  box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.15);
+}
+.airmail-theme-option[data-airmail-theme="airmail-sage"].active > div:first-child {
+  border-color: #6a9e7e !important;
+  box-shadow: 0 0 0 3px rgba(58, 125, 84, 0.15);
+}
+.airmail-theme-option[data-airmail-theme="airmail-rose"].active > div:first-child {
+  border-color: #c4858a !important;
+  box-shadow: 0 0 0 3px rgba(192, 64, 96, 0.15);
+}
+
+/* ── Field hide transition ── */
+#title-field-wrap,
+#typography-section,
+#theme-selector-wrap,
+#airmail-color-display,
+#texture-section-wrap {
+  transition: opacity 0.25s ease, max-height 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+#title-field-wrap.field-hidden,
+#typography-section.field-hidden,
+#theme-selector-wrap.field-hidden,
+#airmail-color-display.field-hidden,
+#texture-section-wrap.field-hidden {
+  opacity: 0;
+  max-height: 0 !important;
+  pointer-events: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+/* ── Template Section Premium Lock ── */
+#template-selector-lock {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(3px);
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  padding: 16px;
+}
+
+#template-selector-lock.hidden {
+  display: none !important;
+}
+
+#template-selector-lock .lock-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#section-template .section-body-inner {
+  position: relative;
 }

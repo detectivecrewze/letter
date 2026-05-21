@@ -6,6 +6,8 @@ const Studio = (() => {
   let _studioPassword = '';
   let _activeTheme = 'blush-cream';
   let _activeTexture = 'normal';
+  let _activeTemplate = 'classic';
+  let _activeAirmailTheme = 'airmail-parchment'; // default airmail colour
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -13,6 +15,7 @@ const Studio = (() => {
     Music.init(config);
     Autosave.init();
     _bindInputs();
+    _bindTemplateSelector();
     _initCollapse();
     showToast('Studio siap');
 
@@ -110,6 +113,24 @@ const Studio = (() => {
       btn.classList.remove('active');
       if (btn.dataset.texture === _activeTexture) btn.classList.add('active');
     });
+
+    // Template Initial State
+    _activeTemplate = config.templateType || 'classic';
+    document.getElementById('input-template-type').value = _activeTemplate;
+    _applyTemplateUI(_activeTemplate);
+    // Mark the correct card as active
+    document.querySelectorAll('.template-card').forEach(card => {
+      const isActive = card.dataset.template === _activeTemplate;
+      card.classList.toggle('active', isActive);
+      const check = card.querySelector('.template-check');
+      if (check) check.classList.toggle('hidden', !isActive);
+    });
+
+    // Airmail Theme Initial State
+    _activeAirmailTheme = config.airmailTheme || 'airmail-parchment';
+    document.querySelectorAll('.airmail-theme-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.airmailTheme === _activeAirmailTheme);
+    });
   }
 
   function _setVal(id, val) {
@@ -198,7 +219,118 @@ const Studio = (() => {
     });
   }
 
+  /* ─────────────────────────────────────────────────────────
+     TEMPLATE SELECTOR
+  ───────────────────────────────────────────────────────── */
+  function _bindTemplateSelector() {
+    // Card selection
+    document.querySelectorAll('.template-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        // Don't trigger if user clicked the Preview button inside
+        if (e.target.closest('.template-preview-btn')) return;
+
+        const tmpl = card.dataset.template;
+        if (!tmpl || tmpl === _activeTemplate) return;
+
+        _activeTemplate = tmpl;
+        document.getElementById('input-template-type').value = tmpl;
+
+        // Update card visual states
+        document.querySelectorAll('.template-card').forEach(c => {
+          const isNow = c.dataset.template === tmpl;
+          c.classList.toggle('active', isNow);
+          const check = c.querySelector('.template-check');
+          if (check) check.classList.toggle('hidden', !isNow);
+        });
+
+        _applyTemplateUI(tmpl);
+        Autosave.trigger();
+        showToast(`Template '${tmpl === 'airmail' ? 'Vintage Airmail' : 'Classic Letter'}' dipilih`);
+      });
+    });
+
+    // Preview buttons inside each card
+    document.querySelectorAll('.template-preview-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tmpl = btn.dataset.templatePreview;
+        Preview.openTemplatePreview(tmpl);
+      });
+    });
+
+    // Airmail Colour Binding
+    _bindAirmailThemeSelector();
+  }
+
+  function _bindAirmailThemeSelector() {
+    document.querySelectorAll('.airmail-theme-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.airmailTheme;
+        if (!theme || theme === _activeAirmailTheme) return;
+        _activeAirmailTheme = theme;
+        document.querySelectorAll('.airmail-theme-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Autosave.trigger();
+        const names = {
+          'airmail-parchment': 'Parchment',
+          'airmail-lilac': 'Dusty Lilac',
+          'airmail-sage': 'Sage Mist',
+          'airmail-rose': 'Rosy Petal'
+        };
+        showToast(`Warna '${names[theme] || theme}' dipilih`);
+      });
+    });
+  }
+
+  function _applyTemplateUI(template) {
+    const titleWrap       = document.getElementById('title-field-wrap');
+    const typoSec         = document.getElementById('typography-section');
+    const themeSelectorWrap = document.getElementById('theme-selector-wrap');
+    const airmailColorDisp  = document.getElementById('airmail-color-display');
+    const textureSectionWrap = document.getElementById('texture-section-wrap');
+    const isAirmail       = template === 'airmail';
+
+    // Helper: hide or show with transition
+    function _toggle(el, shouldHide) {
+      if (!el) return;
+      if (shouldHide) {
+        el.style.maxHeight = el.scrollHeight + 'px';
+        requestAnimationFrame(() => el.classList.add('field-hidden'));
+      } else {
+        el.classList.remove('field-hidden');
+        el.style.maxHeight = '';
+      }
+    }
+
+    _toggle(titleWrap,         isAirmail);   // no title for airmail
+    _toggle(typoSec,           isAirmail);   // no font/size for airmail
+    _toggle(themeSelectorWrap, isAirmail);   // hide multi-color for airmail
+    _toggle(airmailColorDisp, !isAirmail);   // show single chip for airmail
+    _toggle(textureSectionWrap, isAirmail);  // no paper texture for airmail
+  }
+
   function _applyPremiumLock(isPrem) {
+    // ── 0. Template Selector Lock ────────────────────────
+    const templateLock     = document.getElementById('template-selector-lock');
+    const templateSelector = document.getElementById('template-selector');
+    if (templateLock && templateSelector) {
+      if (isPrem) {
+        templateLock.classList.add('hidden');
+        templateSelector.style.pointerEvents = '';
+        templateSelector.style.opacity = '';
+        // Also re-enable preview buttons
+        document.querySelectorAll('.template-preview-btn').forEach(b => b.style.pointerEvents = '');
+      } else {
+        templateLock.classList.remove('hidden');
+        templateSelector.style.pointerEvents = 'none';
+        templateSelector.style.opacity = '0.35';
+        document.querySelectorAll('.template-preview-btn').forEach(b => b.style.pointerEvents = 'none');
+        // Force classic template (can't switch to airmail without premium)
+        _activeTemplate = 'classic';
+        document.getElementById('input-template-type').value = 'classic';
+      }
+    }
+
     // ── 1. Premium Upgrade Button vs Badge & VIP Link ──────────
     const upgSection = document.getElementById('premium-upgrade-section');
     const actBadge = document.getElementById('premium-active-badge');
@@ -631,6 +763,7 @@ const Studio = (() => {
   function getStudioPassword() { return _studioPassword; }
   function getActiveTheme() { return _activeTheme; }
   function getActiveTexture() { return _activeTexture; }
+  function getActiveAirmailTheme() { return _activeAirmailTheme; }
 
   function updateSidebarBonusStatus() {
     const config = Auth.getInitialConfig() || {};
@@ -641,38 +774,17 @@ const Studio = (() => {
     const sidebarBonusSection = document.getElementById('sidebar-bonus-section');
     const sidebarBonusClaimedSection = document.getElementById('sidebar-bonus-claimed-section');
 
+    // ── Bonus Surat — feature deferred, always hidden for now ──
     if (sidebarBonusSection) {
-      if (isPrem && isPublished && !bonusCreatedId) {
-        sidebarBonusSection.classList.remove('hidden');
-      } else {
-        sidebarBonusSection.classList.add('hidden');
-      }
+      sidebarBonusSection.classList.add('hidden');
     }
 
     if (sidebarBonusClaimedSection) {
-      if (isPrem && isPublished && bonusCreatedId) {
-        sidebarBonusClaimedSection.classList.remove('hidden');
-        
-        const idText = document.getElementById('sidebar-bonus-id-text');
-        const liveLink = document.getElementById('sidebar-bonus-live-link');
-        const studioBtn = document.getElementById('link-sidebar-bonus-claimed');
-        
-        const liveUrl = `${window.location.protocol}//${window.location.host}/${bonusCreatedId}`;
-        const studioUrl = `${window.location.protocol}//${window.location.host}/studio/${bonusCreatedId}`;
-        
-        if (idText) idText.textContent = bonusCreatedId;
-        if (liveLink) {
-          liveLink.href = liveUrl;
-          liveLink.textContent = liveUrl;
-        }
-        if (studioBtn) studioBtn.href = studioUrl;
-      } else {
-        sidebarBonusClaimedSection.classList.add('hidden');
-      }
+      sidebarBonusClaimedSection.classList.add('hidden');
     }
   }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {
