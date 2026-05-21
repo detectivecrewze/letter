@@ -431,7 +431,7 @@ async function _playPaperPlaneTransition(airmailTheme) {
     ctx.lineTo(-11,  0);
     ctx.closePath();
     ctx.fillStyle   = C.ink;
-    ctx.globalAlpha = alpha * 0.14;
+    ctx.globalAlpha = alpha * 0.6; // Increased from 0.14 for stronger 3D effect
     ctx.fill();
 
     // Centre fold crease
@@ -439,7 +439,7 @@ async function _playPaperPlaneTransition(airmailTheme) {
     ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
     ctx.strokeStyle = C.ink;
     ctx.lineWidth   = 1.0;
-    ctx.globalAlpha = alpha * 0.5;
+    ctx.globalAlpha = alpha * 0.6;
     ctx.stroke();
 
     // Airmail stripe accents on upper wing
@@ -674,7 +674,7 @@ function _startBackgroundPlanes(airmailTheme) {
       this.scale = 0.35 + Math.random() * 0.3;
       this.speed = 0.5 + Math.random() * 0.7;
       if (this.isForeground) {
-        this.scale *= 1.3; // Foreground planes are slightly bigger
+        this.scale *= 1.3;
         this.speed *= 1.2;
       }
       
@@ -687,10 +687,10 @@ function _startBackgroundPlanes(airmailTheme) {
       }
       this.y = Math.random() * H;
       this.angle = angleBase;
-      this.turn = (Math.random() - 0.5) * 0.003; 
+      this.turn = (Math.random() - 0.5) * 0.003;
       this.baseAlpha = 0.12 + Math.random() * 0.18;
       if (this.isForeground) {
-        this.baseAlpha *= 1.2; // slightly more opaque
+        this.baseAlpha *= 1.2;
       }
       this.swayPhase = Math.random() * Math.PI * 2;
       this.swaySpeed = 0.01 + Math.random() * 0.02;
