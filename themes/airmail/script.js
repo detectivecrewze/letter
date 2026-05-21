@@ -402,61 +402,65 @@ async function _playPaperPlaneTransition(airmailTheme) {
      Origin = centre of plane body, pointing RIGHT (angle=0).
      Caller rotates ctx before calling this.                */
   function drawPlaneMesh(alpha) {
-    // Upper wing face
+    // Upper wing — swept-back, lancip, elegant
     ctx.beginPath();
-    ctx.moveTo(30, 0);        // nose
-    ctx.lineTo(-22, -19);     // upper wing tip
-    ctx.lineTo(-11, 0);       // tail notch
+    ctx.moveTo(44, 0);
+    ctx.lineTo(-20, -28);
+    ctx.lineTo(-8, -5);
+    ctx.lineTo(10, -1);
     ctx.closePath();
     ctx.fillStyle   = C.plane;
     ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.4;
+    ctx.lineWidth   = 1.1;
     ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
-    // Lower wing face (mirror)
+    // Lower wing — mirror
     ctx.beginPath();
-    ctx.moveTo(30, 0);
-    ctx.lineTo(-22, 19);
-    ctx.lineTo(-11, 0);
+    ctx.moveTo(44, 0);
+    ctx.lineTo(-20, 28);
+    ctx.lineTo(-8, 5);
+    ctx.lineTo(10, 1);
     ctx.closePath();
     ctx.fillStyle   = C.plane;
     ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.4;
+    ctx.lineWidth   = 1.1;
     ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
-    // Under-belly shadow — gives 3-D depth
+    // Belly shadow — tipis, elegan
     ctx.beginPath();
-    ctx.moveTo(-22, -19);
-    ctx.lineTo(-22,  19);
-    ctx.lineTo(-11,  0);
+    ctx.moveTo(-20, -28);
+    ctx.lineTo(-20, 28);
+    ctx.lineTo(-8, 5);
+    ctx.lineTo(-8, -5);
     ctx.closePath();
     ctx.fillStyle   = C.ink;
-    ctx.globalAlpha = alpha * 0.6; // Increased from 0.14 for stronger 3D effect
+    ctx.globalAlpha = alpha * 0.38;
     ctx.fill();
 
-    // Centre fold crease
+    // Centre crease — sangat tipis
     ctx.beginPath();
-    ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
+    ctx.moveTo(44, 0); ctx.lineTo(-8, 0);
     ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.0;
-    ctx.globalAlpha = alpha * 0.6;
+    ctx.lineWidth   = 0.8;
+    ctx.globalAlpha = alpha * 0.5;
     ctx.stroke();
 
-    // Airmail stripe accents on upper wing
+    // Primary stripe — satu, subtle
     ctx.beginPath();
-    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
+    ctx.moveTo(28, -4); ctx.lineTo(-12, -20);
     ctx.strokeStyle = C.s1;
-    ctx.lineWidth   = 2.0;
-    ctx.globalAlpha = alpha * 0.75;
+    ctx.lineWidth   = 1.8;
+    ctx.globalAlpha = alpha * 0.7;
     ctx.stroke();
 
+    // Hairline stripe kedua
     ctx.beginPath();
-    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
+    ctx.moveTo(28, -7); ctx.lineTo(-12, -23);
     ctx.strokeStyle = C.s2;
-    ctx.lineWidth   = 1.5;
-    ctx.globalAlpha = alpha * 0.60;
+    ctx.lineWidth   = 1.0;
+    ctx.globalAlpha = alpha * 0.45;
     ctx.stroke();
   }
 
@@ -690,31 +694,66 @@ function _startBackgroundPlanes(airmailTheme) {
   const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
 
   function drawPlaneMesh(ctx, alpha) {
+    // Upper wing — swept-back, lancip, elegant
     ctx.beginPath();
-    ctx.moveTo(30, 0); ctx.lineTo(-22, -19); ctx.lineTo(-11, 0); ctx.closePath();
-    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
+    ctx.moveTo(44, 0);
+    ctx.lineTo(-20, -28);
+    ctx.lineTo(-8, -5);
+    ctx.lineTo(10, -1);
+    ctx.closePath();
+    ctx.fillStyle   = C.plane;
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.1;
+    ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
+    // Lower wing — mirror
     ctx.beginPath();
-    ctx.moveTo(30, 0); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
-    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
+    ctx.moveTo(44, 0);
+    ctx.lineTo(-20, 28);
+    ctx.lineTo(-8, 5);
+    ctx.lineTo(10, 1);
+    ctx.closePath();
+    ctx.fillStyle   = C.plane;
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.1;
+    ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
+    // Belly shadow — tipis, elegan
     ctx.beginPath();
-    ctx.moveTo(-22, -19); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
-    ctx.fillStyle = C.ink; ctx.globalAlpha = alpha * 0.14; ctx.fill();
+    ctx.moveTo(-20, -28);
+    ctx.lineTo(-20, 28);
+    ctx.lineTo(-8, 5);
+    ctx.lineTo(-8, -5);
+    ctx.closePath();
+    ctx.fillStyle   = C.ink;
+    ctx.globalAlpha = alpha * 0.38;
+    ctx.fill();
 
+    // Centre crease — sangat tipis
     ctx.beginPath();
-    ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
-    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.0; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
+    ctx.moveTo(44, 0); ctx.lineTo(-8, 0);
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 0.8;
+    ctx.globalAlpha = alpha * 0.5;
+    ctx.stroke();
 
+    // Primary stripe — satu, subtle
     ctx.beginPath();
-    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
-    ctx.strokeStyle = C.s1; ctx.lineWidth = 2.0; ctx.globalAlpha = alpha * 0.75; ctx.stroke();
+    ctx.moveTo(28, -4); ctx.lineTo(-12, -20);
+    ctx.strokeStyle = C.s1;
+    ctx.lineWidth   = 1.8;
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.stroke();
 
+    // Hairline stripe kedua
     ctx.beginPath();
-    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
-    ctx.strokeStyle = C.s2; ctx.lineWidth = 1.5; ctx.globalAlpha = alpha * 0.60; ctx.stroke();
+    ctx.moveTo(28, -7); ctx.lineTo(-12, -23);
+    ctx.strokeStyle = C.s2;
+    ctx.lineWidth   = 1.0;
+    ctx.globalAlpha = alpha * 0.45;
+    ctx.stroke();
   }
 
   class BgPlane {
