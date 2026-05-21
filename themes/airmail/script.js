@@ -136,6 +136,9 @@ async function init() {
   // Transition to letter
   showState('letter');
 
+  // Start background planes
+  _startBackgroundPlanes(config.airmailTheme || 'airmail-parchment');
+
   // Trigger paper rise animation
   const paper = document.getElementById('letter-paper');
   if (paper) {
@@ -488,10 +491,14 @@ async function _playPaperPlaneTransition(airmailTheme) {
       // Record longer trail (38 points for sweeping dashes)
       this.trail.unshift({ x: this.x, y: this.y });
       if (this.trail.length > 38) this.trail.pop();
-      // Start fading only when very close to edge
-      const d = Math.hypot(this.x - cx, this.y - cy);
-      if (d > maxR * 0.70) {
-        this.alpha = Math.max(0, 1 - (d - maxR * 0.70) / (maxR * 0.30));
+      // Start fading only when very close to edge or if life is too long
+      if (this.life > 160) {
+        this.alpha -= 0.03;
+      } else {
+        const d = Math.hypot(this.x - cx, this.y - cy);
+        if (d > maxR * 0.70) {
+          this.alpha = Math.max(0, 1 - (d - maxR * 0.70) / (maxR * 0.30));
+        }
       }
     }
 
@@ -596,6 +603,150 @@ async function _playPaperPlaneTransition(airmailTheme) {
   });
 }
 
+
+/* ════════════════════════════════════════════════════════════
+   BACKGROUND PAPER PLANES
+   ════════════════════════════════════════════════════════════ */
+let _bgPlanesAnimId = null;
+
+function _startBackgroundPlanes(airmailTheme) {
+  const canvas = document.getElementById('bg-planes-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  let W = canvas.width = window.innerWidth;
+  let H = canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  });
+
+  const PALETTES = {
+    'airmail-parchment': { plane: '#fdf6e3', ink: '#5a3e28', s1: '#c0392b', s2: '#2c3e80' },
+    'airmail-lilac':     { plane: '#f7f0fc', ink: '#4a3060', s1: '#9b59b6', s2: '#5b4a8a' },
+    'airmail-sage':      { plane: '#f3faf5', ink: '#2a4a35', s1: '#3a7d54', s2: '#2a5c44' },
+    'airmail-rose':      { plane: '#fdf0f3', ink: '#5a2535', s1: '#c04060', s2: '#8a3050' },
+  };
+  const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
+
+  function drawPlaneMesh(alpha) {
+    ctx.beginPath();
+    ctx.moveTo(30, 0);
+    ctx.lineTo(-22, -19);
+    ctx.lineTo(-11, 0);
+    ctx.closePath();
+    ctx.fillStyle   = C.plane;
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.4;
+    ctx.globalAlpha = alpha;
+    ctx.fill(); ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(30, 0);
+    ctx.lineTo(-22, 19);
+    ctx.lineTo(-11, 0);
+    ctx.closePath();
+    ctx.fillStyle   = C.plane;
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.4;
+    ctx.globalAlpha = alpha;
+    ctx.fill(); ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(-22, -19);
+    ctx.lineTo(-22,  19);
+    ctx.lineTo(-11,  0);
+    ctx.closePath();
+    ctx.fillStyle   = C.ink;
+    ctx.globalAlpha = alpha * 0.14;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.0;
+    ctx.globalAlpha = alpha * 0.5;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
+    ctx.strokeStyle = C.s1;
+    ctx.lineWidth   = 2.0;
+    ctx.globalAlpha = alpha * 0.75;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
+    ctx.strokeStyle = C.s2;
+    ctx.lineWidth   = 1.5;
+    ctx.globalAlpha = alpha * 0.60;
+    ctx.stroke();
+  }
+
+  class BgPlane {
+    constructor() {
+      this.reset(true);
+    }
+    reset(initial = false) {
+      // Adjusted scale: bigger than before, but still subtle
+      this.scale = 0.35 + Math.random() * 0.3;
+      this.speed = 0.5 + Math.random() * 0.7;
+      
+      let angleBase = (Math.random() - 0.5) * Math.PI * 0.5;
+      if (Math.random() > 0.5) {
+        angleBase += Math.PI; 
+        this.x = initial ? Math.random() * W : W + 50;
+      } else {
+        this.x = initial ? Math.random() * W : -50;
+      }
+      
+      this.y = Math.random() * H;
+      this.angle = angleBase;
+      this.turn = (Math.random() - 0.5) * 0.003; 
+      this.baseAlpha = 0.12 + Math.random() * 0.18; 
+      
+      this.swayPhase = Math.random() * Math.PI * 2;
+      this.swaySpeed = 0.01 + Math.random() * 0.02;
+    }
+    update() {
+      this.angle += this.turn;
+      this.swayPhase += this.swaySpeed;
+      const sway = Math.sin(this.swayPhase) * 0.4;
+      
+      this.x += Math.cos(this.angle) * this.speed + Math.cos(this.angle + Math.PI/2) * sway;
+      this.y += Math.sin(this.angle) * this.speed + Math.sin(this.angle + Math.PI/2) * sway;
+      
+      if (this.x < -150 || this.x > W + 150 || this.y < -150 || this.y > H + 150) {
+        this.reset();
+      }
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.scale(this.scale, this.scale);
+      drawPlaneMesh(this.baseAlpha);
+      ctx.restore();
+    }
+  }
+
+  const isMobile = window.innerWidth < 600;
+  // Increased count for a denser background effect
+  const count = isMobile ? 12 : 24;
+  const planes = Array.from({ length: count }, () => new BgPlane());
+
+  setTimeout(() => canvas.classList.add('is-visible'), 500);
+
+  if (_bgPlanesAnimId) cancelAnimationFrame(_bgPlanesAnimId);
+  
+  function tick() {
+    ctx.clearRect(0, 0, W, H);
+    planes.forEach(p => { p.update(); p.draw(); });
+    _bgPlanesAnimId = requestAnimationFrame(tick);
+  }
+  tick();
+}
 
 /* ════════════════════════════════════════════════════════════
    RENDER SKELETON
