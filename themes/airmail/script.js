@@ -506,13 +506,14 @@ async function _playPaperPlaneTransition(airmailTheme) {
 
     draw() {
       if (this.life <= 0) return;
-      // Longer dashed flight trail with fade along length
+      // Elegant, solid wind vapor trail instead of dashed dots
       if (this.trail.length > 2) {
         ctx.save();
-        ctx.setLineDash([6, 10]);
-        ctx.strokeStyle = C.ink;
-        ctx.lineWidth   = 1.6;
-        ctx.globalAlpha = this.alpha * 0.32;
+        ctx.strokeStyle = C.plane; // Vapor trail color
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.lineWidth   = 2.0;
+        ctx.globalAlpha = this.alpha * 0.45;
         ctx.beginPath();
         this.trail.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
         ctx.stroke();
@@ -533,31 +534,78 @@ async function _playPaperPlaneTransition(airmailTheme) {
     }
   }
 
-  /* ── 5. Expanding shockwave ring from envelope centre ─ */
-  class Shockwave {
+  /* ── 5. Expanding cloud puff / paper dust ─────────────── */
+  class CloudPuff {
     constructor(delay = 0) {
-      this.r     = 8;
-      this.alpha = 0.85;
-      this.del   = delay;
+      this.del = delay;
+      // Soft circular cloud blobs
+      this.blobs = Array.from({length: 12}, () => ({
+        a: Math.random() * Math.PI * 2,
+        d: 10 + Math.random() * 15,
+        v: 4 + Math.random() * 7,
+        s: 15 + Math.random() * 25, // blob size
+        alpha: 0.6 + Math.random() * 0.3
+      }));
+      // Dynamic wind fibers shooting outwards
+      this.fibers = Array.from({length: 8}, () => ({
+        a: Math.random() * Math.PI * 2,
+        d: 20 + Math.random() * 20,
+        v: 8 + Math.random() * 6,
+        len: 15 + Math.random() * 20,
+        alpha: 0.8
+      }));
     }
     update() {
       if (this.del-- > 0) return;
-      // Slower expand — 12px/frame instead of 20
-      this.r    += 12;
-      this.alpha *= 0.84;
+      this.blobs.forEach(b => {
+        b.d += b.v;
+        b.v *= 0.90; // drag
+        b.s += 0.8;  // clouds expand
+        b.alpha *= 0.88; // fade out
+      });
+      this.fibers.forEach(f => {
+        f.d += f.v;
+        f.v *= 0.92; // drag
+        f.len *= 0.85; // shrink
+        f.alpha *= 0.86; // fade out
+      });
     }
     draw() {
-      if (this.del > 0 || this.alpha < 0.01) return;
+      if (this.del > 0) return;
       ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, this.r, 0, Math.PI * 2);
-      ctx.strokeStyle = C.s1;
-      ctx.lineWidth   = 3.5;
-      ctx.globalAlpha = this.alpha;
-      ctx.stroke();
+      
+      // Draw clouds using paper color
+      ctx.fillStyle = C.plane;
+      this.blobs.forEach(b => {
+        if (b.alpha < 0.01) return;
+        ctx.globalAlpha = b.alpha;
+        ctx.beginPath();
+        ctx.arc(cx + Math.cos(b.a) * b.d, cy + Math.sin(b.a) * b.d, b.s, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw wind fibers
+      ctx.strokeStyle = C.plane;
+      ctx.lineCap = 'round';
+      ctx.lineWidth = 2.5;
+      this.fibers.forEach(f => {
+        if (f.alpha < 0.01) return;
+        ctx.globalAlpha = f.alpha;
+        ctx.beginPath();
+        const sx = cx + Math.cos(f.a) * f.d;
+        const sy = cy + Math.sin(f.a) * f.d;
+        const ex = cx + Math.cos(f.a) * (f.d + f.len);
+        const ey = cy + Math.sin(f.a) * (f.d + f.len);
+        ctx.moveTo(sx, sy);
+        ctx.lineTo(ex, ey);
+        ctx.stroke();
+      });
+
       ctx.restore();
     }
-    get done() { return this.alpha < 0.01; }
+    get done() {
+      return this.blobs.every(b => b.alpha < 0.01) && this.fibers.every(f => f.alpha < 0.01);
+    }
   }
 
   /* ── 6. Spawn all entities ─────────────────────────────── */
@@ -566,8 +614,8 @@ async function _playPaperPlaneTransition(airmailTheme) {
   const PLANE_COUNT = isMobile ? 12 : 18;
 
   const planes = Array.from({ length: PLANE_COUNT }, (_, i) => new Plane(i, PLANE_COUNT));
-  // 4 shockwaves staggered — last one at frame 30 for a slow triple bloom
-  const waves  = [new Shockwave(0), new Shockwave(12), new Shockwave(26), new Shockwave(42)];
+  // Staggered cloud puffs for a soft, explosive smoke bloom
+  const waves  = [new CloudPuff(0), new CloudPuff(8), new CloudPuff(18)];
 
   /* ── 7. RAF loop ───────────────────────────────────────── */
   return new Promise(resolveTransition => {
