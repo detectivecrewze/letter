@@ -146,8 +146,8 @@ async function init() {
     });
   }
 
-  // Wait for paper to finish rising then start typewriter
-  await _delay(1350);
+  // Wait for paper to finish rising (2.0s transition) then start typewriter
+  await _delay(2200);
   await _typewriteLetter(config);
 }
 
@@ -337,13 +337,17 @@ function _waitForEnvelopeOpen(config) {
       // Start music
       _loadTrack(0, true);
 
-      // Animate envelope out
+      // Animate envelope flap open
       if (envelope) envelope.classList.add('is-opening');
 
-      // After animation, fade out whole scene
-      setTimeout(() => {
+      // After flap (~550ms), launch planes + fade scene simultaneously
+      setTimeout(async () => {
         if (scene) scene.classList.add('is-exit');
-        setTimeout(resolve, 800);
+
+        // Paper planes burst — resolves once safe to show letter behind them
+        await _playPaperPlaneTransition(config.airmailTheme || 'airmail-parchment');
+
+        resolve();
       }, 550);
     }
 
@@ -357,6 +361,238 @@ function _waitForEnvelopeOpen(config) {
         attemptOpen();
       }, { passive: false });
     }
+  });
+}
+
+
+/* ════════════════════════════════════════════════════════════
+   PAPER PLANE TRANSITION  (canvas-based, 60 fps)
+   ════════════════════════════════════════════════════════════ */
+async function _playPaperPlaneTransition(airmailTheme) {
+
+  /* ── 1. Theme palette ─────────────────────────────────── */
+  const PALETTES = {
+    'airmail-parchment': { plane: '#fdf6e3', ink: '#5a3e28', s1: '#c0392b', s2: '#2c3e80' },
+    'airmail-lilac':     { plane: '#f7f0fc', ink: '#4a3060', s1: '#9b59b6', s2: '#5b4a8a' },
+    'airmail-sage':      { plane: '#f3faf5', ink: '#2a4a35', s1: '#3a7d54', s2: '#2a5c44' },
+    'airmail-rose':      { plane: '#fdf0f3', ink: '#5a2535', s1: '#c04060', s2: '#8a3050' },
+  };
+  const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
+
+  /* ── 2. Full-screen canvas overlay ───────────────────── */
+  const canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;top:0;left:0;z-index:9999;pointer-events:none;';
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild(canvas);
+
+  const ctx = canvas.getContext('2d');
+  const W  = canvas.width;
+  const H  = canvas.height;
+  const cx = W / 2;
+  const cy = H / 2;
+  const maxR = Math.hypot(cx, cy);
+
+  /* ── 3. Draw one paper plane (dart silhouette) ────────
+     Origin = centre of plane body, pointing RIGHT (angle=0).
+     Caller rotates ctx before calling this.                */
+  function drawPlaneMesh(alpha) {
+    // Upper wing face
+    ctx.beginPath();
+    ctx.moveTo(30, 0);        // nose
+    ctx.lineTo(-22, -19);     // upper wing tip
+    ctx.lineTo(-11, 0);       // tail notch
+    ctx.closePath();
+    ctx.fillStyle   = C.plane;
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.4;
+    ctx.globalAlpha = alpha;
+    ctx.fill(); ctx.stroke();
+
+    // Lower wing face (mirror)
+    ctx.beginPath();
+    ctx.moveTo(30, 0);
+    ctx.lineTo(-22, 19);
+    ctx.lineTo(-11, 0);
+    ctx.closePath();
+    ctx.fillStyle   = C.plane;
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.4;
+    ctx.globalAlpha = alpha;
+    ctx.fill(); ctx.stroke();
+
+    // Under-belly shadow — gives 3-D depth
+    ctx.beginPath();
+    ctx.moveTo(-22, -19);
+    ctx.lineTo(-22,  19);
+    ctx.lineTo(-11,  0);
+    ctx.closePath();
+    ctx.fillStyle   = C.ink;
+    ctx.globalAlpha = alpha * 0.14;
+    ctx.fill();
+
+    // Centre fold crease
+    ctx.beginPath();
+    ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
+    ctx.strokeStyle = C.ink;
+    ctx.lineWidth   = 1.0;
+    ctx.globalAlpha = alpha * 0.5;
+    ctx.stroke();
+
+    // Airmail stripe accents on upper wing
+    ctx.beginPath();
+    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
+    ctx.strokeStyle = C.s1;
+    ctx.lineWidth   = 2.0;
+    ctx.globalAlpha = alpha * 0.75;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
+    ctx.strokeStyle = C.s2;
+    ctx.lineWidth   = 1.5;
+    ctx.globalAlpha = alpha * 0.60;
+    ctx.stroke();
+  }
+
+  /* ── 4. Plane entity ──────────────────────────────────── */
+  class Plane {
+    constructor(idx, total) {
+      // Even spread around full circle + small jitter
+      this.angle = (idx / total) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+      this.x     = cx;
+      this.y     = cy;
+      // Slower, more graceful speed — 2.5 to 4.5 px/frame
+      this.speed = 2.5 + Math.random() * 2.0;
+      // Slightly stronger arc for more visible curves
+      this.turn  = (Math.random() - 0.5) * 0.018;
+      // Scale bigger: planes are 1.4x larger than before
+      this.scale = 0;
+      this.targetScale = 1.2 + Math.random() * 0.3;
+      this.alpha = 1;
+      this.life  = 0;
+      // Wider cascade stagger: planes launch over ~1.5s total
+      this.delay = idx * 7 + Math.floor(Math.random() * 10);
+      this.trail = []; // past positions
+    }
+
+    update() {
+      if (this.delay-- > 0) return;
+      this.life++;
+      // Scale in smoothly (not pop — gradual grow)
+      this.scale = Math.min(this.targetScale, this.scale + 0.08);
+      // Fly with gentle arc
+      this.angle += this.turn;
+      this.x += Math.cos(this.angle) * this.speed;
+      this.y += Math.sin(this.angle) * this.speed;
+      // Record longer trail (38 points for sweeping dashes)
+      this.trail.unshift({ x: this.x, y: this.y });
+      if (this.trail.length > 38) this.trail.pop();
+      // Start fading only when very close to edge
+      const d = Math.hypot(this.x - cx, this.y - cy);
+      if (d > maxR * 0.70) {
+        this.alpha = Math.max(0, 1 - (d - maxR * 0.70) / (maxR * 0.30));
+      }
+    }
+
+    draw() {
+      if (this.life <= 0) return;
+      // Longer dashed flight trail with fade along length
+      if (this.trail.length > 2) {
+        ctx.save();
+        ctx.setLineDash([6, 10]);
+        ctx.strokeStyle = C.ink;
+        ctx.lineWidth   = 1.6;
+        ctx.globalAlpha = this.alpha * 0.32;
+        ctx.beginPath();
+        this.trail.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+        ctx.restore();
+      }
+      // Plane body — rotated to face direction of travel
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.scale(this.scale, this.scale);
+      drawPlaneMesh(this.alpha);
+      ctx.restore();
+    }
+
+    get done() {
+      return this.life > 0 &&
+        (this.x < -100 || this.x > W + 100 || this.y < -100 || this.y > H + 100 || this.alpha <= 0);
+    }
+  }
+
+  /* ── 5. Expanding shockwave ring from envelope centre ─ */
+  class Shockwave {
+    constructor(delay = 0) {
+      this.r     = 8;
+      this.alpha = 0.85;
+      this.del   = delay;
+    }
+    update() {
+      if (this.del-- > 0) return;
+      // Slower expand — 12px/frame instead of 20
+      this.r    += 12;
+      this.alpha *= 0.84;
+    }
+    draw() {
+      if (this.del > 0 || this.alpha < 0.01) return;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, this.r, 0, Math.PI * 2);
+      ctx.strokeStyle = C.s1;
+      ctx.lineWidth   = 3.5;
+      ctx.globalAlpha = this.alpha;
+      ctx.stroke();
+      ctx.restore();
+    }
+    get done() { return this.alpha < 0.01; }
+  }
+
+  /* ── 6. Spawn all entities ─────────────────────────────── */
+  const isMobile    = W < 600;
+  // More planes for a dramatic sweep
+  const PLANE_COUNT = isMobile ? 12 : 18;
+
+  const planes = Array.from({ length: PLANE_COUNT }, (_, i) => new Plane(i, PLANE_COUNT));
+  // 4 shockwaves staggered — last one at frame 30 for a slow triple bloom
+  const waves  = [new Shockwave(0), new Shockwave(12), new Shockwave(26), new Shockwave(42)];
+
+  /* ── 7. RAF loop ───────────────────────────────────────── */
+  return new Promise(resolveTransition => {
+    let frame    = 0;
+    let resolved = false;
+
+    function tick() {
+      ctx.clearRect(0, 0, W, H);
+
+      waves.forEach(w => { w.update(); w.draw(); });
+      planes.forEach(p => { p.update(); p.draw(); });
+
+      frame++;
+
+      // Resolve at ~2500ms (frame 150 @ 60fps) — letter rises AFTER planes
+      // have swept across most of the screen, just like Classic Letter flowers
+      if (!resolved && frame >= 150) {
+        resolved = true;
+        resolveTransition();
+      }
+
+      const allGone =
+        planes.every(p => p.done) &&
+        waves.every(w => w.done);
+
+      if (allGone && frame > 200) {
+        canvas.remove();
+        return;
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    tick();
   });
 }
 
