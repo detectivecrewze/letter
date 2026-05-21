@@ -126,8 +126,97 @@ const Publisher = (() => {
       waBtn.href = `https://wa.me/?text=${msg}`;
     }
 
-    // ── QR export card design remains static as defined in index.html ──
+    // ── QR export card design styling based on template ──
+    const topAccent = document.getElementById('qr-top-accent');
+    const title = document.getElementById('qr-title');
+    const subtitle = document.getElementById('qr-subtitle');
+    const branding = document.getElementById('qr-branding');
 
+    if (templateType === 'airmail') {
+      // Vintage Airmail Design
+      if (exportContainer) {
+        exportContainer.style.background = 'linear-gradient(160deg, #fdf6e3 0%, #f4ebd8 100%)';
+        exportContainer.style.border = '2px dashed #b58756';
+        exportContainer.style.borderRadius = '8px';
+        exportContainer.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.15), 0 4px 12px rgba(181,135,86,0.15)';
+      }
+      if (topAccent) {
+        topAccent.style.width = '100%';
+        topAccent.style.height = '8px';
+        topAccent.style.borderRadius = '0';
+        topAccent.style.left = '0';
+        topAccent.style.transform = 'none';
+        topAccent.style.background = 'transparent';
+        topAccent.style.display = 'flex';
+        topAccent.style.overflow = 'hidden';
+        topAccent.innerHTML = '';
+        for (let i = 0; i < 15; i++) {
+          const b1 = document.createElement('div');
+          b1.style.minWidth = '16px'; b1.style.height = '100%'; b1.style.backgroundColor = '#c0392b'; b1.style.transform = 'skewX(-45deg)'; b1.style.marginLeft = i === 0 ? '-8px' : '0';
+          const b2 = document.createElement('div');
+          b2.style.minWidth = '16px'; b2.style.height = '100%'; b2.style.backgroundColor = 'transparent'; b2.style.transform = 'skewX(-45deg)';
+          const b3 = document.createElement('div');
+          b3.style.minWidth = '16px'; b3.style.height = '100%'; b3.style.backgroundColor = '#2c3e80'; b3.style.transform = 'skewX(-45deg)';
+          const b4 = document.createElement('div');
+          b4.style.minWidth = '16px'; b4.style.height = '100%'; b4.style.backgroundColor = 'transparent'; b4.style.transform = 'skewX(-45deg)';
+          topAccent.appendChild(b1); topAccent.appendChild(b2); topAccent.appendChild(b3); topAccent.appendChild(b4);
+        }
+      }
+      if (title) {
+        title.textContent = 'AIRMAIL';
+        title.style.fontFamily = '"Courier New", Courier, monospace';
+        title.style.fontStyle = 'normal';
+        title.style.fontWeight = '900';
+        title.style.fontSize = '24px';
+        title.style.color = '#c0392b';
+        title.style.letterSpacing = '0.15em';
+      }
+      if (subtitle) {
+        subtitle.textContent = 'PAR AVION ✦ PRIORITY';
+        subtitle.style.color = '#2c3e80';
+      }
+      if (branding) {
+        branding.textContent = 'POSTAGE PAID';
+        branding.style.color = '#5a3e28';
+        branding.style.fontWeight = 'bold';
+      }
+    } else {
+      // Classic Letter Design (Restore defaults)
+      if (exportContainer) {
+        exportContainer.style.background = 'linear-gradient(160deg, #fffaf5 0%, #fff8f0 50%, #f5efe6 100%)';
+        exportContainer.style.border = '1px solid rgba(212,174,106,0.2)';
+        exportContainer.style.borderRadius = '16px';
+        exportContainer.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.12), 0 4px 12px rgba(212,174,106,0.08)';
+      }
+      if (topAccent) {
+        topAccent.style.width = '40px';
+        topAccent.style.height = '3px';
+        topAccent.style.borderRadius = '0 0 4px 4px';
+        topAccent.style.left = '50%';
+        topAccent.style.transform = 'translateX(-50%)';
+        topAccent.style.background = 'linear-gradient(90deg, transparent, #d4a373, transparent)';
+        topAccent.style.display = 'block';
+        topAccent.innerHTML = '';
+      }
+      if (title) {
+        title.textContent = 'A Letter';
+        title.style.fontFamily = 'serif';
+        title.style.fontStyle = 'italic';
+        title.style.fontWeight = 'normal';
+        title.style.fontSize = '22px';
+        title.style.color = '#1a1a1a';
+        title.style.letterSpacing = '-0.02em';
+      }
+      if (subtitle) {
+        subtitle.textContent = '✦ scan to open your letter ✦';
+        subtitle.style.color = '#d4a373';
+      }
+      if (branding) {
+        branding.textContent = 'letter edition';
+        branding.style.color = '#c4b49a';
+        branding.style.fontWeight = 'normal';
+      }
+    }
     // Generate QR Code
     if (qrBox && typeof QRCode !== 'undefined') {
       qrBox.innerHTML = '';

@@ -610,16 +610,23 @@ async function _playPaperPlaneTransition(airmailTheme) {
 let _bgPlanesAnimId = null;
 
 function _startBackgroundPlanes(airmailTheme) {
-  const canvas = document.getElementById('bg-planes-canvas');
-  if (!canvas) return;
+  const bgCanvas = document.getElementById('bg-planes-canvas');
+  const fgCanvas = document.getElementById('fg-planes-canvas');
+  if (!bgCanvas) return;
 
-  const ctx = canvas.getContext('2d');
-  let W = canvas.width = window.innerWidth;
-  let H = canvas.height = window.innerHeight;
+  const bgCtx = bgCanvas.getContext('2d');
+  const fgCtx = fgCanvas ? fgCanvas.getContext('2d') : null;
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+  
+  bgCanvas.width = W; bgCanvas.height = H;
+  if (fgCanvas) { fgCanvas.width = W; fgCanvas.height = H; }
 
   window.addEventListener('resize', () => {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+    W = window.innerWidth;
+    H = window.innerHeight;
+    bgCanvas.width = W; bgCanvas.height = H;
+    if (fgCanvas) { fgCanvas.width = W; fgCanvas.height = H; }
   });
 
   const PALETTES = {
@@ -630,68 +637,46 @@ function _startBackgroundPlanes(airmailTheme) {
   };
   const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
 
-  function drawPlaneMesh(alpha) {
+  function drawPlaneMesh(ctx, alpha) {
     ctx.beginPath();
-    ctx.moveTo(30, 0);
-    ctx.lineTo(-22, -19);
-    ctx.lineTo(-11, 0);
-    ctx.closePath();
-    ctx.fillStyle   = C.plane;
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.4;
-    ctx.globalAlpha = alpha;
+    ctx.moveTo(30, 0); ctx.lineTo(-22, -19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(30, 0);
-    ctx.lineTo(-22, 19);
-    ctx.lineTo(-11, 0);
-    ctx.closePath();
-    ctx.fillStyle   = C.plane;
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.4;
-    ctx.globalAlpha = alpha;
+    ctx.moveTo(30, 0); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
     ctx.beginPath();
-    ctx.moveTo(-22, -19);
-    ctx.lineTo(-22,  19);
-    ctx.lineTo(-11,  0);
-    ctx.closePath();
-    ctx.fillStyle   = C.ink;
-    ctx.globalAlpha = alpha * 0.14;
-    ctx.fill();
+    ctx.moveTo(-22, -19); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.ink; ctx.globalAlpha = alpha * 0.14; ctx.fill();
 
     ctx.beginPath();
     ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.0;
-    ctx.globalAlpha = alpha * 0.5;
-    ctx.stroke();
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.0; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
 
     ctx.beginPath();
     ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
-    ctx.strokeStyle = C.s1;
-    ctx.lineWidth   = 2.0;
-    ctx.globalAlpha = alpha * 0.75;
-    ctx.stroke();
+    ctx.strokeStyle = C.s1; ctx.lineWidth = 2.0; ctx.globalAlpha = alpha * 0.75; ctx.stroke();
 
     ctx.beginPath();
     ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
-    ctx.strokeStyle = C.s2;
-    ctx.lineWidth   = 1.5;
-    ctx.globalAlpha = alpha * 0.60;
-    ctx.stroke();
+    ctx.strokeStyle = C.s2; ctx.lineWidth = 1.5; ctx.globalAlpha = alpha * 0.60; ctx.stroke();
   }
 
   class BgPlane {
-    constructor() {
+    constructor(isForeground) {
+      this.isForeground = isForeground;
       this.reset(true);
     }
     reset(initial = false) {
-      // Adjusted scale: bigger than before, but still subtle
       this.scale = 0.35 + Math.random() * 0.3;
       this.speed = 0.5 + Math.random() * 0.7;
+      if (this.isForeground) {
+        this.scale *= 1.3; // Foreground planes are slightly bigger
+        this.speed *= 1.2;
+      }
       
       let angleBase = (Math.random() - 0.5) * Math.PI * 0.5;
       if (Math.random() > 0.5) {
@@ -700,12 +685,13 @@ function _startBackgroundPlanes(airmailTheme) {
       } else {
         this.x = initial ? Math.random() * W : -50;
       }
-      
       this.y = Math.random() * H;
       this.angle = angleBase;
       this.turn = (Math.random() - 0.5) * 0.003; 
-      this.baseAlpha = 0.12 + Math.random() * 0.18; 
-      
+      this.baseAlpha = 0.12 + Math.random() * 0.18;
+      if (this.isForeground) {
+        this.baseAlpha *= 1.2; // slightly more opaque
+      }
       this.swayPhase = Math.random() * Math.PI * 2;
       this.swaySpeed = 0.01 + Math.random() * 0.02;
     }
@@ -713,36 +699,45 @@ function _startBackgroundPlanes(airmailTheme) {
       this.angle += this.turn;
       this.swayPhase += this.swaySpeed;
       const sway = Math.sin(this.swayPhase) * 0.4;
-      
       this.x += Math.cos(this.angle) * this.speed + Math.cos(this.angle + Math.PI/2) * sway;
       this.y += Math.sin(this.angle) * this.speed + Math.sin(this.angle + Math.PI/2) * sway;
-      
       if (this.x < -150 || this.x > W + 150 || this.y < -150 || this.y > H + 150) {
         this.reset();
       }
     }
     draw() {
+      const ctx = this.isForeground ? fgCtx : bgCtx;
+      if (!ctx) return;
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.angle);
       ctx.scale(this.scale, this.scale);
-      drawPlaneMesh(this.baseAlpha);
+      drawPlaneMesh(ctx, this.baseAlpha);
       ctx.restore();
     }
   }
 
   const isMobile = window.innerWidth < 600;
-  // Increased count for a denser background effect
   const count = isMobile ? 12 : 24;
-  const planes = Array.from({ length: count }, () => new BgPlane());
+  const fgCount = isMobile ? 1 : 2; // Very few planes in the foreground
+  
+  const planes = Array.from({ length: count }, () => new BgPlane(false));
+  const fgPlanes = Array.from({ length: fgCount }, () => new BgPlane(true));
 
-  setTimeout(() => canvas.classList.add('is-visible'), 500);
+  setTimeout(() => {
+    bgCanvas.classList.add('is-visible');
+    if (fgCanvas) fgCanvas.classList.add('is-visible');
+  }, 500);
 
   if (_bgPlanesAnimId) cancelAnimationFrame(_bgPlanesAnimId);
   
   function tick() {
-    ctx.clearRect(0, 0, W, H);
+    bgCtx.clearRect(0, 0, W, H);
+    if (fgCtx) fgCtx.clearRect(0, 0, W, H);
+    
     planes.forEach(p => { p.update(); p.draw(); });
+    fgPlanes.forEach(p => { p.update(); p.draw(); });
+    
     _bgPlanesAnimId = requestAnimationFrame(tick);
   }
   tick();
