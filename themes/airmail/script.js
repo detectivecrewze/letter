@@ -435,66 +435,31 @@ async function _playPaperPlaneTransition(airmailTheme) {
      Origin = centre of plane body, pointing RIGHT (angle=0).
      Caller rotates ctx before calling this.                */
   function drawPlaneMesh(alpha) {
-    // Upper wing — swept-back, lancip, elegant
     ctx.beginPath();
-    ctx.moveTo(44, 0);
-    ctx.lineTo(-20, -28);
-    ctx.lineTo(-8, -5);
-    ctx.lineTo(10, -1);
-    ctx.closePath();
-    ctx.fillStyle   = C.plane;
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.1;
-    ctx.globalAlpha = alpha;
+    ctx.moveTo(30, 0); ctx.lineTo(-22, -19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
-    // Lower wing — mirror
     ctx.beginPath();
-    ctx.moveTo(44, 0);
-    ctx.lineTo(-20, 28);
-    ctx.lineTo(-8, 5);
-    ctx.lineTo(10, 1);
-    ctx.closePath();
-    ctx.fillStyle   = C.plane;
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.1;
-    ctx.globalAlpha = alpha;
+    ctx.moveTo(30, 0); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
-    // Belly shadow — tipis, elegan
     ctx.beginPath();
-    ctx.moveTo(-20, -28);
-    ctx.lineTo(-20, 28);
-    ctx.lineTo(-8, 5);
-    ctx.lineTo(-8, -5);
-    ctx.closePath();
-    ctx.fillStyle   = C.ink;
-    ctx.globalAlpha = alpha * 0.38;
-    ctx.fill();
+    ctx.moveTo(-22, -19); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.ink; ctx.globalAlpha = alpha * 0.14; ctx.fill();
 
-    // Centre crease — sangat tipis
     ctx.beginPath();
-    ctx.moveTo(44, 0); ctx.lineTo(-8, 0);
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 0.8;
-    ctx.globalAlpha = alpha * 0.5;
-    ctx.stroke();
+    ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.0; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
 
-    // Primary stripe — satu, subtle
     ctx.beginPath();
-    ctx.moveTo(28, -4); ctx.lineTo(-12, -20);
-    ctx.strokeStyle = C.s1;
-    ctx.lineWidth   = 1.8;
-    ctx.globalAlpha = alpha * 0.7;
-    ctx.stroke();
+    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
+    ctx.strokeStyle = C.s1; ctx.lineWidth = 2.0; ctx.globalAlpha = alpha * 0.75; ctx.stroke();
 
-    // Hairline stripe kedua
     ctx.beginPath();
-    ctx.moveTo(28, -7); ctx.lineTo(-12, -23);
-    ctx.strokeStyle = C.s2;
-    ctx.lineWidth   = 1.0;
-    ctx.globalAlpha = alpha * 0.45;
-    ctx.stroke();
+    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
+    ctx.strokeStyle = C.s2; ctx.lineWidth = 1.5; ctx.globalAlpha = alpha * 0.60; ctx.stroke();
   }
 
   /* ── 4. Plane entity ──────────────────────────────────── */
@@ -727,66 +692,31 @@ function _startBackgroundPlanes(airmailTheme) {
   const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
 
   function drawPlaneMesh(ctx, alpha) {
-    // Upper wing — swept-back, lancip, elegant
     ctx.beginPath();
-    ctx.moveTo(44, 0);
-    ctx.lineTo(-20, -28);
-    ctx.lineTo(-8, -5);
-    ctx.lineTo(10, -1);
-    ctx.closePath();
-    ctx.fillStyle   = C.plane;
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.1;
-    ctx.globalAlpha = alpha;
+    ctx.moveTo(30, 0); ctx.lineTo(-22, -19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
-    // Lower wing — mirror
     ctx.beginPath();
-    ctx.moveTo(44, 0);
-    ctx.lineTo(-20, 28);
-    ctx.lineTo(-8, 5);
-    ctx.lineTo(10, 1);
-    ctx.closePath();
-    ctx.fillStyle   = C.plane;
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 1.1;
-    ctx.globalAlpha = alpha;
+    ctx.moveTo(30, 0); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.plane; ctx.strokeStyle = C.ink; ctx.lineWidth = 1.4; ctx.globalAlpha = alpha;
     ctx.fill(); ctx.stroke();
 
-    // Belly shadow — tipis, elegan
     ctx.beginPath();
-    ctx.moveTo(-20, -28);
-    ctx.lineTo(-20, 28);
-    ctx.lineTo(-8, 5);
-    ctx.lineTo(-8, -5);
-    ctx.closePath();
-    ctx.fillStyle   = C.ink;
-    ctx.globalAlpha = alpha * 0.38;
-    ctx.fill();
+    ctx.moveTo(-22, -19); ctx.lineTo(-22, 19); ctx.lineTo(-11, 0); ctx.closePath();
+    ctx.fillStyle = C.ink; ctx.globalAlpha = alpha * 0.14; ctx.fill();
 
-    // Centre crease — sangat tipis
     ctx.beginPath();
-    ctx.moveTo(44, 0); ctx.lineTo(-8, 0);
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth   = 0.8;
-    ctx.globalAlpha = alpha * 0.5;
-    ctx.stroke();
+    ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
+    ctx.strokeStyle = C.ink; ctx.lineWidth = 1.0; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
 
-    // Primary stripe — satu, subtle
     ctx.beginPath();
-    ctx.moveTo(28, -4); ctx.lineTo(-12, -20);
-    ctx.strokeStyle = C.s1;
-    ctx.lineWidth   = 1.8;
-    ctx.globalAlpha = alpha * 0.7;
-    ctx.stroke();
+    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
+    ctx.strokeStyle = C.s1; ctx.lineWidth = 2.0; ctx.globalAlpha = alpha * 0.75; ctx.stroke();
 
-    // Hairline stripe kedua
     ctx.beginPath();
-    ctx.moveTo(28, -7); ctx.lineTo(-12, -23);
-    ctx.strokeStyle = C.s2;
-    ctx.lineWidth   = 1.0;
-    ctx.globalAlpha = alpha * 0.45;
-    ctx.stroke();
+    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
+    ctx.strokeStyle = C.s2; ctx.lineWidth = 1.5; ctx.globalAlpha = alpha * 0.60; ctx.stroke();
   }
 
   class BgPlane {
@@ -795,10 +725,10 @@ function _startBackgroundPlanes(airmailTheme) {
       this.reset(true);
     }
     reset(initial = false) {
-      this.scale = 0.2;
+      this.scale = 0.3;
       this.speed = 0.5 + Math.random() * 0.7;
       if (this.isForeground) {
-        this.scale = 0.28;
+        this.scale = 0.4;
         this.speed *= 1.2;
       }
       
@@ -842,8 +772,8 @@ function _startBackgroundPlanes(airmailTheme) {
   }
 
   const isMobile = window.innerWidth < 600;
-  const count = isMobile ? 12 : 24;
-  const fgCount = isMobile ? 1 : 2; // Very few planes in the foreground
+  const count = isMobile ? 18 : 36; // Increased to make the screen feel populated
+  const fgCount = isMobile ? 2 : 3; // Slightly more foreground planes
   
   const planes = Array.from({ length: count }, () => new BgPlane(false));
   const fgPlanes = Array.from({ length: fgCount }, () => new BgPlane(true));
