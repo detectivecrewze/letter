@@ -26,11 +26,40 @@ const TW_PARA_PAUSE = 800;
 /* ════════════════════════════════════════════════════════════
    STATE MACHINE
    ════════════════════════════════════════════════════════════ */
-function showState(stateId) {
-  ['loading', 'envelope', 'letter', 'maintenance'].forEach(id => {
-    const el = document.getElementById(`state-${id}`);
-    if (!el) return;
-    el.classList.toggle('hidden', id !== stateId);
+function showState(stateId, options = {}) {
+  const { duration = 500 } = options;
+  const ids = ['loading', 'envelope', 'letter', 'maintenance'];
+
+  const incoming = document.getElementById(`state-${stateId}`);
+  if (!incoming) return;
+
+  // Find currently visible state (not hidden, not exiting)
+  const outgoing = ids
+    .filter(id => id !== stateId)
+    .map(id => document.getElementById(`state-${id}`))
+    .find(el => el && !el.classList.contains('hidden') && !el.classList.contains('is-exiting'));
+
+  // Prepare incoming — unhide but invisible, shifted up from below
+  incoming.classList.remove('hidden', 'is-exiting');
+  incoming.classList.add('is-entering');
+
+  // Force reflow so transition fires
+  void incoming.offsetWidth;
+
+  if (outgoing) {
+    // Exit outgoing simultaneously
+    outgoing.classList.add('is-exiting');
+    setTimeout(() => {
+      outgoing.classList.add('hidden');
+      outgoing.classList.remove('is-exiting');
+    }, duration);
+  }
+
+  // Enter incoming
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      incoming.classList.remove('is-entering');
+    });
   });
 }
 
@@ -130,11 +159,15 @@ async function init() {
   }
 
   // ── Show Envelope ──
+  await _delay(200);
   showState('envelope');
   await _waitForEnvelopeOpen(config);
 
   // Transition to letter
   showState('letter');
+
+  // Small delay so letter state crossfade overlaps with envelope exit
+  await _delay(300);
 
   // Start background planes
   _startBackgroundPlanes(config.airmailTheme || 'airmail-parchment');
@@ -149,8 +182,8 @@ async function init() {
     });
   }
 
-  // Wait for paper to finish rising (2.0s transition) then start typewriter
-  await _delay(2200);
+  // Wait for paper to finish rising then start typewriter
+  await _delay(2000);
   await _typewriteLetter(config);
 }
 

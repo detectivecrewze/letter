@@ -1408,3 +1408,28 @@ body {
     max-width: 260px;
   }
 }
+
+/* ════════════════════════════════════════════════════════
+   STATE TRANSITIONS
+   ════════════════════════════════════════════════════════ */
+.state-screen {
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.state-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.state-screen.is-exiting {
+  opacity: 0;
+  transform: translateY(-18px);
+  pointer-events: none;
+}
+
+.state-screen.is-entering {
+  opacity: 0;
+  transform: translateY(22px);
+}
