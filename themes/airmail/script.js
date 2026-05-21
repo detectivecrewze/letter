@@ -158,7 +158,7 @@ async function init() {
    AIRMAIL COLOUR THEME
    ════════════════════════════════════════════════════════════ */
 function _applyAirmailTheme(theme) {
-  const validThemes = ['airmail-parchment', 'airmail-lilac', 'airmail-sage', 'airmail-rose'];
+  const validThemes = ['airmail-parchment', 'airmail-lilac', 'airmail-sage', 'airmail-rose', 'airmail-midnight', 'airmail-bordeaux'];
   const t = validThemes.includes(theme) ? theme : 'airmail-parchment';
   if (t === 'airmail-parchment') {
     // Default — remove attribute so :root CSS applies
@@ -379,6 +379,8 @@ async function _playPaperPlaneTransition(airmailTheme) {
     'airmail-lilac':     { plane: '#f7f0fc', ink: '#4a3060', s1: '#9b59b6', s2: '#5b4a8a' },
     'airmail-sage':      { plane: '#f3faf5', ink: '#2a4a35', s1: '#3a7d54', s2: '#2a5c44' },
     'airmail-rose':      { plane: '#fdf0f3', ink: '#5a2535', s1: '#c04060', s2: '#8a3050' },
+    'airmail-midnight':  { plane: '#1e293b', ink: '#8da4c4', s1: '#e11d48', s2: '#3b82f6' },
+    'airmail-bordeaux':  { plane: '#2d0a14', ink: '#d4a090', s1: '#e11d48', s2: '#c084fc' }
   };
   const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
 
@@ -634,6 +636,8 @@ function _startBackgroundPlanes(airmailTheme) {
     'airmail-lilac':     { plane: '#f7f0fc', ink: '#4a3060', s1: '#9b59b6', s2: '#5b4a8a' },
     'airmail-sage':      { plane: '#f3faf5', ink: '#2a4a35', s1: '#3a7d54', s2: '#2a5c44' },
     'airmail-rose':      { plane: '#fdf0f3', ink: '#5a2535', s1: '#c04060', s2: '#8a3050' },
+    'airmail-midnight':  { plane: '#1e293b', ink: '#8da4c4', s1: '#e11d48', s2: '#3b82f6' },
+    'airmail-bordeaux':  { plane: '#2d0a14', ink: '#d4a090', s1: '#e11d48', s2: '#c084fc' }
   };
   const C = PALETTES[airmailTheme] || PALETTES['airmail-parchment'];
 

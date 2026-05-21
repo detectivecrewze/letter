@@ -105,7 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Top Theme
         const themeCounts = {};
         gifts.forEach(g => {
-            const t = String(g.theme || 'blush-cream').toLowerCase();
+            const isAirmail = g.templateType === 'airmail';
+            const t = String(isAirmail ? (g.airmailTheme || 'airmail-parchment') : (g.theme || 'blush-cream')).toLowerCase();
             themeCounts[t] = (themeCounts[t] || 0) + 1;
         });
         const topThemeRaw = Object.keys(themeCounts).reduce((a, b) => themeCounts[a] > themeCounts[b] ? a : b, 'blush-cream');
@@ -113,9 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
             'sage-green': 'Sage', 
             'rose-petal': 'Rose', 
             'blush-cream': 'Blush', 
-            'midnight-blue': 'Midnight'
+            'midnight-blue': 'Midnight',
+            'airmail-parchment': 'Parchment',
+            'airmail-lilac': 'Lilac',
+            'airmail-sage': 'Sage',
+            'airmail-rose': 'Rose',
+            'airmail-midnight': 'Midnight',
+            'airmail-bordeaux': 'Bordeaux'
         };
-        document.getElementById('stat-theme').innerText = (themeNames[topThemeRaw] || topThemeRaw.split('-')[0]).toUpperCase();
+        document.getElementById('stat-theme').innerText = (themeNames[topThemeRaw] || topThemeRaw.replace('airmail-', '').split('-')[0]).toUpperCase();
 
         // Top Audio
         const audioCounts = {};
@@ -149,7 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isStale = gift.lastOpened && (new Date() - new Date(gift.lastOpened)) > (30 * 24 * 60 * 60 * 1000);
 
-            const theme = String(gift.theme || 'blush-cream').toLowerCase();
+            const isAirmail = gift.templateType === 'airmail';
+            const theme = String(isAirmail ? (gift.airmailTheme || 'airmail-parchment') : (gift.theme || 'blush-cream')).toLowerCase();
             let badgeClass = 'badge-blush';
             let themeName = 'Blush';
 
@@ -158,6 +166,9 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (theme.includes('midnight')) { badgeClass = 'badge-midnight'; themeName = 'Midnight'; }
             else if (theme.includes('crimson')) { badgeClass = 'badge-crimson'; themeName = 'Crimson'; }
             else if (theme.includes('obsidian')) { badgeClass = 'badge-obsidian'; themeName = 'Obsidian'; }
+            else if (theme.includes('lilac')) { badgeClass = 'badge-lilac'; themeName = 'Lilac'; }
+            else if (theme.includes('parchment')) { badgeClass = 'badge-parchment'; themeName = 'Parchment'; }
+            else if (theme.includes('bordeaux')) { badgeClass = 'badge-bordeaux'; themeName = 'Bordeaux'; }
 
             const paperTexture = gift.paperTexture || 'normal';
             const paperName = paperTexture === 'handmade' ? 'Kertas Handmade' : 'Kertas Biasa';
@@ -312,7 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let matchesTheme = true;
             if (themeFilter !== 'all') {
-                const t = String(g.theme || 'blush-cream').toLowerCase();
+                const isAirmail = g.templateType === 'airmail';
+                const t = String(isAirmail ? (g.airmailTheme || 'airmail-parchment') : (g.theme || 'blush-cream')).toLowerCase();
                 matchesTheme = t.includes(themeFilter);
             }
 

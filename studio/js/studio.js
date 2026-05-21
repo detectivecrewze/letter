@@ -275,7 +275,9 @@ const Studio = (() => {
           'airmail-parchment': 'Parchment',
           'airmail-lilac': 'Dusty Lilac',
           'airmail-sage': 'Sage Mist',
-          'airmail-rose': 'Rosy Petal'
+          'airmail-rose': 'Rosy Petal',
+          'airmail-midnight': 'Midnight',
+          'airmail-bordeaux': 'Bordeaux'
         };
         showToast(`Warna '${names[theme] || theme}' dipilih`);
       });

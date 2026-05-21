@@ -106,7 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
             }) : '-';
 
-            const theme = String(gift.theme || 'blush-cream').toLowerCase();
+            const isAirmail = gift.templateType === 'airmail';
+            const theme = String(isAirmail ? (gift.airmailTheme || 'airmail-parchment') : (gift.theme || 'blush-cream')).toLowerCase();
             let badgeClass = 'badge-blush';
             let themeName = 'Blush';
 
@@ -115,6 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (theme.includes('midnight')) { badgeClass = 'badge-midnight'; themeName = 'Midnight'; }
             else if (theme.includes('crimson')) { badgeClass = 'badge-crimson'; themeName = 'Crimson'; }
             else if (theme.includes('obsidian')) { badgeClass = 'badge-obsidian'; themeName = 'Obsidian'; }
+            else if (theme.includes('lilac')) { badgeClass = 'badge-lilac'; themeName = 'Lilac'; }
+            else if (theme.includes('parchment')) { badgeClass = 'badge-parchment'; themeName = 'Parchment'; }
+            else if (theme.includes('bordeaux')) { badgeClass = 'badge-bordeaux'; themeName = 'Bordeaux'; }
 
             const templateType = gift.templateType === 'airmail' ? 'Vintage Airmail' : 'Classic Letter';
             const templateBadgeClass = gift.templateType === 'airmail' 
