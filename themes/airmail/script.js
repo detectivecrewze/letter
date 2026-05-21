@@ -795,10 +795,10 @@ function _startBackgroundPlanes(airmailTheme) {
       this.reset(true);
     }
     reset(initial = false) {
-      this.scale = 0.35 + Math.random() * 0.3;
+      this.scale = 0.2;
       this.speed = 0.5 + Math.random() * 0.7;
       if (this.isForeground) {
-        this.scale *= 1.3;
+        this.scale = 0.28;
         this.speed *= 1.2;
       }
       
