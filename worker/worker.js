@@ -554,6 +554,7 @@ var index_default = {
                 isBonus: config.isBonus || false,
                 parentId: config.parentId || null,
                 bonusCreatedId: config.bonusCreatedId || null,
+                templateType: config.templateType || 'classic',
               };
             }
           } catch (e) { return null; }
