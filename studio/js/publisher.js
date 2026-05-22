@@ -136,7 +136,7 @@ const Publisher = (() => {
       // Vintage Airmail Design
       if (exportContainer) {
         exportContainer.style.background = 'linear-gradient(160deg, #fdf6e3 0%, #f4ebd8 100%)';
-        exportContainer.style.border = '2px dashed #b58756';
+        exportContainer.style.border = 'none'; // Removed dashed lines
         exportContainer.style.borderRadius = '8px';
         exportContainer.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.15), 0 4px 12px rgba(181,135,86,0.15)';
       }
