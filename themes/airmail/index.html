@@ -14,10 +14,10 @@
   <meta property="og:type" content="website">
 
   <!-- Favicons (shared with parent project) -->
-  <link rel="icon" type="image/png" href="../../assets/favicon/favicon-96x96.png" sizes="96x96" />
-  <link rel="icon" type="image/svg+xml" href="../../assets/favicon/favicon.svg" />
-  <link rel="shortcut icon" href="../../assets/favicon/favicon.ico" />
-  <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicon/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="/assets/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Caveat:wght@400;500;700&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="/themes/airmail/style.css">
 </head>
 
 <body>
@@ -274,16 +274,210 @@
       <!-- Right Arrow -->
       <button id="btn-memory-next" class="memory-arrow memory-arrow-right" aria-label="Next memory">›</button>
     </div>
+      <div class="loading-stamp-spinner">
+        <div class="stamp-border"></div>
+        <span class="stamp-icon">✈</span>
+      </div>
+      <p class="loading-label">Delivering your letter…</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: ENVELOPE                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-envelope" class="state-screen hidden">
+
+    <!-- Wooden desk background -->
+    <div class="desk-surface" aria-hidden="true"></div>
+    <!-- Warm desk lamp glow -->
+    <div class="desk-lamp-glow" aria-hidden="true"></div>
+
+    <div class="envelope-scene" id="envelope-scene">
+
+      <!-- The Airmail Envelope -->
+      <div class="airmail-envelope" id="airmail-envelope" role="button" aria-label="Open this letter" tabindex="0">
+
+        <!-- Airmail border stripes -->
+        <div class="airmail-border airmail-border-top"></div>
+        <div class="airmail-border airmail-border-bottom"></div>
+        <div class="airmail-border airmail-border-left"></div>
+        <div class="airmail-border airmail-border-right"></div>
+
+
+        <!-- Circular postmark stamp overlay -->
+        <div class="postmark" id="postmark">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="60" r="52" stroke="currentColor" stroke-width="2.5" opacity="0.35"/>
+            <circle cx="60" cy="60" r="42" stroke="currentColor" stroke-width="1" opacity="0.25"/>
+            <line x1="8" y1="50" x2="112" y2="50" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+            <line x1="8" y1="70" x2="112" y2="70" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+            <text x="60" y="64" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.4"
+              font-family="'Special Elite', monospace" id="postmark-date">14 APR 2026</text>
+          </svg>
+        </div>
+
+        <!-- PAR AVION label -->
+        <div class="par-avion-label">
+          <span class="par-avion-text">PAR AVION</span>
+          <span class="par-avion-sub">BY AIR MAIL</span>
+        </div>
+
+        <!-- Recipient address block -->
+        <div class="envelope-address">
+          <span class="address-to-label">To:</span>
+          <span class="address-to-name" id="env-to-name">Kamu</span>
+          <span class="address-line" id="env-address-line">Someone Special, Somewhere Beautiful</span>
+        </div>
+
+        <!-- Tap hint -->
+        <div class="tap-hint" id="tap-hint">
+          <span class="tap-hint-text">tap to open</span>
+        </div>
+
+      </div><!-- /airmail-envelope -->
+
+    </div><!-- /envelope-scene -->
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: LETTER                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-letter" class="state-screen hidden">
+
+    <!-- Desk surface continues -->
+    <div class="desk-surface desk-surface-letter" aria-hidden="true"></div>
+
+    <!-- Background paper plane canvas (behind the letter paper) -->
+    <canvas id="bg-planes-canvas" aria-hidden="true"></canvas>
+
+    <!-- Foreground paper plane canvas (in front of the letter paper) -->
+    <canvas id="fg-planes-canvas" aria-hidden="true"></canvas>
+
+    <!-- Scroll wrapper -->
+    <div class="letter-scroll">
+      <article class="telegram-paper" id="letter-paper" role="main">
+
+        <!-- Telegram header -->
+        <header class="telegram-header">
+          <div class="telegram-banner">
+            <div class="banner-line"></div>
+            <span class="banner-text">✦ PAR AVION — BY AIR MAIL ✦</span>
+            <div class="banner-line"></div>
+          </div>
+
+          <div class="telegram-meta">
+            <div class="meta-row">
+              <span class="meta-label">DATE:</span>
+              <span class="meta-value" id="letter-date"></span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">TO:</span>
+              <span class="meta-value" id="letter-to"></span>
+            </div>
+          </div>
+
+          <div class="header-rule">
+            <div class="rule-line"></div>
+            <span class="rule-ornament">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b7355" stroke-width="1.5" opacity="0.5">
+                <path d="M22 2L11 13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </span>
+            <div class="rule-line"></div>
+          </div>
+        </header>
+
+        <!-- Body (injected by script.js via typewriter) -->
+        <div class="letter-body" id="letter-body" aria-label="Letter content"></div>
+
+        <!-- Footer: signature -->
+        <footer class="letter-footer">
+          <div class="footer-rule">
+            <div class="rule-line"></div>
+          </div>
+          <div class="letter-from-wrap">
+            <span class="letter-from" id="letter-from"></span>
+          </div>
+          <div class="footer-stamp">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="34" stroke="#8b7355" stroke-width="1.5" opacity="0.25"/>
+              <circle cx="40" cy="40" r="28" stroke="#8b7355" stroke-width="0.8" opacity="0.15"/>
+              <text x="40" y="45" text-anchor="middle" font-size="14" fill="#8b7355" opacity="0.3"
+                font-family="'Special Elite', monospace">SEALED</text>
+            </svg>
+          </div>
+        </footer>
+
+      </article>
+
+      <!-- Action Buttons Container -->
+      <div id="save-letter-container"
+        style="display: none; opacity: 0; transition: opacity 1.2s ease-in-out; text-align: center; margin-top: 2.5rem; margin-bottom: 3rem; padding-bottom: 2rem;">
+        <div id="letter-end"></div>
+
+        <!-- Primary: Secret Memory Button -->
+        <button id="btn-secret-memory" class="btn-airmail-action btn-primary-action" style="display: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          View Enclosed Photos
+        </button>
+        <br>
+        <!-- Secondary: Save Letter Button -->
+        <button id="btn-save-letter" class="btn-airmail-action btn-secondary-action">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Save This Letter
+        </button>
+      </div>
+
+    </div>
+
+  </div><!-- /state-letter -->
+
+  <!-- Hidden audio element -->
+  <audio id="audio-player" preload="auto"></audio>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECRET MEMORY MODAL (Polaroid style)                  -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="modal-secret-memory" aria-hidden="true" class="memory-modal">
+
+    <!-- Close button -->
+    <button id="btn-close-memory" class="memory-close" aria-label="Close memory">✕</button>
+
+    <!-- Counter Badge -->
+    <div id="polaroid-counter" class="memory-counter"></div>
+
+    <!-- Carousel Row -->
+    <div class="memory-carousel">
+      <!-- Left Arrow -->
+      <button id="btn-memory-prev" class="memory-arrow memory-arrow-left" aria-label="Previous memory">‹</button>
+
+      <!-- Polaroid Frame -->
+      <div id="polaroid-frame" class="polaroid-frame">
+        <div id="polaroid-media-wrap" class="polaroid-media"></div>
+        <p id="polaroid-caption" class="polaroid-caption"></p>
+      </div>
+
+      <!-- Right Arrow -->
+      <button id="btn-memory-next" class="memory-arrow memory-arrow-right" aria-label="Next memory">›</button>
+    </div>
   </div>
 
   <!-- External Library for PNG Screenshot -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <!-- Standalone config (demo / premium mode) -->
-  <script src="../../config.js"></script>
-  <!-- Main logic -->
-  <script src="script.js"></script>
-
+  <script src="/config.js"></script>
+  <!-- Theme Script -->
+  <script src="/themes/airmail/script.js"></script>
 </body>
 
 </html>
