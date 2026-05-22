@@ -456,164 +456,98 @@ async function _playPaperPlaneTransition(airmailTheme) {
 
   }
 
-  /* ── 4. Plane entity ──────────────────────────────────── */
-  class Plane {
-    constructor(idx, total) {
-      // Even spread around full circle + small jitter
-      this.angle = (idx / total) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
-      this.x     = cx;
-      this.y     = cy;
-      // Slower, more graceful speed — 2.5 to 4.5 px/frame
-      this.speed = 2.5 + Math.random() * 2.0;
-      // Slightly stronger arc for more visible curves
-      this.turn  = (Math.random() - 0.5) * 0.018;
-      // Scale bigger: planes are 1.4x larger than before
-      this.scale = 0;
-      this.targetScale = 1.2 + Math.random() * 0.3;
+  /* ── 4. Flock Plane ──────────────────────────────────── */
+  class FlockPlane {
+    constructor(delay) {
+      // Start near bottom-left, spread out a bit
+      this.x = -100 - Math.random() * 200;
+      this.y = H * 0.7 + Math.random() * H * 0.5;
+      
+      // Target top-right roughly
+      const dx = W - this.x + (Math.random() - 0.5) * 400;
+      const dy = 0 - this.y + (Math.random() - 0.5) * 400;
+      this.angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * 0.4;
+      
+      this.speed = (Math.max(W, H) / 110) * (0.8 + Math.random() * 0.5); 
+      this.turn = (Math.random() - 0.5) * 0.005; // gentle curves
+      this.scale = (W < 600 ? 1.0 : 1.3) * (0.6 + Math.random() * 0.6);
       this.alpha = 1;
-      this.life  = 0;
-      // Wider cascade stagger: planes launch over ~1.5s total
-      this.delay = idx * 7 + Math.floor(Math.random() * 10);
-      this.trail = []; // past positions
+      this.trail = [];
+      this.delay = delay;
     }
 
     update() {
       if (this.delay-- > 0) return;
-      this.life++;
-      // Scale in smoothly (not pop — gradual grow)
-      this.scale = Math.min(this.targetScale, this.scale + 0.08);
-      // Fly with gentle arc
+      
       this.angle += this.turn;
       this.x += Math.cos(this.angle) * this.speed;
       this.y += Math.sin(this.angle) * this.speed;
-      // Record longer trail (38 points for sweeping dashes)
-      this.trail.unshift({ x: this.x, y: this.y });
-      if (this.trail.length > 38) this.trail.pop();
-      // Start fading only when very close to edge or if life is too long
-      if (this.life > 160) {
-        this.alpha -= 0.03;
-      } else {
-        const d = Math.hypot(this.x - cx, this.y - cy);
-        if (d > maxR * 0.70) {
-          this.alpha = Math.max(0, 1 - (d - maxR * 0.70) / (maxR * 0.30));
-        }
+      
+      this.trail.push({x: this.x, y: this.y});
+      // Shorten the trail for a cleaner look
+      if (this.trail.length > 45) this.trail.shift();
+
+      // Fade out slowly if way off screen
+      if (this.x > W + 200 || this.y < -200 || this.x < -400 || this.y > H + 400) {
+        this.alpha -= 0.05;
       }
     }
 
     draw() {
-      if (this.life <= 0) return;
-      // Elegant, solid wind vapor trail instead of dashed dots
+      if (this.delay > 0) return;
+      
+      // Elegant wind streak (soft, solid, fading tail)
       if (this.trail.length > 2) {
         ctx.save();
-        ctx.strokeStyle = C.plane; // Vapor trail color
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.lineWidth   = 2.0;
-        ctx.globalAlpha = this.alpha * 0.45;
+        ctx.lineWidth = this.scale * 1.8;
+        
+        const head = this.trail[this.trail.length - 1];
+        const tail = this.trail[0];
+        const dx = tail.x - head.x;
+        const dy = tail.y - head.y;
+        
+        if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
+          const grad = ctx.createLinearGradient(head.x, head.y, tail.x, tail.y);
+          grad.addColorStop(0, `rgba(255, 255, 255, ${this.alpha * 0.55})`);
+          grad.addColorStop(1, `rgba(255, 255, 255, 0)`);
+          ctx.strokeStyle = grad;
+        } else {
+          ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha * 0.2})`;
+        }
+
         ctx.beginPath();
-        this.trail.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        this.trail.forEach((p, i) => {
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
         ctx.stroke();
         ctx.restore();
       }
-      // Plane body — rotated to face direction of travel
+
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.angle);
       ctx.scale(this.scale, this.scale);
-      drawPlaneMesh(this.alpha);
+      drawPlaneMesh(Math.max(0, this.alpha));
       ctx.restore();
     }
 
     get done() {
-      return this.life > 0 &&
-        (this.x < -100 || this.x > W + 100 || this.y < -100 || this.y > H + 100 || this.alpha <= 0);
+      return this.delay <= 0 && this.alpha <= 0;
     }
   }
 
-  /* ── 5. Expanding cloud puff / paper dust ─────────────── */
-  class CloudPuff {
-    constructor(delay = 0) {
-      this.del = delay;
-      // Soft circular cloud blobs
-      this.blobs = Array.from({length: 12}, () => ({
-        a: Math.random() * Math.PI * 2,
-        d: 10 + Math.random() * 15,
-        v: 4 + Math.random() * 7,
-        s: 15 + Math.random() * 25, // blob size
-        alpha: 0.6 + Math.random() * 0.3
-      }));
-      // Dynamic wind fibers shooting outwards
-      this.fibers = Array.from({length: 8}, () => ({
-        a: Math.random() * Math.PI * 2,
-        d: 20 + Math.random() * 20,
-        v: 8 + Math.random() * 6,
-        len: 15 + Math.random() * 20,
-        alpha: 0.8
-      }));
-    }
-    update() {
-      if (this.del-- > 0) return;
-      this.blobs.forEach(b => {
-        b.d += b.v;
-        b.v *= 0.90; // drag
-        b.s += 0.8;  // clouds expand
-        b.alpha *= 0.88; // fade out
-      });
-      this.fibers.forEach(f => {
-        f.d += f.v;
-        f.v *= 0.92; // drag
-        f.len *= 0.85; // shrink
-        f.alpha *= 0.86; // fade out
-      });
-    }
-    draw() {
-      if (this.del > 0) return;
-      ctx.save();
-      
-      // Draw clouds using paper color
-      ctx.fillStyle = C.plane;
-      this.blobs.forEach(b => {
-        if (b.alpha < 0.01) return;
-        ctx.globalAlpha = b.alpha;
-        ctx.beginPath();
-        ctx.arc(cx + Math.cos(b.a) * b.d, cy + Math.sin(b.a) * b.d, b.s, 0, Math.PI * 2);
-        ctx.fill();
-      });
+  /* ── 5. Spawn entities ─────────────────────────────── */
+  const planeCount = W < 600 ? 35 : 60;
+  const flock = Array.from({length: planeCount}, (_, i) => {
+    // Spread launch delays across ~90 frames (1.5 seconds)
+    const delay = Math.floor(Math.random() * 90) + Math.floor(i * 1.5);
+    return new FlockPlane(delay);
+  });
 
-      // Draw wind fibers
-      ctx.strokeStyle = C.plane;
-      ctx.lineCap = 'round';
-      ctx.lineWidth = 2.5;
-      this.fibers.forEach(f => {
-        if (f.alpha < 0.01) return;
-        ctx.globalAlpha = f.alpha;
-        ctx.beginPath();
-        const sx = cx + Math.cos(f.a) * f.d;
-        const sy = cy + Math.sin(f.a) * f.d;
-        const ex = cx + Math.cos(f.a) * (f.d + f.len);
-        const ey = cy + Math.sin(f.a) * (f.d + f.len);
-        ctx.moveTo(sx, sy);
-        ctx.lineTo(ex, ey);
-        ctx.stroke();
-      });
-
-      ctx.restore();
-    }
-    get done() {
-      return this.blobs.every(b => b.alpha < 0.01) && this.fibers.every(f => f.alpha < 0.01);
-    }
-  }
-
-  /* ── 6. Spawn all entities ─────────────────────────────── */
-  const isMobile    = W < 600;
-  // More planes for a dramatic sweep
-  const PLANE_COUNT = isMobile ? 12 : 18;
-
-  const planes = Array.from({ length: PLANE_COUNT }, (_, i) => new Plane(i, PLANE_COUNT));
-  // Staggered cloud puffs for a soft, explosive smoke bloom
-  const waves  = [new CloudPuff(0), new CloudPuff(8), new CloudPuff(18)];
-
-  /* ── 7. RAF loop ───────────────────────────────────────── */
+  /* ── 6. RAF loop ───────────────────────────────────────── */
   return new Promise(resolveTransition => {
     let frame    = 0;
     let resolved = false;
@@ -621,23 +555,21 @@ async function _playPaperPlaneTransition(airmailTheme) {
     function tick() {
       ctx.clearRect(0, 0, W, H);
 
-      waves.forEach(w => { w.update(); w.draw(); });
-      planes.forEach(p => { p.update(); p.draw(); });
+      flock.forEach(p => {
+        p.update();
+        p.draw();
+      });
 
       frame++;
 
-      // Resolve at ~2500ms (frame 150 @ 60fps) — letter rises AFTER planes
-      // have swept across most of the screen, just like Classic Letter flowers
+      // Resolve at ~2500ms (frame 150 @ 60fps) — letter rises AFTER planes cross most of the screen
       if (!resolved && frame >= 150) {
         resolved = true;
         resolveTransition();
       }
 
-      const allGone =
-        planes.every(p => p.done) &&
-        waves.every(w => w.done);
-
-      if (allGone && frame > 200) {
+      const allDone = flock.every(p => p.done);
+      if (allDone && frame > 200) {
         canvas.remove();
         return;
       }
