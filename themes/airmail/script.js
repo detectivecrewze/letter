@@ -453,13 +453,7 @@ async function _playPaperPlaneTransition(airmailTheme) {
     ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
     ctx.strokeStyle = C.ink; ctx.lineWidth = 1.0; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
-    ctx.strokeStyle = C.s1; ctx.lineWidth = 2.0; ctx.globalAlpha = alpha * 0.75; ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
-    ctx.strokeStyle = C.s2; ctx.lineWidth = 1.5; ctx.globalAlpha = alpha * 0.60; ctx.stroke();
   }
 
   /* ── 4. Plane entity ──────────────────────────────────── */
@@ -710,13 +704,7 @@ function _startBackgroundPlanes(airmailTheme) {
     ctx.moveTo(30, 0); ctx.lineTo(-11, 0);
     ctx.strokeStyle = C.ink; ctx.lineWidth = 1.0; ctx.globalAlpha = alpha * 0.5; ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(13, -4); ctx.lineTo(-15, -13);
-    ctx.strokeStyle = C.s1; ctx.lineWidth = 2.0; ctx.globalAlpha = alpha * 0.75; ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(13, -7); ctx.lineTo(-15, -16);
-    ctx.strokeStyle = C.s2; ctx.lineWidth = 1.5; ctx.globalAlpha = alpha * 0.60; ctx.stroke();
   }
 
   class BgPlane {
