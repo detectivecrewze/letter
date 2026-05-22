@@ -154,42 +154,42 @@
     radial-gradient(ellipse at 30% 20%, rgba(107, 140, 186, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 70% 80%, rgba(201, 169, 110, 0.12) 0%, transparent 50%);
 
-  --env-paper:      #141e35;
-  --env-paper-dark: #18243e;
+  --env-paper:      #f2ece2;
+  --env-paper-dark: #e8e0d4;
   --airmail-red:    #e11d48; /* bright rose/crimson red */
   --airmail-blue:   #3b82f6; /* bright sky blue */
-  --airmail-white:  #141e35; /* dark blue backdrop for stripe alternating */
+  --airmail-white:  #f2ece2; /* dark blue backdrop for stripe alternating */
 
-  --stamp-bg:     #1e293b;
-  --stamp-border: #6b8cba;
-  --telegram-header: #8da4c4;
+  --stamp-bg:     #e8e0d4;
+  --stamp-border: #8a9aba;
+  --telegram-header: #4a5a7a;
   --btn-primary-bg: #3b82f6;
   --btn-secondary-border: #6b8cba;
-  --par-avion-bg: rgba(10, 15, 29, 0.65);
-  --postmark-color: #6b8cba;
+  --par-avion-bg: rgba(242, 236, 226, 0.85);
+  --postmark-color: #2a3a6a;
 
   /* Dark mode telegram paper and typewriter text styling */
-  --telegram-paper: #141e35;
-  --telegram-rule: #2a3d5c;
-  --typewriter-ink: #faecd8; /* readable warm cream text */
-  --typewriter-ink-faded: #a0947c;
-  --ink-black: #faecd8;
-  --ink-faded: rgba(250, 236, 216, 0.45);
+  --telegram-paper: #f2ece2;
+  --telegram-rule:  #d4cabb;
+  --typewriter-ink: #1a1610; /* readable warm cream text */
+  --typewriter-ink-faded: #3a3228;
+  --ink-black: #1a1610;
+  --ink-faded: rgba(26, 22, 16, 0.4);
 
   /* Tactile Separation Details */
-  --env-border: 1px solid rgba(255, 255, 255, 0.08);
-  --paper-border: 1px solid rgba(255, 255, 255, 0.06);
-  --env-shadow: 0 2px 10px rgba(0, 0, 0, 0.35),
-                0 12px 40px rgba(0, 0, 0, 0.55),
-                0 24px 60px rgba(0, 0, 0, 0.45),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  --env-shadow-hover: 0 4px 15px rgba(0, 0, 0, 0.4),
-                      0 16px 48px rgba(0, 0, 0, 0.6),
-                      0 32px 72px rgba(0, 0, 0, 0.5);
-  --paper-shadow: 0 2px 10px rgba(0, 0, 0, 0.3),
-                  0 12px 40px rgba(0, 0, 0, 0.5),
-                  0 24px 64px rgba(0, 0, 0, 0.4),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --env-border: 1px solid rgba(0, 0, 0, 0.08);
+  --paper-border: 1px solid rgba(0, 0, 0, 0.06);
+  --env-shadow: 0 2px 12px rgba(0, 0, 0, 0.5),
+                0 16px 48px rgba(0, 0, 0, 0.7),
+                0 32px 72px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --env-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.55),
+                      0 20px 56px rgba(0, 0, 0, 0.75),
+                      0 40px 80px rgba(0, 0, 0, 0.55);
+  --paper-shadow: 0 2px 12px rgba(0, 0, 0, 0.45),
+                  0 16px 48px rgba(0, 0, 0, 0.65),
+                  0 32px 72px rgba(0, 0, 0, 0.45),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
   /* Cream-toned fiber paper textures to stand out on dark blue */
   --envelope-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.98   0 0 0 0 0.92   0 0 0 0 0.85   1 0 0 0 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
@@ -206,42 +206,42 @@
     radial-gradient(ellipse at 30% 20%, rgba(192, 48, 80, 0.15) 0%, transparent 50%),
     radial-gradient(ellipse at 70% 80%, rgba(138, 24, 40, 0.12) 0%, transparent 50%);
 
-  --env-paper:      #250810;
-  --env-paper-dark: #2d0a14;
+  --env-paper:      #f5ede8;
+  --env-paper-dark: #ede0d8;
   --airmail-red:    #e11d48; /* rose red */
   --airmail-blue:   #c084fc; /* purple/violet */
-  --airmail-white:  #250810; /* deep wine backdrop for stripe alternating */
+  --airmail-white:  #f5ede8; /* deep wine backdrop for stripe alternating */
 
-  --stamp-bg:     #2d0a14;
-  --stamp-border: #c03050;
-  --telegram-header: #d4a090;
+  --stamp-bg:     #ede0d8;
+  --stamp-border: #c09080;
+  --telegram-header: #6a3028;
   --btn-primary-bg: #c03050;
   --btn-secondary-border: #d4a090;
-  --par-avion-bg: rgba(18, 3, 6, 0.65);
-  --postmark-color: #c03050;
+  --par-avion-bg: rgba(245, 237, 232, 0.85);
+  --postmark-color: #8a2030;
 
   /* Dark mode telegram paper and typewriter text styling */
-  --telegram-paper: #250810;
-  --telegram-rule: #4d0f1a;
-  --typewriter-ink: #fae8e8; /* high-contrast light warm rose-cream text */
-  --typewriter-ink-faded: #d4a090;
-  --ink-black: #fae8e8;
-  --ink-faded: rgba(250, 232, 232, 0.45);
+  --telegram-paper: #f5ede8;
+  --telegram-rule:  #d4c4bc;
+  --typewriter-ink: #2a0a10; /* high-contrast light warm rose-cream text */
+  --typewriter-ink-faded: #6a3a38;
+  --ink-black: #2a0a10;
+  --ink-faded: rgba(42, 10, 16, 0.4);
 
   /* Tactile Separation Details */
-  --env-border: 1px solid rgba(255, 255, 255, 0.08);
-  --paper-border: 1px solid rgba(255, 255, 255, 0.06);
-  --env-shadow: 0 2px 10px rgba(0, 0, 0, 0.35),
-                0 12px 40px rgba(0, 0, 0, 0.55),
-                0 24px 60px rgba(0, 0, 0, 0.45),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  --env-shadow-hover: 0 4px 15px rgba(0, 0, 0, 0.4),
-                      0 16px 48px rgba(0, 0, 0, 0.6),
-                      0 32px 72px rgba(0, 0, 0, 0.5);
-  --paper-shadow: 0 2px 10px rgba(0, 0, 0, 0.3),
-                  0 12px 40px rgba(0, 0, 0, 0.5),
-                  0 24px 64px rgba(0, 0, 0, 0.4),
-                  inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --env-border: 1px solid rgba(0, 0, 0, 0.08);
+  --paper-border: 1px solid rgba(0, 0, 0, 0.06);
+  --env-shadow: 0 2px 12px rgba(0, 0, 0, 0.5),
+                0 16px 48px rgba(0, 0, 0, 0.7),
+                0 32px 72px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --env-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.55),
+                      0 20px 56px rgba(0, 0, 0, 0.75),
+                      0 40px 80px rgba(0, 0, 0, 0.55);
+  --paper-shadow: 0 2px 12px rgba(0, 0, 0, 0.45),
+                  0 16px 48px rgba(0, 0, 0, 0.65),
+                  0 32px 72px rgba(0, 0, 0, 0.45),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
   /* Rose-cream tinted fiber paper textures to stand out on deep wine */
   --envelope-texture: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.98   0 0 0 0 0.91   0 0 0 0 0.91   1 0 0 0 0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
