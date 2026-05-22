@@ -1087,6 +1087,13 @@ function _initDownloadButton(config) {
         useCORS: true,
         backgroundColor: null,
         onclone: (clonedDoc) => {
+          // Preserve theme in cloned document
+          const currentTheme = document.body.getAttribute('data-airmail-theme');
+          if (currentTheme) {
+            clonedDoc.body.setAttribute('data-airmail-theme', currentTheme);
+            clonedDoc.documentElement.setAttribute('data-airmail-theme', currentTheme);
+          }
+
           const paper = clonedDoc.getElementById('letter-paper');
           if (paper) {
             paper.style.animation = 'none';
@@ -1094,6 +1101,15 @@ function _initDownloadButton(config) {
             paper.style.transform = 'none';
             paper.style.opacity = '1';
           }
+
+          // CRITICAL for iOS: Remove SVG animations and path drawing that crash html2canvas
+          clonedDoc.querySelectorAll('svg, svg path, svg circle, svg text, svg polygon').forEach(el => {
+            el.style.animation = 'none';
+            el.style.strokeDashoffset = '0';
+            el.style.strokeDasharray = 'none';
+            el.style.opacity = '1';
+            el.style.transform = 'none';
+          });
         }
       });
 
