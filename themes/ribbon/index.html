@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Letter For You — Ribbon & Seal</title>
+  <meta name="description" content="A heartfelt letter, delivered with magic across the sky.">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Open Graph (WhatsApp preview) -->
+  <meta property="og:title" content="Ada surat untukmu 💌">
+  <meta property="og:description" content="Seseorang mengirimkan sesuatu yang sangat spesial untukmu.">
+  <meta property="og:type" content="website">
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="/assets/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="/assets/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon/apple-touch-icon.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Caveat:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Sacramento&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/themes/ribbon/style.css">
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- ATMOSPHERE LAYERS                                      -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div class="static-bg" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- PASSWORD GATE                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="password-gate" class="hidden">
+    <div class="gate-card">
+      <div class="gate-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8b6b4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+        </svg>
+      </div>
+      <h2 class="gate-title">This Letter is Sealed</h2>
+      <p class="gate-desc">Enter the secret passcode to open it.</p>
+
+      <div id="gate-hint-container" class="hidden">
+        <span class="hint-label">Clue:</span>
+        <p id="gate-hint-text"></p>
+      </div>
+
+      <div class="gate-input-wrapper">
+        <input id="gate-password-input" type="password" placeholder="Enter passcode..." autocomplete="off" />
+      </div>
+
+      <button id="btn-gate-verify">Unseal Letter</button>
+      <p id="gate-error" class="hidden">Incorrect passcode. Try again.</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: MAINTENANCE                                     -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-maintenance" class="state-screen hidden">
+    <div class="maintenance-content">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8b6b4a" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:1rem">
+        <path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+      <h1>The Delivery is Paused</h1>
+      <p>This letter is temporarily unavailable. It will be delivered again soon.</p>
+      <div class="maint-footer">
+        <span>RIBBON & SEAL</span>
+        <span class="dot"></span>
+        <span>EST. 2025</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: LOADING                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-loading" class="state-screen">
+    <div class="loading-content">
+      <div class="loading-spinner">
+        <svg class="spinner-svg" width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(139,107,74,0.15)" stroke-width="3"/>
+          <circle cx="32" cy="32" r="26" fill="none" stroke="#8b6b4a" stroke-width="3" stroke-linecap="round" stroke-dasharray="40 120" class="spinner-arc"/>
+        </svg>
+        <div class="spinner-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b6b4a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </div>
+      </div>
+      <p class="loading-label">Your letter is on its way…</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: ENVELOPE                                        -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-envelope" class="state-screen hidden">
+    <div class="envelope-scene" id="envelope-scene">
+
+      <!-- The Envelope -->
+      <div class="ribbon-envelope" id="ribbon-envelope" role="button" aria-label="Open this letter" tabindex="0">
+
+        <!-- Envelope body (kraft paper look) -->
+        <div class="envelope-body">
+          <!-- Flap -->
+          <div class="envelope-flap"></div>
+
+          <!-- Decorative vine across envelope (SVG) -->
+          <svg class="envelope-vine" viewBox="0 0 300 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M0 10 Q75 0 150 10 Q225 20 300 10" stroke="#7a9e7e" stroke-width="1.2" fill="none" opacity="0.4"/>
+            <circle cx="50" cy="7" r="3" fill="#9cb8a0" opacity="0.35"/>
+            <circle cx="120" cy="11" r="2.5" fill="#d4b8c8" opacity="0.3"/>
+            <circle cx="180" cy="8" r="3" fill="#9cb8a0" opacity="0.35"/>
+            <circle cx="250" cy="12" r="2.5" fill="#d4b8c8" opacity="0.3"/>
+            <path d="M45 8 Q48 3 55 6" stroke="#7a9e7e" stroke-width="0.8" fill="none" opacity="0.35"/>
+            <path d="M175 9 Q178 4 185 7" stroke="#7a9e7e" stroke-width="0.8" fill="none" opacity="0.35"/>
+          </svg>
+
+          <!-- Wax seal -->
+          <div class="wax-seal" id="wax-seal">
+            <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
+              <!-- Irregular seal edge -->
+              <path d="M26 2 L30 6 L35 3 L36 9 L42 8 L40 14 L46 16 L42 20 L47 24 L42 27 L46 32 L40 32 L42 38 L36 36 L35 42 L30 39 L26 44 L22 39 L17 42 L16 36 L10 38 L12 32 L6 32 L10 27 L5 24 L10 20 L6 16 L12 14 L10 8 L16 9 L17 3 L22 6 Z" fill="var(--seal-red)" opacity="0.9"/>
+              <circle cx="26" cy="23" r="14" fill="none" stroke="rgba(255,220,200,0.4)" stroke-width="0.8"/>
+              <!-- Leaf icon in seal -->
+              <path d="M22 26 Q26 14 30 20 Q28 24 26 28 Q24 24 22 26Z" fill="rgba(255,220,200,0.6)" stroke="rgba(255,220,200,0.3)" stroke-width="0.5"/>
+            </svg>
+          </div>
+
+          <!-- Ribbon -->
+          <div class="ribbon-wrap" id="ribbon-wrap">
+            <div class="ribbon-h"></div>
+          </div>
+
+          <!-- Recipient tag -->
+          <div class="recipient-tag">
+            <span class="tag-for">For</span>
+            <span class="tag-name" id="env-to-name">Kamu</span>
+          </div>
+        </div>
+
+        <!-- Tap hint -->
+        <div class="tap-hint" id="tap-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.6">
+            <path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <span class="tap-hint-text">gently open</span>
+        </div>
+
+      </div><!-- /ribbon-envelope -->
+
+    </div><!-- /envelope-scene -->
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- STATE: LETTER                                         -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="state-letter" class="state-screen hidden">
+
+    <!-- Scroll wrapper -->
+    <div class="letter-scroll">
+      <article class="letter-paper" id="letter-paper" role="main">
+
+        <!-- Watercolor edge wash (top) -->
+        <div class="watercolor-edge watercolor-edge-top" aria-hidden="true"></div>
+
+        <!-- Corner vine (top-left) -->
+        <svg class="corner-vine corner-vine-tl" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M5 95 Q5 50 20 30 Q35 10 60 5" stroke="#9cb8a0" stroke-width="1" fill="none" opacity="0.5"/>
+          <path d="M15 75 Q20 65 28 68" stroke="#9cb8a0" stroke-width="0.8" fill="none" opacity="0.4"/>
+          <path d="M25 55 Q30 45 38 50" stroke="#9cb8a0" stroke-width="0.8" fill="none" opacity="0.35"/>
+          <circle cx="18" cy="72" r="3.5" fill="#d4b8c8" opacity="0.25"/>
+          <circle cx="28" cy="53" r="3" fill="#c9a0a0" opacity="0.2"/>
+          <circle cx="10" cy="85" r="2.5" fill="#9cb8a0" opacity="0.3"/>
+          <path d="M12 80 Q16 74 22 78" stroke="#7a9e7e" stroke-width="0.6" fill="none" opacity="0.3"/>
+        </svg>
+
+        <!-- Corner vine (top-right) -->
+        <svg class="corner-vine corner-vine-tr" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M95 95 Q95 50 80 30 Q65 10 40 5" stroke="#9cb8a0" stroke-width="1" fill="none" opacity="0.5"/>
+          <path d="M85 75 Q80 65 72 68" stroke="#9cb8a0" stroke-width="0.8" fill="none" opacity="0.4"/>
+          <path d="M75 55 Q70 45 62 50" stroke="#9cb8a0" stroke-width="0.8" fill="none" opacity="0.35"/>
+          <circle cx="82" cy="72" r="3.5" fill="#d4b8c8" opacity="0.25"/>
+          <circle cx="72" cy="53" r="3" fill="#c9a0a0" opacity="0.2"/>
+          <circle cx="90" cy="85" r="2.5" fill="#9cb8a0" opacity="0.3"/>
+        </svg>
+
+        <!-- Letter header -->
+        <header class="letter-header">
+          <div class="header-ornament">
+            <svg width="100%" height="20" viewBox="0 0 300 20" preserveAspectRatio="none" fill="none" aria-hidden="true">
+              <line x1="0" y1="10" x2="120" y2="10" stroke="#c8b89a" stroke-width="0.5" opacity="0.5"/>
+              <path d="M130 10 Q140 3 150 10 Q160 17 170 10" stroke="#9cb8a0" stroke-width="1" fill="none" opacity="0.55"/>
+              <circle cx="150" cy="10" r="2" fill="#c9a0a0" opacity="0.4"/>
+              <line x1="180" y1="10" x2="300" y2="10" stroke="#c8b89a" stroke-width="0.5" opacity="0.5"/>
+            </svg>
+          </div>
+
+          <h1 class="letter-title" id="letter-title"></h1>
+
+          <div class="title-underline" aria-hidden="true">
+            <svg width="100%" height="14" viewBox="0 0 300 14" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 7 Q 75 13, 150 7 T 300 7" stroke="#8b6b4a" stroke-width="1.2" fill="none" opacity="0.8"/>
+              <path d="M20 10 Q 150 14, 280 10" stroke="#8b6b4a" stroke-width="0.5" fill="none" opacity="0.35"/>
+              <circle cx="150" cy="7" r="2" fill="#c9a0a0" opacity="0.9"/>
+            </svg>
+          </div>
+          
+          <time class="meta-date" id="letter-date"></time>
+
+          <div class="header-divider">
+            <div class="divider-line"></div>
+            <svg class="divider-leaf" width="20" height="14" viewBox="0 0 20 14" fill="none">
+              <path d="M10 1 Q4 4 2 10 Q6 8 10 7 Q14 8 18 10 Q16 4 10 1Z" fill="#9cb8a0" opacity="0.45"/>
+              <line x1="10" y1="1" x2="10" y2="13" stroke="#7a9e7e" stroke-width="0.6" opacity="0.4"/>
+            </svg>
+            <div class="divider-line"></div>
+          </div>
+        </header>
+
+        <!-- Salutation -->
+        <div class="letter-salutation">
+          <span class="meta-to-name" id="letter-to"></span>
+        </div>
+
+        <!-- Body (injected by script.js via typewriter) -->
+        <div class="letter-body" id="letter-body" aria-label="Letter content"></div>
+
+        <!-- Footer: signature -->
+        <footer class="letter-footer">
+          <div class="footer-divider">
+            <div class="divider-line"></div>
+          </div>
+          <div class="letter-from-wrap">
+            <span class="letter-from" id="letter-from"></span>
+          </div>
+          <!-- Small pressed flower SVG -->
+          <svg class="footer-flower" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <circle cx="14" cy="11" r="4" fill="#d4b8c8" opacity="0.3"/>
+            <circle cx="10" cy="13" r="3" fill="#c9a0a0" opacity="0.25"/>
+            <circle cx="18" cy="13" r="3" fill="#c9a0a0" opacity="0.25"/>
+            <circle cx="14" cy="16" r="3.5" fill="#d4b8c8" opacity="0.3"/>
+            <circle cx="14" cy="13" r="2" fill="#ecd8c6" opacity="0.5"/>
+            <line x1="14" y1="16" x2="14" y2="26" stroke="#7a9e7e" stroke-width="0.8" opacity="0.35"/>
+            <path d="M14 20 Q10 18 8 22" stroke="#7a9e7e" stroke-width="0.6" fill="none" opacity="0.3"/>
+          </svg>
+        </footer>
+
+        <!-- Watercolor edge wash (bottom) -->
+        <div class="watercolor-edge watercolor-edge-bottom" aria-hidden="true"></div>
+
+      </article>
+
+      <!-- Action Buttons Container -->
+      <div id="save-letter-container"
+        style="display: none; opacity: 0; transition: opacity 1.2s ease-in-out; text-align: center; margin-top: 2.5rem; margin-bottom: 3rem; padding-bottom: 2rem;">
+        <div id="letter-end"></div>
+
+        <!-- Primary: Secret Memory Button -->
+        <button id="btn-secret-memory" class="btn-ribbon-action btn-primary-action" style="display: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          View Enclosed Photos
+        </button>
+        <br>
+        <!-- Secondary: Save Letter Button -->
+        <button id="btn-save-letter" class="btn-ribbon-action btn-secondary-action">
+          <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Save This Letter
+        </button>
+      </div>
+
+    </div>
+
+  </div><!-- /state-letter -->
+
+  <!-- Hidden audio element -->
+  <audio id="audio-player" preload="auto"></audio>
+
+  <!-- ══════════════════════════════════════════════════════ -->
+  <!-- SECRET MEMORY MODAL                                    -->
+  <!-- ══════════════════════════════════════════════════════ -->
+  <div id="modal-secret-memory" aria-hidden="true" class="memory-modal">
+
+    <!-- Close button -->
+    <button id="btn-close-memory" class="memory-close" aria-label="Close memory">&times;</button>
+
+    <!-- Counter Badge -->
+    <div id="polaroid-counter" class="memory-counter"></div>
+
+    <!-- Carousel Row -->
+    <div class="memory-carousel">
+      <!-- Left Arrow -->
+      <button id="btn-memory-prev" class="memory-arrow memory-arrow-left" aria-label="Previous memory">&#8249;</button>
+
+      <!-- Photo Frame -->
+      <div id="polaroid-frame" class="polaroid-frame">
+        <div id="polaroid-media-wrap" class="polaroid-media"></div>
+        <p id="polaroid-caption" class="polaroid-caption"></p>
+      </div>
+
+      <!-- Right Arrow -->
+      <button id="btn-memory-next" class="memory-arrow memory-arrow-right" aria-label="Next memory">&#8250;</button>
+    </div>
+  </div>
+
+  <!-- External Library for PNG Screenshot -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Standalone config (demo / premium mode) -->
+  <script src="/config.js"></script>
+  <!-- Theme Script -->
+  <script src="/themes/ribbon/script.js"></script>
+
+</body>
+
+</html>
