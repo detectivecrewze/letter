@@ -69,15 +69,22 @@ html, body {
   width: 100%;
   overflow: hidden;
   font-family: var(--font-ui);
-  background-color: var(--bg-top);
   color: var(--ink-primary);
   -webkit-font-smoothing: antialiased;
 }
 
-html {
-  /* Force Safari untuk re-evaluate background saat theme berubah */
-  transition: background-color 0.01ms;
-}
+/* iOS Safari reads overscroll/safe-area color from html background.
+   Set explicitly per theme so it never falls back to :root default. */
+html { background: #eeeadd; }
+html[data-ribbon-theme="ribbon-crimson"]  { background: #eeeadd; }
+html[data-ribbon-theme="ribbon-rose"]     { background: #f0e0e8; }
+html[data-ribbon-theme="ribbon-sage"]     { background: #dde8e0; }
+html[data-ribbon-theme="ribbon-midnight"] { background: #1a2240; }
+html[data-ribbon-theme="ribbon-bordeaux"] { background: #2d0f18; }
+html[data-ribbon-theme="ribbon-lavender"] { background: #ece4f4; }
+
+/* Body: transparent so html background shows through for overscroll */
+body { background: transparent; }
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 

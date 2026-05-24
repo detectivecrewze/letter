@@ -112,23 +112,33 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
-  // Force reflow dulu baru update meta
+  // ── iOS Safari theme-color + overscroll fix ──────────────────
+  // Hardcoded map used because CSS vars aren't reliably resolved yet.
+  const _themeColorMap = {
+    'ribbon-crimson':  '#eeeadd',
+    'ribbon-rose':     '#f0e0e8',
+    'ribbon-sage':     '#dde8e0',
+    'ribbon-midnight': '#1a2240',
+    'ribbon-bordeaux': '#2d0f18',
+    'ribbon-lavender': '#ece4f4',
+  };
+  const _themeColor = _themeColorMap[activeTheme] || '#eeeadd';
+  const _metaTC = document.getElementById('theme-color-meta');
+
+  // Set immediately — no setTimeout
+  if (_metaTC) _metaTC.setAttribute('content', _themeColor);
+
+  // Force reflow so CSS theme selector activates, then clear inline bg
+  // (inline bg was set by the <head> script before CSS loaded)
   void document.documentElement.offsetHeight;
 
-  const bgTop = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
-
-  const metaThemeColor = document.getElementById('theme-color-meta');
-  if (metaThemeColor && bgTop) {
-    metaThemeColor.setAttribute('content', bgTop);
-  }
-
-  // Double-fire setelah paint cycle berikutnya (Safari quirk)
+  // Double rAF: after CSS is fully applied, clear the inline style
+  // so CSS [data-ribbon-theme] rules own the background going forward
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
-      if (metaThemeColor && bg) {
-        metaThemeColor.setAttribute('content', bg);
-      }
+      document.documentElement.style.background = '';
+      // Re-fire theme-color in case Safari missed the first one
+      if (_metaTC) _metaTC.setAttribute('content', _themeColor);
     });
   });
 
@@ -1475,4 +1485,3 @@ function _setText(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
 }
-

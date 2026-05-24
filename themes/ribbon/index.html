@@ -8,31 +8,33 @@
   <meta name="description" content="A heartfelt letter, delivered with magic across the sky.">
   <meta name="robots" content="noindex, nofollow">
   <meta name="theme-color" id="theme-color-meta" content="#eeeadd">
-  
-  <!-- Inline script: set theme-color SEBELUM paint pertama -->
+
+  <!-- iOS Safari fix: set theme-color + html background BEFORE first paint
+       so status bar and overscroll area get the correct theme color.
+       Must use hardcoded hex (not CSS vars) at this point in load. -->
   <script>
-    (function() {
+    (function () {
       try {
-        const params = new URLSearchParams(window.location.search);
-        let theme = 'ribbon-crimson';
-        const configStr = params.get('config');
-        if (configStr) {
-          const cfg = JSON.parse(decodeURIComponent(atob(configStr)));
-          if (cfg && cfg.ribbonTheme) theme = cfg.ribbonTheme;
-        }
-        const themeColors = {
-          'ribbon-crimson': '#eeeadd',
-          'ribbon-forest':  '#dde8e0',
-          'ribbon-midnight':'#1a2240',
-          'ribbon-rose':    '#f0e0e8',
-          'ribbon-bordeaux':'#2d0f18',
-          'ribbon-violet':  '#ece4f4',
+        var params = new URLSearchParams(window.location.search);
+        var theme = params.get('theme') || params.get('ribbonTheme') || 'ribbon-crimson';
+        var map = {
+          'ribbon-crimson':  '#eeeadd',
+          'ribbon-rose':     '#f0e0e8',
+          'ribbon-sage':     '#dde8e0',
+          'ribbon-midnight': '#1a2240',
+          'ribbon-bordeaux': '#2d0f18',
+          'ribbon-lavender': '#ece4f4',
         };
-        const color = themeColors[theme] || '#eeeadd';
-        document.getElementById('theme-color-meta').setAttribute('content', color);
+        var color = map[theme] || '#eeeadd';
+        // 1. Set theme-color meta immediately
+        var meta = document.getElementById('theme-color-meta');
+        if (meta) meta.setAttribute('content', color);
+        // 2. Set data attribute on html so CSS theme rules activate instantly
         document.documentElement.setAttribute('data-ribbon-theme', theme);
-        document.documentElement.style.backgroundColor = color;
-      } catch(e) {}
+        // 3. Set hardcoded background on html element — Safari reads this
+        //    for overscroll/safe-area before CSS variables resolve
+        document.documentElement.style.background = color;
+      } catch (e) {}
     })();
   </script>
 
