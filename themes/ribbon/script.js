@@ -21,6 +21,8 @@ const WORKER_URL = 'https://letter-edition.aldoramadhan16.workers.dev';
 const TW_CHAR_DELAY = 38;
 const TW_PARA_PAUSE = 700;
 
+let _bgDovesAnimId = null; // background doves RAF handle
+
 /* ════════════════════════════════════════════════════════════
    STATE MACHINE
    ════════════════════════════════════════════════════════════ */
@@ -168,12 +170,18 @@ async function init() {
   showState('envelope');
   await _waitForEnvelopeOpen(config);
 
-  // Transition to letter
+  // ── Switch to letter state & start dove transition concurrently ──
+  // Doves fly first, then paper rises mid-flight (like airmail planes)
   showState('letter');
   await _delay(300);
 
-  // Trigger paper reveal
+  // Start doves (no await — runs in background)
+  _playDoveTransition(config.ribbonTheme || 'ribbon-crimson');
+
+  // Delay paper reveal to ~2/3 point of dove animation (~2800ms)
+  // so the letter appears later as most doves have already swept across
   const paper = document.getElementById('letter-paper');
+  await _delay(2800);
   if (paper) {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -182,13 +190,466 @@ async function init() {
     });
   }
 
-  await _delay(1800);
+  // Start persistent background doves alongside paper reveal
+  _startBackgroundDoves(config.ribbonTheme || 'ribbon-crimson');
+
+  // Wait for paper rise animation to finish, then start typewriter
+  await _delay(1600);
   await _typewriteLetter(config);
 }
 
 /* ════════════════════════════════════════════════════════════
    SPARKLE PARTICLES (Removed for static aesthetic)
    ════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════
+   DOVE TRANSITION
+   ════════════════════════════════════════════════════════════ */
+function _playDoveTransition(ribbonTheme) {
+  return new Promise(resolve => {
+
+    // ── Colour palette per theme ──────────────────────────────
+    const palette = {
+      //                 wing          body           sky tint                      feather trail           light bg?
+      'ribbon-crimson':  { wing: '#b8956a', body: '#c4a07a', sky: 'rgba(180,140,100,0.10)', trail: 'rgba(180,140,90,0.30)',  light: true  },
+      'ribbon-forest':   { wing: '#f0fff4', body: '#edfbf0', sky: 'rgba(40,120,70,0.10)',   trail: 'rgba(180,240,200,0.20)', light: false },
+      'ribbon-midnight': { wing: '#e8eeff', body: '#dde6ff', sky: 'rgba(30,50,120,0.15)',   trail: 'rgba(160,180,255,0.20)', light: false },
+      'ribbon-rose':     { wing: '#c48090', body: '#d49090', sky: 'rgba(200,80,140,0.10)',  trail: 'rgba(210,150,160,0.28)', light: true  },
+      'ribbon-bordeaux': { wing: '#f0d8c0', body: '#e8c8a8', sky: 'rgba(120,20,35,0.20)',   trail: 'rgba(220,160,130,0.25)', light: false },
+      'ribbon-violet':   { wing: '#c8a0e0', body: '#d8b0f0', sky: 'rgba(130,80,190,0.10)', trail: 'rgba(200,160,240,0.25)', light: true  },
+    };
+    const clr = palette[ribbonTheme] || palette['ribbon-crimson'];
+
+    // ── Canvas setup ─────────────────────────────────────────
+    const canvas = document.createElement('canvas');
+    canvas.style.cssText = [
+      'position:fixed', 'inset:0', 'width:100%', 'height:100%',
+      'z-index:9999', 'pointer-events:none'
+    ].join(';');
+    document.body.appendChild(canvas);
+
+    const W = canvas.width  = window.innerWidth;
+    const H = canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    // ── Sky wash overlay ─────────────────────────────────────
+    // Fades in then out as a colour-tinted veil
+    let skyAlpha = 0;
+    let skyPhase = 'in'; // 'in' | 'hold' | 'out'
+
+    // ── Bird definitions ─────────────────────────────────────
+    const isMobile = W < 600;
+    const BIRD_COUNT = isMobile ? 30 : 65;
+
+    // Each bird flies from bottom-left quadrant to upper-right
+    // with slight variation in angle, speed and wing phase
+    const birds = [];
+    for (let i = 0; i < BIRD_COUNT; i++) {
+      // Launch position: clustered at bottom-left with spread
+      const startX = -80 + (Math.random() * W * 0.35);
+      const startY =  H + 40 + Math.random() * 120;
+
+      // Destination: upper-right, varied
+      const endX = W * 0.55 + Math.random() * W * 0.65;
+      const endY = -80 - Math.random() * 180;
+
+      // Staggered launch delay — spread across ~3500ms so last bird launches well before end
+      const delay = i * 50 + Math.random() * 120;
+
+      // Travel duration — slightly faster for concurrent mode
+      const duration = 1800 + Math.random() * 1000;
+
+      // Wing flap frequency & starting phase
+      const flapSpeed = 0.008 + Math.random() * 0.006;
+      const flapPhase = Math.random() * Math.PI * 2;
+
+      // Bird scale (slight variation for depth)
+      const scale = (isMobile ? 0.55 : 0.75) + Math.random() * 0.45;
+
+      // Gentle horizontal sway amplitude
+      const swayAmp = 10 + Math.random() * 18;
+      const swayFreq = 0.003 + Math.random() * 0.003;
+
+      birds.push({ startX, startY, endX, endY, delay, duration, flapSpeed, flapPhase, scale, swayAmp, swayFreq, born: null, done: false });
+    }
+
+    // ── Draw a single dove at (0,0), facing right ─────────────
+    // Uses pure canvas paths — no external assets needed.
+    // wingAngle: 0 = neutral, positive = wings up, negative = wings down
+    function _drawDove(ctx, wingAngle, scale, clr) {
+      ctx.save();
+      ctx.scale(scale, scale);
+
+      const up = wingAngle;   // positive = wings raised
+
+      // Body (teardrop, pointing right)
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 14, 6.5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = clr.body;
+      // Light themes: add shadow so doves contrast against pale background
+      if (clr.light) {
+        ctx.shadowColor = 'rgba(80,50,30,0.45)';
+        ctx.shadowBlur  = 8;
+      } else {
+        ctx.shadowColor = 'rgba(200,180,170,0.35)';
+        ctx.shadowBlur  = 6;
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Stroke outline for visibility on light backgrounds
+      if (clr.light) {
+        ctx.strokeStyle = 'rgba(100,65,40,0.35)';
+        ctx.lineWidth = 0.8 / scale;
+        ctx.stroke();
+      }
+
+      // Tail (small fan behind body)
+      ctx.beginPath();
+      ctx.moveTo(-14, 0);
+      ctx.lineTo(-22, -5 + up * 0.3);
+      ctx.lineTo(-21,  0);
+      ctx.lineTo(-22,  5 - up * 0.3);
+      ctx.closePath();
+      ctx.fillStyle = clr.wing;
+      ctx.fill();
+
+      // Head (small circle ahead of body)
+      ctx.beginPath();
+      ctx.arc(16, -4, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = clr.body;
+      ctx.fill();
+
+      // Beak
+      ctx.beginPath();
+      ctx.moveTo(20, -4.5);
+      ctx.lineTo(25, -4);
+      ctx.lineTo(20, -3.5);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(220,180,160,0.9)';
+      ctx.fill();
+
+      // Left wing (top wing — rises when flapping up)
+      ctx.beginPath();
+      ctx.moveTo(0, -2);
+      // Control points create a curved wing
+      ctx.bezierCurveTo(
+        -2, -12 - up * 9,
+         8, -20 - up * 12,
+        14, -10 - up * 6
+      );
+      ctx.bezierCurveTo(10, -4, 4, -1, 0, -2);
+      ctx.fillStyle = clr.wing;
+      ctx.globalAlpha = 0.95;
+      ctx.fill();
+      if (clr.light) {
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = 'rgba(100,65,40,0.4)';
+        ctx.lineWidth = 0.7 / scale;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      // Right wing (bottom wing — dips when left rises)
+      ctx.beginPath();
+      ctx.moveTo(0, 2);
+      ctx.bezierCurveTo(
+        -2,  12 + up * 6,
+         8,  18 + up * 9,
+        14,   8 + up * 5
+      );
+      ctx.bezierCurveTo(10, 3, 4, 1, 0, 2);
+      ctx.fillStyle = clr.wing;
+      ctx.globalAlpha = 0.85;
+      ctx.fill();
+      if (clr.light) {
+        ctx.globalAlpha = 0.45;
+        ctx.strokeStyle = 'rgba(100,65,40,0.35)';
+        ctx.lineWidth = 0.7 / scale;
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.restore();
+    }
+
+    // ── Tiny feather sparkles trail ────────────────────────────
+    const sparkles = [];
+    function _spawnSparkle(x, y) {
+      if (Math.random() > 0.25) return; // sparse
+      sparkles.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: -Math.random() * 0.8,
+        life: 1.0,
+        size: 2 + Math.random() * 3,
+        angle: Math.random() * Math.PI * 2
+      });
+    }
+
+    function _updateSparkles() {
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const s = sparkles[i];
+        s.x += s.vx; s.y += s.vy;
+        s.vy += 0.015; // gentle gravity
+        s.life -= 0.022;
+        if (s.life <= 0) { sparkles.splice(i, 1); continue; }
+        ctx.save();
+        ctx.globalAlpha = s.life * 0.6;
+        ctx.translate(s.x, s.y);
+        ctx.rotate(s.angle);
+        // draw a tiny feather-like oval
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s.size * 0.35, s.size, 0, 0, Math.PI * 2);
+        ctx.fillStyle = clr.trail;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // ── Animation loop ────────────────────────────────────────
+    let startTime = null;
+    const TOTAL_DURATION = 4200; // ms — runs concurrently with letter rise
+    const SKY_IN_END    = 700;
+    const SKY_HOLD_END  = 2800;
+
+    function _ease(t) {
+      // ease-in-out cubic
+      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+    }
+
+    function _loop(ts) {
+      if (!startTime) startTime = ts;
+      const elapsed = ts - startTime;
+
+      ctx.clearRect(0, 0, W, H);
+
+      // Sky veil — max alpha 0.22 so it's a subtle tint, not a heavy wash
+      if (elapsed < SKY_IN_END) {
+        skyAlpha = _ease(elapsed / SKY_IN_END) * 0.22;
+      } else if (elapsed < SKY_HOLD_END) {
+        skyAlpha = 0.22;
+      } else {
+        skyAlpha = 0.22 * (1 - _ease((elapsed - SKY_HOLD_END) / (TOTAL_DURATION - SKY_HOLD_END)));
+      }
+      // Build sky colour with live alpha (extract RGB from palette string)
+      const skyRgb = clr.sky.match(/[\d.]+/g);
+      ctx.fillStyle = `rgba(${skyRgb[0]},${skyRgb[1]},${skyRgb[2]},${skyAlpha.toFixed(3)})`;
+      ctx.fillRect(0, 0, W, H);
+
+      // Sparkle trails
+      _updateSparkles();
+
+      // Birds
+      let allDone = true;
+      for (const b of birds) {
+        const bornAt = b.delay;
+        if (elapsed < bornAt) { allDone = false; continue; }
+
+        const t = Math.min((elapsed - bornAt) / b.duration, 1);
+        const et = _ease(t);
+
+        const x = b.startX + (b.endX - b.startX) * et
+                + Math.sin(elapsed * b.swayFreq) * b.swayAmp * (1 - t);
+        const y = b.startY + (b.endY - b.startY) * et;
+
+        // Wing flap — sine wave, more vigorous at launch
+        const flapVigor = 1 - t * 0.35;
+        const wingAngle = Math.sin((elapsed * b.flapSpeed * 2 * Math.PI) + b.flapPhase) * 7 * flapVigor;
+
+        // Bird opacity — fade in/out gently
+        const birdAlpha = t < 0.08 ? t / 0.08 : t > 0.88 ? (1 - t) / 0.12 : 1;
+
+        ctx.save();
+        ctx.globalAlpha = birdAlpha * 0.92;
+        ctx.translate(x, y);
+        // Tilt slightly in direction of travel
+        const tiltAngle = -0.18 - (1 - t) * 0.15;
+        ctx.rotate(tiltAngle);
+        _drawDove(ctx, wingAngle, b.scale, clr);
+        ctx.restore();
+
+        // Spawn feather sparkles mid-flight
+        if (t > 0.1 && t < 0.9) _spawnSparkle(x, y);
+
+        if (t < 1) allDone = false;
+      }
+
+      if (elapsed < TOTAL_DURATION || !allDone) {
+        requestAnimationFrame(_loop);
+      } else {
+        // Fade canvas out gently
+        canvas.style.transition = 'opacity 0.5s ease';
+        canvas.style.opacity = '0';
+        setTimeout(() => {
+          canvas.remove();
+          window.dispatchEvent(new CustomEvent('doves-gone'));
+          resolve();
+        }, 520);
+      }
+    }
+
+    requestAnimationFrame(_loop);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   BACKGROUND DOVES
+   ════════════════════════════════════════════════════════════ */
+function _startBackgroundDoves(ribbonTheme) {
+  const bgCanvas = document.getElementById('bg-doves-canvas');
+  const fgCanvas = document.getElementById('fg-doves-canvas');
+  if (!bgCanvas) return;
+
+  const bgCtx = bgCanvas.getContext('2d');
+  const fgCtx = fgCanvas ? fgCanvas.getContext('2d') : null;
+  let W = window.innerWidth;
+  let H = window.innerHeight;
+
+  bgCanvas.width = W; bgCanvas.height = H;
+  if (fgCanvas) { fgCanvas.width = W; fgCanvas.height = H; }
+
+  window.addEventListener('resize', () => {
+    W = window.innerWidth; H = window.innerHeight;
+    bgCanvas.width = W; bgCanvas.height = H;
+    if (fgCanvas) { fgCanvas.width = W; fgCanvas.height = H; }
+  });
+
+  // ── Per-theme palette (light themes get darker doves for visibility) ──
+  const PALETTES = {
+    'ribbon-crimson':  { wing: '#c4956a', body: '#b88050', isLight: true  },
+    'ribbon-forest':   { wing: '#c8e8d0', body: '#b0d4b8', isLight: false },
+    'ribbon-midnight': { wing: '#b8c8f0', body: '#a0b0e0', isLight: false },
+    'ribbon-rose':     { wing: '#d09098', body: '#c07888', isLight: true  },
+    'ribbon-bordeaux': { wing: '#f0d8c0', body: '#e0c4a0', isLight: false },
+    'ribbon-violet':   { wing: '#a880c8', body: '#9870b8', isLight: true  },
+  };
+  const C = PALETTES[ribbonTheme] || PALETTES['ribbon-crimson'];
+
+  // ── Draw a small dove silhouette (simplified for bg ambient use) ──
+  function drawBgDove(ctx, alpha, scale) {
+    const flap = Math.sin(Date.now() * 0.003 + scale * 10) * 5;
+    ctx.save();
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = alpha;
+
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 10, 4.5, 0, 0, Math.PI * 2);
+    ctx.fillStyle = C.body;
+    if (!C.isLight) {
+      ctx.shadowColor = 'rgba(255,255,255,0.2)';
+      ctx.shadowBlur = 4;
+    }
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Top wing
+    ctx.beginPath();
+    ctx.moveTo(0, -1);
+    ctx.bezierCurveTo(-1, -8 - flap * 0.9, 6, -14 - flap * 1.2, 10, -7 - flap * 0.6);
+    ctx.bezierCurveTo(7, -3, 3, -1, 0, -1);
+    ctx.fillStyle = C.wing;
+    ctx.fill();
+
+    // Bottom wing
+    ctx.beginPath();
+    ctx.moveTo(0, 1);
+    ctx.bezierCurveTo(-1, 8 + flap * 0.6, 6, 12 + flap * 0.9, 10, 5 + flap * 0.5);
+    ctx.bezierCurveTo(7, 2, 3, 1, 0, 1);
+    ctx.fillStyle = C.wing;
+    ctx.globalAlpha = alpha * 0.8;
+    ctx.fill();
+
+    // Outline stroke for light themes
+    if (C.isLight) {
+      ctx.globalAlpha = alpha * 0.35;
+      ctx.strokeStyle = 'rgba(100,65,35,0.5)';
+      ctx.lineWidth = 0.6 / scale;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  // ── Dove class ──
+  class BgDove {
+    constructor(isForeground) {
+      this.isFg = isForeground;
+      this.reset(true);
+    }
+    reset(initial = false) {
+      // FG doves are slightly bigger/faster
+      this.scale = this.isFg
+        ? 0.5 + Math.random() * 0.3
+        : 0.22 + Math.random() * 0.28;
+      this.speed = (this.isFg ? 0.6 : 0.35) + Math.random() * 0.45;
+
+      // Random direction — mostly drifting diagonally
+      const angle = (Math.random() - 0.5) * Math.PI * 0.55;
+      if (Math.random() > 0.5) {
+        this.x = initial ? Math.random() * W : W + 60;
+        this.angle = Math.PI + angle;
+      } else {
+        this.x = initial ? Math.random() * W : -60;
+        this.angle = angle;
+      }
+      this.y = initial ? Math.random() * H : Math.random() * H;
+
+      this.turn = (Math.random() - 0.5) * 0.002;
+      this.baseAlpha = this.isFg
+        ? 0.18 + Math.random() * 0.14
+        : 0.08 + Math.random() * 0.10;
+      this.swayPhase = Math.random() * Math.PI * 2;
+      this.swaySpeed = 0.008 + Math.random() * 0.015;
+    }
+    update() {
+      this.angle += this.turn;
+      this.swayPhase += this.swaySpeed;
+      const sway = Math.sin(this.swayPhase) * 0.3;
+      this.x += Math.cos(this.angle) * this.speed + Math.cos(this.angle + Math.PI / 2) * sway;
+      this.y += Math.sin(this.angle) * this.speed + Math.sin(this.angle + Math.PI / 2) * sway;
+      if (this.x < -120 || this.x > W + 120 || this.y < -120 || this.y > H + 120) {
+        this.reset();
+      }
+    }
+    draw() {
+      const ctx = this.isFg ? fgCtx : bgCtx;
+      if (!ctx) return;
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      drawBgDove(ctx, this.baseAlpha, this.scale);
+      ctx.restore();
+    }
+  }
+
+  const isMobile = W < 600;
+  const bgCount = isMobile ? 16 : 32;
+  const fgCount = isMobile ? 2 : 4;
+
+  const bgDoves = Array.from({ length: bgCount }, () => new BgDove(false));
+  const fgDoves = Array.from({ length: fgCount }, () => new BgDove(true));
+
+  // Fade canvases in after a short delay
+  setTimeout(() => {
+    bgCanvas.classList.add('is-visible');
+    if (fgCanvas) fgCanvas.classList.add('is-visible');
+  }, 600);
+
+  if (_bgDovesAnimId) cancelAnimationFrame(_bgDovesAnimId);
+
+  function tick() {
+    bgCtx.clearRect(0, 0, W, H);
+    if (fgCtx) fgCtx.clearRect(0, 0, W, H);
+
+    bgDoves.forEach(d => { d.update(); d.draw(); });
+    fgDoves.forEach(d => { d.update(); d.draw(); });
+
+    _bgDovesAnimId = requestAnimationFrame(tick);
+  }
+  tick();
+}
 
 /* ════════════════════════════════════════════════════════════
    ENVELOPE OPEN
@@ -417,15 +878,15 @@ function _showSaveContainer(config) {
   const container = document.getElementById('save-letter-container');
   if (!container) return;
 
-  const hasPhotos = config.photos && config.photos.length > 0;
+  // Use secretMediaList (same field as airmail/classic)
+  const hasMedia = config.secretMediaList && config.secretMediaList.length > 0;
   const memBtn = document.getElementById('btn-secret-memory');
-  if (memBtn) memBtn.style.display = hasPhotos ? 'inline-flex' : 'none';
+  if (memBtn) memBtn.style.display = hasMedia ? 'inline-flex' : 'none';
 
   container.style.display = 'block';
-  void container.offsetWidth;
-  container.style.opacity = '1';
+  setTimeout(() => { container.style.opacity = '1'; }, 50);
 
-  if (hasPhotos) _initSecretMemory(config.photos);
+  _initSecretMemory(config);
 
   const scrollEl = document.querySelector('.letter-scroll');
   if (scrollEl) {
@@ -545,28 +1006,67 @@ function _initDownloadButton(config) {
 /* ════════════════════════════════════════════════════════════
    SECRET MEMORY MODAL
    ════════════════════════════════════════════════════════════ */
-function _initSecretMemory(photos) {
-  const modal    = document.getElementById('modal-secret-memory');
-  const openBtn  = document.getElementById('btn-secret-memory');
-  const closeBtn = document.getElementById('btn-close-memory');
-  const prevBtn  = document.getElementById('btn-memory-prev');
-  const nextBtn  = document.getElementById('btn-memory-next');
-  const frame    = document.getElementById('polaroid-frame');
-  const mediaWrap= document.getElementById('polaroid-media-wrap');
-  const caption  = document.getElementById('polaroid-caption');
-  const counter  = document.getElementById('polaroid-counter');
+/* ════════════════════════════════════════════════════════════
+   FEATHER BURST (ribbon version of sparkle burst)
+   ════════════════════════════════════════════════════════════ */
+function _burstFeathers() {
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    const angle = (i / count) * 360;
+    const dist  = 60 + Math.random() * 80;
+    const size  = 6 + Math.random() * 8;
+    const dur   = 600 + Math.random() * 400;
+    el.style.cssText = [
+      'position:fixed',
+      `left:${window.innerWidth / 2}px`,
+      `top:${window.innerHeight / 2}px`,
+      `width:${size}px`,
+      `height:${size * 2.5}px`,
+      'border-radius:50%',
+      'background:var(--ribbon-red,#c0392b)',
+      'opacity:0.85',
+      'pointer-events:none',
+      'z-index:99999',
+      `transform:rotate(${angle}deg) translateY(-${dist}px)`,
+      `transition:transform ${dur}ms cubic-bezier(0.2,0.8,0.4,1), opacity ${dur}ms ease`,
+    ].join(';');
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.style.opacity = '0';
+      el.style.transform = `rotate(${angle}deg) translateY(-${dist + 40}px)`;
+    }));
+    setTimeout(() => el.remove(), dur + 100);
+  }
+}
 
-  if (!modal || !openBtn) return;
+function _initSecretMemory(config) {
+  const modal     = document.getElementById('modal-secret-memory');
+  const openBtn   = document.getElementById('btn-secret-memory');
+  const closeBtn  = document.getElementById('btn-close-memory');
+  const prevBtn   = document.getElementById('btn-memory-prev');
+  const nextBtn   = document.getElementById('btn-memory-next');
+  const frame     = document.getElementById('polaroid-frame');
+  const mediaWrap = document.getElementById('polaroid-media-wrap');
+  const caption   = document.getElementById('polaroid-caption');
+  const counter   = document.getElementById('polaroid-counter');
+
+  const list = config.secretMediaList || [];
+  if (!modal || !openBtn || list.length === 0) return;
 
   let current = 0;
 
   const render = (idx) => {
-    const photo = photos[idx];
-    if (!photo) return;
+    const item = list[idx];
+    if (!item) return;
 
+    // Pause any playing video before switching
+    const oldVid = mediaWrap.querySelector('video');
+    if (oldVid) oldVid.pause();
     mediaWrap.innerHTML = '';
-    const src = photo.url || photo.src || photo;
-    const isVideo = typeof src === 'string' && /\.(mp4|webm|mov)$/i.test(src);
+
+    const src = item.url || item.src || item;
+    const isVideo = typeof src === 'string' && /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(src);
 
     if (isVideo) {
       const vid = document.createElement('video');
@@ -575,33 +1075,45 @@ function _initSecretMemory(photos) {
       vid.loop = true;
       vid.muted = true;
       vid.playsInline = true;
-      vid.controls = false;
+      vid.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
       mediaWrap.appendChild(vid);
+      vid.play().catch(() => {});
     } else {
       const img = document.createElement('img');
       img.src = src;
-      img.alt = photo.caption || `Photo ${idx + 1}`;
+      img.alt = item.caption || `Memory ${idx + 1}`;
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
       mediaWrap.appendChild(img);
     }
 
-    caption.textContent = photo.caption || '';
-    counter.textContent = `${idx + 1} / ${photos.length}`;
+    if (caption) caption.textContent = item.caption || '';
 
-    prevBtn.disabled = idx === 0;
-    nextBtn.disabled = idx === photos.length - 1;
+    if (list.length > 1 && counter) {
+      counter.textContent = `${idx + 1} / ${list.length}`;
+      counter.style.display = 'block';
+    }
 
-    const tilt = (idx % 2 === 0 ? 1 : -1) * (0.5 + (idx % 3));
-    frame.style.transform = `rotate(${tilt}deg)`;
+    if (prevBtn) prevBtn.disabled = idx === 0;
+    if (nextBtn) nextBtn.disabled = idx === list.length - 1;
+
+    const tilt = idx % 2 === 0 ? '-2.5deg' : '2deg';
+    if (frame) frame.style.transform = `rotate(${tilt})`;
   };
 
   const open = () => {
     current = 0;
     render(0);
+    _burstFeathers();
     modal.setAttribute('aria-hidden', 'false');
-    _burstSparkles(15);
+    if (list.length > 1) {
+      if (prevBtn) prevBtn.style.display = 'flex';
+      if (nextBtn) nextBtn.style.display = 'flex';
+    }
   };
 
   const close = () => {
+    const vid = mediaWrap.querySelector('video');
+    if (vid) vid.pause();
     modal.setAttribute('aria-hidden', 'true');
   };
 
@@ -614,13 +1126,13 @@ function _initSecretMemory(photos) {
   });
 
   nextBtn.addEventListener('click', () => {
-    if (current < photos.length - 1) { current++; render(current); }
+    if (current < list.length - 1) { current++; render(current); }
   });
 
   document.addEventListener('keydown', (e) => {
     if (modal.getAttribute('aria-hidden') === 'true') return;
     if (e.key === 'ArrowLeft'  && current > 0)               { current--; render(current); }
-    if (e.key === 'ArrowRight' && current < photos.length - 1){ current++; render(current); }
+    if (e.key === 'ArrowRight' && current < list.length - 1) { current++; render(current); }
     if (e.key === 'Escape') close();
   });
 
@@ -629,8 +1141,8 @@ function _initSecretMemory(photos) {
   modal.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchStartX;
     if (Math.abs(dx) < 50) return;
-    if (dx < 0 && current < photos.length - 1) { current++; render(current); }
-    if (dx > 0 && current > 0)                 { current--; render(current); }
+    if (dx < 0 && current < list.length - 1) { current++; render(current); }
+    if (dx > 0 && current > 0)               { current--; render(current); }
   });
 }
 

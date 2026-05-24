@@ -602,7 +602,9 @@ body[data-ribbon-theme="ribbon-midnight"] {
   --ribbon-red:         #3a5090;
   --ribbon-mid:         #4a62a8;
   --ribbon-dark:        #28407a;
-  --warm-brown:         #8a7a60;
+  /* text colors — cool silver-blue to match navy background */
+  --warm-brown:         #4a6490;  /* soft steel-blue for title/from/to */
+  --ink-secondary:      #3a547e;  /* slightly darker steel-blue for secondary */
   --paper-bg:           #fdfaf4;
   --paper-bg2:          #f8f0e0;
 }
@@ -627,6 +629,46 @@ body[data-ribbon-theme="ribbon-rose"] {
   --ink-secondary:      #7a4858;
 }
 
+/* 5. Bordeaux — deep wine/burgundy bg, aged ivory paper, crimson-gold ribbon */
+body[data-ribbon-theme="ribbon-bordeaux"] {
+  --bg-top:             #2d0f18;
+  --bg-bottom:          #1c0810;
+  --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(140, 30, 50, 0.35) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(100, 20, 35, 0.25) 0%, transparent 50%);
+  --kraft-highlight:    #f5e8d0;
+  --kraft-light:        #ede0c4;
+  --kraft-mid:          #d8c8a8;
+  --seal-red:           #8a1c2a;
+  --seal-red-light:     #b82c3c;
+  --ribbon-red:         #9e2030;
+  --ribbon-mid:         #b83040;
+  --ribbon-dark:        #7a1420;
+  --warm-brown:         #c09060;
+  --ink-secondary:      #b07840;
+  --paper-bg:           #fefaf2;
+  --paper-bg2:          #f8f0e0;
+}
+
+/* 6. Soft Violet — lavender mist bg, parchment envelope, violet ribbon */
+body[data-ribbon-theme="ribbon-violet"] {
+  --bg-top:             #ece4f4;
+  --bg-bottom:          #dfd4ec;
+  --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(170, 140, 210, 0.22) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(150, 120, 195, 0.16) 0%, transparent 50%);
+  --kraft-highlight:    #f4eef8;
+  --kraft-light:        #ece4f4;
+  --kraft-mid:          #ddd0ec;
+  --seal-red:           #7a5898;
+  --seal-red-light:     #9a74b8;
+  --ribbon-red:         #8a64a8;
+  --ribbon-mid:         #9e7abc;
+  --ribbon-dark:        #724e90;
+  --warm-brown:         #7a5890;
+  --ink-secondary:      #6a4880;
+  --paper-bg:           #fdf9ff;
+  --paper-bg2:          #f7f0fc;
+}
+
 /* ════════════════════════════════════════════════════════════
    LETTER STATE
    ════════════════════════════════════════════════════════════ */
@@ -635,6 +677,23 @@ body[data-ribbon-theme="ribbon-rose"] {
   justify-content: center;
   overflow: hidden;
 }
+
+/* ── Background / Foreground Dove Canvas ────────────────────── */
+#bg-doves-canvas,
+#fg-doves-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+#bg-doves-canvas { z-index: 1;  } /* behind letter paper */
+#fg-doves-canvas { z-index: 10; } /* in front of letter paper */
+
+#bg-doves-canvas.is-visible,
+#fg-doves-canvas.is-visible { opacity: 1; }
 
 .letter-scroll {
   position: relative;
