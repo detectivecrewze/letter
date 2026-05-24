@@ -112,41 +112,6 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
-  // ── iOS Safari overscroll + status bar color fix ──────────────
-  // Safari caches the html background color for overscroll/safe-area.
-  // We set it directly via inline style AFTER config is fetched,
-  // so the correct theme color is used. Then we update meta theme-color.
-  // The color-scheme CSS property (set per-theme) helps Safari repaint.
-  const _bgMap = {
-    'ribbon-crimson':  '#eeeadd',
-    'ribbon-rose':     '#f0e0e8',
-    'ribbon-forest':   '#dde8e0',
-    'ribbon-midnight': '#1a2240',
-    'ribbon-bordeaux': '#2d0f18',
-    'ribbon-violet':   '#ece4f4',
-  };
-  const _themeBg = _bgMap[activeTheme] || '#eeeadd';
-
-  // 1. Set html background-color inline — Safari reads this for overscroll
-  document.documentElement.style.backgroundColor = _themeBg;
-
-  // 2. Update meta theme-color — Safari reads this for status bar
-  const _metaTC = document.getElementById('theme-color-meta');
-  if (_metaTC) _metaTC.setAttribute('content', _themeBg);
-
-  // 3. Force reflow
-  void document.documentElement.offsetHeight;
-
-  // 4. Double-fire setelah paint cycle berikutnya (Safari quirk)
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
-      if (_metaTC && bg) {
-        _metaTC.setAttribute('content', bg);
-      }
-    });
-  });
-
   // Render static skeleton
   _renderLetterSkeleton(config);
 

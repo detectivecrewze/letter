@@ -7,35 +7,6 @@
   <title>A Letter For You — Ribbon & Seal</title>
   <meta name="description" content="A heartfelt letter, delivered with magic across the sky.">
   <meta name="robots" content="noindex, nofollow">
-  <!-- theme-color: updated dynamically by script.js after config fetch -->
-  <meta name="theme-color" id="theme-color-meta" content="#eeeadd">
-  
-  <!-- Inline script: set theme-color SEBELUM paint pertama -->
-  <script>
-    (function() {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        let theme = 'ribbon-crimson';
-        const configStr = params.get('config');
-        if (configStr) {
-          const cfg = JSON.parse(decodeURIComponent(atob(configStr)));
-          if (cfg && cfg.ribbonTheme) theme = cfg.ribbonTheme;
-        }
-        const themeColors = {
-          'ribbon-crimson': '#eeeadd',
-          'ribbon-forest':  '#dde8e0',
-          'ribbon-midnight':'#1a2240',
-          'ribbon-rose':    '#f0e0e8',
-          'ribbon-bordeaux':'#2d0f18',
-          'ribbon-violet':  '#ece4f4',
-        };
-        const color = themeColors[theme] || '#eeeadd';
-        document.getElementById('theme-color-meta').setAttribute('content', color);
-        document.documentElement.setAttribute('data-ribbon-theme', theme);
-        document.documentElement.style.backgroundColor = color;
-      } catch(e) {}
-    })();
-  </script>
 
   <!-- Open Graph (WhatsApp preview) -->
   <meta property="og:title" content="Ada surat untukmu 💌">
