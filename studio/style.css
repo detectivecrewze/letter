@@ -846,30 +846,6 @@ textarea,
     width: 28px !important;
     height: 28px !important;
   }
-
-  /* Keep template selector cards beautiful on mobile instead of squishing them in 3 columns */
-  #template-selector {
-    display: flex;
-    overflow-x: auto;
-    gap: 12px;
-    padding: 8px 4px 12px;
-    margin: -8px -4px 0;
-    -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-  }
-
-  #template-selector::-webkit-scrollbar {
-    display: none; /* Safari and Chrome */
-  }
-
-  .template-card {
-    width: 145px;
-    min-width: 145px;
-    flex-shrink: 0;
-    scroll-snap-align: start;
-  }
 }
 
 /* ── Music Library Locked State ── */
@@ -1269,4 +1245,30 @@ textarea,
 
 #section-template .section-body-inner {
   position: relative;
+}
+
+/* Mobile Responsive Overrides placed at the end to ensure correct CSS cascade */
+@media (max-width: 640px) {
+  #template-selector {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 8px 4px 12px;
+    margin: -8px -4px 0;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  #template-selector::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+
+  .template-card {
+    width: 175px; /* Wider card so the next template peeks in beautifully from the right */
+    min-width: 175px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
 }
