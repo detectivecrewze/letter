@@ -394,6 +394,8 @@ textarea,
   font-size: 0.9rem;
   bottom: 6rem;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  white-space: normal;
+  line-height: 1.5;
 }
 
 /* ── Modals & Overlay ── */
