@@ -846,6 +846,30 @@ textarea,
     width: 28px !important;
     height: 28px !important;
   }
+
+  /* Keep template selector cards beautiful on mobile instead of squishing them in 3 columns */
+  #template-selector {
+    display: flex;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 8px 4px 12px;
+    margin: -8px -4px 0;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  #template-selector::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+
+  .template-card {
+    width: 145px;
+    min-width: 145px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
 }
 
 /* ── Music Library Locked State ── */

@@ -69,7 +69,7 @@ html, body {
   width: 100%;
   overflow: hidden;
   font-family: var(--font-ui);
-  background: var(--sky-top);
+  background: var(--bg-top);
   color: var(--ink-primary);
   -webkit-font-smoothing: antialiased;
 }
