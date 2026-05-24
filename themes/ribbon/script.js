@@ -134,15 +134,16 @@ async function init() {
   const _metaTC = document.getElementById('theme-color-meta');
   if (_metaTC) _metaTC.setAttribute('content', _themeBg);
 
-  // 3. Force reflow so color-scheme CSS property activates
+  // 3. Force reflow
   void document.documentElement.offsetHeight;
 
-  // 4. Remove inline style after 2 frames so CSS owns it going forward,
-  //    but keep meta theme-color updated
+  // 4. Double-fire setelah paint cycle berikutnya (Safari quirk)
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      document.documentElement.style.backgroundColor = '';
-      if (_metaTC) _metaTC.setAttribute('content', _themeBg);
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
+      if (_metaTC && bg) {
+        _metaTC.setAttribute('content', bg);
+      }
     });
   });
 

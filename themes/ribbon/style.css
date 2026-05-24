@@ -69,16 +69,15 @@ html, body {
   width: 100%;
   overflow: hidden;
   font-family: var(--font-ui);
+  background-color: var(--bg-top);
   color: var(--ink-primary);
   -webkit-font-smoothing: antialiased;
 }
 
-/* html & body: NO background at all.
-   Safari caches html background for overscroll at first paint.
-   Since theme is fetched async, we cannot know the right color at that time.
-   Solution: keep html/body transparent; use .static-bg div for all visuals.
-   We force Safari to repaint overscroll via color-scheme toggle trick in JS. */
-html, body { background: transparent !important; }
+html {
+  /* Force Safari untuk re-evaluate background saat theme berubah */
+  transition: background-color 0.01ms;
+}
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
