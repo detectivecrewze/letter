@@ -73,18 +73,13 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* iOS Safari reads overscroll/safe-area color from html background.
-   Set explicitly per theme so it never falls back to :root default. */
-html { background: #eeeadd; }
-html[data-ribbon-theme="ribbon-crimson"]  { background: #eeeadd; }
-html[data-ribbon-theme="ribbon-rose"]     { background: #f0e0e8; }
-html[data-ribbon-theme="ribbon-sage"]     { background: #dde8e0; }
-html[data-ribbon-theme="ribbon-midnight"] { background: #1a2240; }
-html[data-ribbon-theme="ribbon-bordeaux"] { background: #2d0f18; }
-html[data-ribbon-theme="ribbon-lavender"] { background: #ece4f4; }
+/* html: NO background — same as airmail pattern.
+   Safari reads html background for overscroll; leaving it unset
+   avoids the parchment color getting cached before theme loads. */
+html { background: none; }
 
-/* Body: transparent so html background shows through for overscroll */
-body { background: transparent; }
+/* body gets the theme color via CSS variable — works after theme attr is set */
+body { background: var(--bg-top); }
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
