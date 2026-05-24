@@ -119,6 +119,9 @@ async function init() {
     if (metaThemeColor && bgTop) {
       metaThemeColor.setAttribute('content', bgTop);
     }
+    // Force iOS Safari safe area overscroll color update
+    document.documentElement.style.backgroundColor = bgTop;
+    document.body.style.backgroundColor = bgTop;
   }, 50);
 
   // Render static skeleton
