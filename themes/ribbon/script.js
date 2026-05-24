@@ -1277,7 +1277,7 @@ function _initMusicPlayer(config) {
   const fab = document.createElement('button');
   fab.id = 'music-player-fab';
   fab.setAttribute('aria-label', 'Toggle music');
-  fab.innerHTML = `<span id="music-fab-icon">♪</span>`;
+  fab.innerHTML = `<span id="music-fab-icon">♪</span><div class="music-slash"></div>`;
   document.body.appendChild(fab);
 
   const iconEl = fab.querySelector('#music-fab-icon');
@@ -1295,8 +1295,11 @@ function _initMusicPlayer(config) {
     try {
       await audio.play();
       playing = true;
-      iconEl.textContent = '♪';
-    } catch (_) { playing = false; }
+      fab.classList.remove('muted');
+    } catch (_) { 
+      playing = false; 
+      fab.classList.add('muted');
+    }
   };
 
   // Auto-play when letter state becomes visible
@@ -1313,7 +1316,7 @@ function _initMusicPlayer(config) {
     if (playing) {
       audio.pause();
       playing = false;
-      iconEl.textContent = '♪';
+      fab.classList.add('muted');
     } else {
       await tryPlay();
     }
@@ -1325,7 +1328,7 @@ function _initMusicPlayer(config) {
       tryPlay();
     } else {
       playing = false;
-      iconEl.textContent = '♪';
+      fab.classList.add('muted');
     }
   });
 
