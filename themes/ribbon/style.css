@@ -392,24 +392,49 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   background: linear-gradient(180deg, var(--kraft-mid) 0%, var(--kraft-light) 100%);
   border-top: 1px solid rgba(180, 158, 120, 0.5);
   opacity: 0.9;
+  overflow: visible;
 }
 
+/* Left fold crease line */
+.envelope-flap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg,
+    rgba(120, 90, 50, 0.10) 0%,
+    transparent 60%
+  );
+  clip-path: inherit;
+  pointer-events: none;
+}
+
+/* Right fold crease line + bottom join shadow */
 .envelope-flap::after {
   content: '';
   position: absolute;
   inset: 0;
+  background:
+    linear-gradient(225deg,
+      rgba(120, 90, 50, 0.10) 0%,
+      transparent 60%
+    ),
+    linear-gradient(to bottom, transparent 80%, rgba(100, 70, 30, 0.12) 100%);
   clip-path: inherit;
-  box-shadow: inset 0 -2px 6px rgba(120, 90, 50, 0.15);
+  box-shadow: inset 0 -3px 10px rgba(120, 90, 50, 0.12);
+  pointer-events: none;
 }
 
 /* ── Vine decoration on envelope ──────────────────────────── */
 .envelope-vine {
   position: absolute;
-  bottom: 18%;
-  left: 5%;
-  right: 5%;
-  height: 20px;
-  opacity: 0.8;
+  bottom: 22%;
+  left: 2%;
+  right: 2%;
+  height: 38px;
+  opacity: 0.85;
 }
 
 /* ── Ribbon ───────────────────────────────────────────────── */
@@ -441,29 +466,17 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     inset 0 -1px 0 rgba(80, 20, 15, 0.2);
 }
 
-/* Ribbon bow via pseudo-elements */
-.ribbon-h::before,
-.ribbon-h::after {
-  content: '';
+/* ── Ribbon Bow SVG ────────────────────────────────────────── */
+.ribbon-bow-svg {
   position: absolute;
   top: 50%;
-  width: 18px;
-  height: 22px;
-  background: var(--ribbon-red);
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  box-shadow: inset 0 1px 2px rgba(255,255,255,0.15);
-}
-
-.ribbon-h::before {
-  right: 50%;
-  transform: translate(60%, -50%) rotate(-20deg);
-  margin-right: -3px;
-}
-
-.ribbon-h::after {
   left: 50%;
-  transform: translate(-60%, -50%) rotate(20deg);
-  margin-left: -3px;
+  transform: translate(-50%, -58%);
+  width: 100px;
+  height: 58px;
+  pointer-events: none;
+  z-index: 4;
+  filter: drop-shadow(0 3px 6px rgba(100, 20, 10, 0.25));
 }
 
 .ribbon-wrap.untying {
@@ -481,11 +494,22 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 52px;
-  height: 52px;
+  width: 72px;
+  height: 72px;
   z-index: 3;
-  filter: drop-shadow(0 3px 6px rgba(120, 40, 30, 0.4));
-  transition: transform 0.3s ease;
+  filter:
+    drop-shadow(0 4px 8px rgba(120, 40, 30, 0.45))
+    drop-shadow(0 0 12px var(--seal-red));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.wax-seal:hover {
+  animation: sealPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes sealPulse {
+  0%, 100% { filter: drop-shadow(0 4px 8px rgba(120, 40, 30, 0.45)) drop-shadow(0 0 12px var(--seal-red)); }
+  50%       { filter: drop-shadow(0 4px 12px rgba(120, 40, 30, 0.6))  drop-shadow(0 0 20px var(--seal-red)); }
 }
 
 .wax-seal.breaking {

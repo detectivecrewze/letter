@@ -106,14 +106,10 @@ async function init() {
     return;
   }
 
-  // Handle password gate
-  if (config.password) {
-    const unlocked = await _handlePasswordGate(config.password, config.passwordHint);
-    if (!unlocked) return;
-  }
-
   // Apply Theme Colors
-  document.body.setAttribute('data-ribbon-theme', config.ribbonTheme || 'ribbon-crimson');
+  const activeTheme = config.ribbonTheme || 'ribbon-crimson';
+  document.body.setAttribute('data-ribbon-theme', activeTheme);
+  _applyEnvelopeTheme(activeTheme);
 
   // Render static skeleton
   _renderLetterSkeleton(config);
@@ -201,6 +197,114 @@ async function init() {
 /* ════════════════════════════════════════════════════════════
    SPARKLE PARTICLES (Removed for static aesthetic)
    ════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════
+   ENVELOPE THEME — wax seal emblem + vine tint per theme
+   ════════════════════════════════════════════════════════════ */
+function _applyEnvelopeTheme(theme) {
+  const emblemEl = document.getElementById('seal-emblem');
+  if (!emblemEl) return;
+
+  // SVG inner paths for each theme emblem (all use rgba(255,228,210,0.75) fill by default)
+  const emblems = {
+    'ribbon-crimson': `
+      <!-- Dove: body + two wings spread + head + eye -->
+      <ellipse cx="36" cy="31" rx="7" ry="4.5" fill="rgba(255,228,210,0.75)"/>
+      <path d="M36 28 C30 23 22 25 20 29 C25 27 31 28 36 28Z" fill="rgba(255,228,210,0.75)"/>
+      <path d="M36 28 C42 23 50 25 52 29 C47 27 41 28 36 28Z" fill="rgba(255,228,210,0.75)"/>
+      <circle cx="32" cy="26.5" r="2" fill="rgba(255,228,210,0.8)"/>
+      <circle cx="31.2" cy="26" r="0.7" fill="rgba(100,40,20,0.5)"/>
+      <path d="M30.5 27 L28.5 28.5" stroke="rgba(255,228,210,0.8)" stroke-width="0.8" stroke-linecap="round"/>`,
+
+    'ribbon-forest': `
+      <!-- Leaf branch with 3 leaves and a central stem -->
+      <line x1="36" y1="38" x2="36" y2="22" stroke="rgba(255,228,210,0.75)" stroke-width="1.2" stroke-linecap="round"/>
+      <ellipse cx="31" cy="28" rx="5" ry="2.8" fill="rgba(255,228,210,0.7)" transform="rotate(-35 31 28)"/>
+      <ellipse cx="41" cy="26" rx="5" ry="2.8" fill="rgba(255,228,210,0.7)" transform="rotate(35 41 26)"/>
+      <ellipse cx="36" cy="22" rx="5" ry="2.8" fill="rgba(255,228,210,0.75)" transform="rotate(0 36 22)"/>
+      <line x1="36" y1="38" x2="31" y2="28" stroke="rgba(255,228,210,0.5)" stroke-width="0.7"/>
+      <line x1="36" y1="35" x2="41" y2="26" stroke="rgba(255,228,210,0.5)" stroke-width="0.7"/>`,
+
+    'ribbon-midnight': `
+      <!-- Crescent moon + small star cluster -->
+      <path d="M40 24 A9 9 0 1 1 31 37 A6 6 0 1 0 40 24Z" fill="rgba(255,228,210,0.75)"/>
+      <circle cx="28" cy="24" r="1.5" fill="rgba(255,228,210,0.8)"/>
+      <circle cx="33" cy="20" r="1" fill="rgba(255,228,210,0.65)"/>
+      <circle cx="44" cy="38" r="1" fill="rgba(255,228,210,0.55)"/>
+      <path d="M26 31 L27.2 34 L30.5 34 L27.9 36 L28.8 39.5 L26 37.5 L23.2 39.5 L24.1 36 L21.5 34 L24.8 34Z"
+        fill="rgba(255,228,210,0.55)" transform="scale(0.55) translate(23 20)"/>`,
+
+    'ribbon-rose': `
+      <!-- Rose bud: layered petals -->
+      <ellipse cx="36" cy="35" rx="4.5" ry="5.5" fill="rgba(255,228,210,0.7)"/>
+      <ellipse cx="32" cy="33" rx="4" ry="5" fill="rgba(255,228,210,0.65)" transform="rotate(-15 32 33)"/>
+      <ellipse cx="40" cy="33" rx="4" ry="5" fill="rgba(255,228,210,0.65)" transform="rotate(15 40 33)"/>
+      <ellipse cx="36" cy="30" rx="3.5" ry="4" fill="rgba(255,228,210,0.75)"/>
+      <ellipse cx="36" cy="28.5" rx="2" ry="2.5" fill="rgba(255,228,210,0.8)"/>
+      <line x1="36" y1="40" x2="36" y2="44" stroke="rgba(255,228,210,0.6)" stroke-width="1" stroke-linecap="round"/>
+      <ellipse cx="32" cy="42" rx="3.5" ry="2" fill="rgba(255,228,210,0.5)" transform="rotate(-30 32 42)"/>`,
+
+    'ribbon-bordeaux': `
+      <!-- Fleur-de-lis stylized -->
+      <line x1="36" y1="22" x2="36" y2="42" stroke="rgba(255,228,210,0.75)" stroke-width="1.5" stroke-linecap="round"/>
+      <ellipse cx="36" cy="25" rx="2.5" ry="5" fill="rgba(255,228,210,0.75)"/>
+      <path d="M36 29 C30 26 25 28 24 33 C27 31 32 30 36 32Z" fill="rgba(255,228,210,0.7)"/>
+      <path d="M36 29 C42 26 47 28 48 33 C45 31 40 30 36 32Z" fill="rgba(255,228,210,0.7)"/>
+      <ellipse cx="36" cy="38" rx="3.5" ry="2" fill="rgba(255,228,210,0.6)"/>
+      <circle cx="36" cy="31" r="2" fill="rgba(255,228,210,0.8)"/>`,
+
+    'ribbon-violet': `
+      <!-- Butterfly wings: 4 wing lobes + body -->
+      <path d="M36 30 C30 22 20 20 18 28 C16 34 24 38 36 34Z" fill="rgba(255,228,210,0.7)"/>
+      <path d="M36 30 C42 22 52 20 54 28 C56 34 48 38 36 34Z" fill="rgba(255,228,210,0.7)"/>
+      <path d="M36 34 C30 36 22 40 24 44 C28 46 34 42 36 38Z" fill="rgba(255,228,210,0.6)"/>
+      <path d="M36 34 C42 36 50 40 48 44 C44 46 38 42 36 38Z" fill="rgba(255,228,210,0.6)"/>
+      <!-- Body -->
+      <ellipse cx="36" cy="33" rx="2" ry="5" fill="rgba(255,228,210,0.85)"/>
+      <!-- Antennae -->
+      <path d="M35 28 C33 24 30 22 29 20" stroke="rgba(255,228,210,0.6)" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+      <path d="M37 28 C39 24 42 22 43 20" stroke="rgba(255,228,210,0.6)" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+      <circle cx="29" cy="20" r="1.2" fill="rgba(255,228,210,0.6)"/>
+      <circle cx="43" cy="20" r="1.2" fill="rgba(255,228,210,0.6)"/>`
+  };
+
+  const emblem = emblems[theme] || emblems['ribbon-crimson'];
+  emblemEl.innerHTML = emblem;
+
+  // Update vine stroke color to match theme sage/accent
+  const vineThemeColors = {
+    'ribbon-crimson':  { stroke: '#7a9e7e', berry: '#d4b8c8', flower: '#d4b8c8' },
+    'ribbon-forest':   { stroke: '#4a7a58', berry: '#9cb8a0', flower: '#c8d8c0' },
+    'ribbon-midnight': { stroke: '#6a8ab8', berry: '#c8d4e8', flower: '#b0c0d8' },
+    'ribbon-rose':     { stroke: '#9a7880', berry: '#e8c0c8', flower: '#e8c0cc' },
+    'ribbon-bordeaux': { stroke: '#7a5040', berry: '#c8a888', flower: '#d4b898' },
+    'ribbon-violet':   { stroke: '#7a68a0', berry: '#c8b8e0', flower: '#d0c0e8' },
+  };
+  const vc = vineThemeColors[theme] || vineThemeColors['ribbon-crimson'];
+
+  // Update all vine strokes and fills
+  const vine = document.querySelector('.envelope-vine');
+  if (vine) {
+    vine.querySelectorAll('path').forEach(p => {
+      if (p.getAttribute('fill') === 'none') p.setAttribute('stroke', vc.stroke);
+      else if (p.getAttribute('fill') && p.getAttribute('fill').includes('#9cb8a0')) p.setAttribute('fill', vc.stroke);
+    });
+    vine.querySelectorAll('ellipse').forEach(el => {
+      const f = el.getAttribute('fill');
+      if (f && f.includes('#9cb8a0')) el.setAttribute('fill', vc.stroke);
+    });
+    vine.querySelectorAll('circle').forEach(c => {
+      const f = c.getAttribute('fill');
+      if (f && (f.includes('#d4b8c8') || f.includes('#c9a0a0'))) c.setAttribute('fill', vc.berry);
+    });
+    // Flower petals
+    vine.querySelectorAll('g circle').forEach(c => {
+      const f = c.getAttribute('fill');
+      if (f && f.includes('#d4b8c8')) c.setAttribute('fill', vc.flower);
+    });
+  }
+}
+
 
 /* ════════════════════════════════════════════════════════════
    DOVE TRANSITION
@@ -665,8 +769,17 @@ function _waitForEnvelopeOpen(config) {
 
     let opened = false;
 
-    const open = () => {
+    const open = async () => {
       if (opened) return;
+
+      // Check password first
+      const params = new URLSearchParams(window.location.search);
+      const skipAuth = params.get('skipAuth') === '1';
+      if (!skipAuth && config.login_password && config.login_password.trim() !== '') {
+        const unlocked = await _handlePasswordGate(config.login_password, config.login_hint);
+        if (!unlocked) return;
+      }
+
       opened = true;
 
       // Hide hint
@@ -1239,6 +1352,12 @@ function _handlePasswordGate(password, hint) {
     }
 
     gate.classList.remove('hidden');
+    gate.style.opacity = '0';
+    gate.style.transition = 'opacity 0.4s ease';
+    
+    // Force reflow to ensure transition applies
+    void gate.offsetWidth;
+    gate.style.opacity = '1';
 
     const verify = () => {
       const val = (input.value || '').trim().toLowerCase();

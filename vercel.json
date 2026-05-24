@@ -33,6 +33,14 @@
             "destination": "/themes/airmail/index.html"
         },
         {
+            "source": "/ribbon/:id",
+            "destination": "/themes/ribbon/index.html"
+        },
+        {
+            "source": "/ribbon",
+            "destination": "/themes/ribbon/index.html"
+        },
+        {
             "source": "/:id",
             "destination": "/index.html"
         }

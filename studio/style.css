@@ -1025,6 +1025,58 @@ textarea,
   border-radius: 1px;
 }
 
+/* Ribbon & Seal: warm parchment with ribbon band & wax seal */
+.thumb-ribbon {
+  position: relative;
+  width: 60px;
+  height: 46px;
+}
+
+.thumb-ribbon-paper {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #eeeadd 0%, #ded9cb 100%);
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 0.5px solid rgba(139, 115, 85, 0.15);
+}
+
+.thumb-ribbon-band {
+  position: absolute;
+  top: 50%;
+  left: -2px;
+  right: -2px;
+  height: 5px;
+  background: linear-gradient(90deg, #c49a6c, #d4a373, #c49a6c);
+  transform: translateY(-50%);
+  box-shadow: 0 1px 3px rgba(139, 107, 74, 0.25);
+}
+
+.thumb-ribbon-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, #b83b3b 40%, #9e3232 100%);
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(158, 59, 59, 0.4);
+  z-index: 1;
+}
+
+.thumb-ribbon-seal::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(255,220,200,0.5);
+}
+
 /* ── Card text ── */
 .template-card-label {
   font-family: 'Inter', sans-serif;
@@ -1070,25 +1122,28 @@ textarea,
 
 /* ── Preview button inside card ── */
 .template-preview-btn {
-  width: 100%;
-  padding: 10px 0;
-  border: none;
-  border-top: 1px solid rgba(212, 163, 115, 0.12);
-  background: transparent;
+  margin-top: 8px;
+  padding: 6px 14px;
+  background: rgba(212, 163, 115, 0.08);
+  border: 1px solid rgba(212, 163, 115, 0.2);
+  border-radius: 20px;
   font-family: 'Inter', sans-serif;
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: #b58756;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-  border-radius: 0 0 12px 12px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .template-preview-btn:hover {
-  background: rgba(212, 163, 115, 0.08);
-  color: #a0723a;
+  background: rgba(212, 163, 115, 0.15);
+  color: #8b6b4a;
+  transform: translateY(-1px);
 }
 
 /* ── Airmail theme option buttons ── */
@@ -1146,6 +1201,7 @@ textarea,
 #typography-section.field-hidden,
 #theme-selector-wrap.field-hidden,
 #airmail-color-display.field-hidden,
+#ribbon-color-display.field-hidden,
 #texture-section-wrap.field-hidden {
   opacity: 0;
   max-height: 0 !important;

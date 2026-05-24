@@ -93,10 +93,10 @@
               </p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4" id="template-selector">
+            <div class="grid grid-cols-3 gap-4" id="template-selector">
 
               <!-- Classic Letter -->
-              <button class="template-card active" data-template="classic" id="tcard-classic">
+              <div class="template-card active" data-template="classic" id="tcard-classic">
                 <div class="template-card-inner">
                   <!-- Mini visual: classic envelope -->
                   <div class="template-thumb">
@@ -108,13 +108,16 @@
                   </div>
                   <div class="template-card-label">Classic Letter</div>
                   <div class="template-card-sub">Timeless & Elegant</div>
+                  <button class="template-preview-btn" data-template-preview="classic" type="button">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Preview
+                  </button>
                   <div class="template-check" id="check-classic">✓</div>
                 </div>
-                <button class="template-preview-btn" data-template-preview="classic" type="button">Preview</button>
-              </button>
+              </div>
 
               <!-- Vintage Airmail -->
-              <button class="template-card" data-template="airmail" id="tcard-airmail">
+              <div class="template-card" data-template="airmail" id="tcard-airmail">
                 <div class="template-card-inner">
                   <!-- Mini visual: airmail envelope -->
                   <div class="template-thumb">
@@ -128,10 +131,34 @@
                   </div>
                   <div class="template-card-label">Vintage Airmail</div>
                   <div class="template-card-sub">Retro Par Avion</div>
+                  <button class="template-preview-btn" data-template-preview="airmail" type="button">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Preview
+                  </button>
                   <div class="template-check hidden" id="check-airmail">✓</div>
                 </div>
-                <button class="template-preview-btn" data-template-preview="airmail" type="button">Preview</button>
-              </button>
+              </div>
+
+              <!-- Ribbon & Seal -->
+              <div class="template-card" data-template="ribbon" id="tcard-ribbon">
+                <div class="template-card-inner">
+                  <!-- Mini visual: parchment with wax seal & ribbon -->
+                  <div class="template-thumb">
+                    <div class="thumb-ribbon">
+                      <div class="thumb-ribbon-paper"></div>
+                      <div class="thumb-ribbon-band"></div>
+                      <div class="thumb-ribbon-seal"></div>
+                    </div>
+                  </div>
+                  <div class="template-card-label">Ribbon & Seal</div>
+                  <div class="template-card-sub">Warm & Handwritten</div>
+                  <button class="template-preview-btn" data-template-preview="ribbon" type="button">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Preview
+                  </button>
+                  <div class="template-check hidden" id="check-ribbon">✓</div>
+                </div>
+              </div>
 
             </div>
           </div>
@@ -277,6 +304,62 @@
                     <div class="w-full h-full rounded-full" style="background:repeating-linear-gradient(90deg,#e11d48 0,#e11d48 3px,#250810 3px,#250810 6px,#c084fc 6px,#c084fc 9px,#250810 9px,#250810 12px)"></div>
                   </div>
                   <span class="text-[8px] uppercase tracking-widest text-gray-400 mt-2 block text-center font-bold">Bordeaux</span>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- Ribbon: selectable colour chips (shown only for ribbon template) -->
+            <div id="ribbon-color-display" class="mb-10 field-hidden">
+              <label class="text-[7px] uppercase tracking-[0.3em] text-gray-400 font-bold block mb-4">Warna Template</label>
+              <div class="flex flex-wrap gap-4" id="ribbon-theme-selector">
+
+                <!-- Parchment (Default): warm beige/parchment bg + crimson ribbon -->
+                <button class="ribbon-theme-option group relative active" data-ribbon-theme="ribbon-crimson">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#9e3b3b] flex items-center justify-center shadow-sm transition-all" style="background:#eeeadd">
+                    <div class="w-6 h-6 rounded-full" style="background:linear-gradient(135deg, #f0e4ce 0%, #e8d5b8 55%, #9e3b3b 100%)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#9e3b3b">Parchment</span>
+                </button>
+
+                <!-- Forest Green: mossy green bg + forest green ribbon -->
+                <button class="ribbon-theme-option group relative" data-ribbon-theme="ribbon-forest">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#3b5a45] flex items-center justify-center shadow-sm transition-all" style="background:#dde8e0">
+                    <div class="w-6 h-6 rounded-full" style="background:linear-gradient(135deg, #c8d8c0 0%, #3b5a45 60%, #4a7a58 100%)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#3b5a45">Forest</span>
+                </button>
+
+                <!-- Midnight Blue: dark navy bg + navy ribbon -->
+                <button class="ribbon-theme-option group relative" data-ribbon-theme="ribbon-midnight">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#3a5090] flex items-center justify-center shadow-sm transition-all" style="background:#1a2240">
+                    <div class="w-6 h-6 rounded-full" style="background:linear-gradient(135deg, #e8dcc8 0%, #2a3d70 60%, #3a5090 100%)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#4a62a8">Midnight</span>
+                </button>
+
+                <!-- Soft Rose: blush bg + rosy ribbon -->
+                <button class="ribbon-theme-option group relative" data-ribbon-theme="ribbon-rose">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#a86c75] flex items-center justify-center shadow-sm transition-all" style="background:#f0e0e8">
+                    <div class="w-6 h-6 rounded-full" style="background:linear-gradient(135deg, #f0dce2 0%, #a86c75 60%, #c49898 100%)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#a86c75">Rose</span>
+                </button>
+
+                <!-- Bordeaux: deep wine/burgundy bg + crimson ribbon -->
+                <button class="ribbon-theme-option group relative" data-ribbon-theme="ribbon-bordeaux">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#8a1c2a] flex items-center justify-center shadow-sm transition-all" style="background:#2d0f18">
+                    <div class="w-6 h-6 rounded-full" style="background:linear-gradient(135deg, #ede0c4 0%, #8a1c2a 55%, #9e2030 100%)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#8a1c2a">Bordeaux</span>
+                </button>
+
+                <!-- Soft Violet: lavender mist bg + violet ribbon -->
+                <button class="ribbon-theme-option group relative" data-ribbon-theme="ribbon-violet">
+                  <div class="w-10 h-10 rounded-full border-2 border-transparent group-[.active]:border-[#7a5898] flex items-center justify-center shadow-sm transition-all" style="background:#ece4f4">
+                    <div class="w-6 h-6 rounded-full" style="background:linear-gradient(135deg, #ece4f4 0%, #7a5898 60%, #8a64a8 100%)"></div>
+                  </div>
+                  <span class="text-[8px] uppercase tracking-widest mt-2 block text-center font-bold" style="color:#7a5898">Violet</span>
                 </button>
 
               </div>

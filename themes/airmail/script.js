@@ -144,11 +144,17 @@ async function init() {
     postmarkDate.textContent = config.date.toUpperCase();
   }
 
-  // ── Handle openMemory shortcut ──
+  // ── Handle skipTW (preview from studio section buttons) ──
+  const isSkipTW = params.get('skipTW') === '1';
   const isOpenMemory = params.get('openMemory') === '1';
-  if (isOpenMemory) {
+  const previewPage = params.get('previewPage');
+
+  const shouldDirectToLetter = isOpenMemory || (isSkipTW && previewPage === 'page-surat');
+
+  if (shouldDirectToLetter) {
     config._forceSkipTW = true;
     showState('letter');
+    _startBackgroundPlanes(config.airmailTheme || 'airmail-parchment');
     const paper = document.getElementById('letter-paper');
     if (paper) {
       requestAnimationFrame(() => requestAnimationFrame(() => paper.classList.add('is-revealing')));

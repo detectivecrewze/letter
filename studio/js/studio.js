@@ -7,7 +7,8 @@ const Studio = (() => {
   let _activeTheme = 'blush-cream';
   let _activeTexture = 'normal';
   let _activeTemplate = 'classic';
-  let _activeAirmailTheme = 'airmail-parchment'; // default airmail colour
+  let _activeAirmailTheme = 'airmail-parchment';
+  let _activeRibbonTheme = 'ribbon-crimson'; // default airmail colour
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -131,6 +132,12 @@ const Studio = (() => {
     document.querySelectorAll('.airmail-theme-option').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.airmailTheme === _activeAirmailTheme);
     });
+
+    // Ribbon Theme Initial State
+    _activeRibbonTheme = config.ribbonTheme || 'ribbon-crimson';
+    document.querySelectorAll('.ribbon-theme-option').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.ribbonTheme === _activeRibbonTheme);
+    });
   }
 
   function _setVal(id, val) {
@@ -245,7 +252,8 @@ const Studio = (() => {
 
         _applyTemplateUI(tmpl);
         Autosave.trigger();
-        showToast(`Template '${tmpl === 'airmail' ? 'Vintage Airmail' : 'Classic Letter'}' dipilih`);
+        const labels = { airmail: 'Vintage Airmail', ribbon: 'Ribbon & Seal' };
+        showToast(`Template '${labels[tmpl] || 'Classic Letter'}' dipilih`);
       });
     });
 
@@ -258,8 +266,29 @@ const Studio = (() => {
       });
     });
 
-    // Airmail Colour Binding
+    // Airmail & Ribbon Colour Binding
     _bindAirmailThemeSelector();
+    _bindRibbonThemeSelector();
+  }
+
+  function _bindRibbonThemeSelector() {
+    document.querySelectorAll('.ribbon-theme-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.ribbonTheme;
+        if (!theme || theme === _activeRibbonTheme) return;
+        _activeRibbonTheme = theme;
+        document.querySelectorAll('.ribbon-theme-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Autosave.trigger();
+        const names = {
+          'ribbon-crimson': 'Parchment',
+          'ribbon-forest': 'Forest Green',
+          'ribbon-midnight': 'Midnight',
+          'ribbon-rose': 'Soft Rose'
+        };
+        showToast(`Warna Ribbon '${names[theme] || theme}' dipilih`);
+      });
+    });
   }
 
   function _bindAirmailThemeSelector() {
@@ -289,8 +318,10 @@ const Studio = (() => {
     const typoSec         = document.getElementById('typography-section');
     const themeSelectorWrap = document.getElementById('theme-selector-wrap');
     const airmailColorDisp  = document.getElementById('airmail-color-display');
+    const ribbonColorDisp   = document.getElementById('ribbon-color-display');
     const textureSectionWrap = document.getElementById('texture-section-wrap');
     const isAirmail       = template === 'airmail';
+    const isRibbon        = template === 'ribbon';
 
     // Helper: hide or show with transition
     function _toggle(el, shouldHide) {
@@ -304,11 +335,12 @@ const Studio = (() => {
       }
     }
 
-    _toggle(titleWrap,         isAirmail);   // no title for airmail
-    _toggle(typoSec,           isAirmail);   // no font/size for airmail
-    _toggle(themeSelectorWrap, isAirmail);   // hide multi-color for airmail
-    _toggle(airmailColorDisp, !isAirmail);   // show single chip for airmail
-    _toggle(textureSectionWrap, isAirmail);  // no paper texture for airmail
+    _toggle(titleWrap,         isAirmail);               // no title for airmail only (ribbon HAS title)
+    _toggle(typoSec,           isAirmail || isRibbon);   // no font/size for airmail or ribbon
+    _toggle(themeSelectorWrap, isAirmail || isRibbon);   // hide multi-color for airmail or ribbon
+    _toggle(airmailColorDisp, !isAirmail);   // show single chip only for airmail
+    _toggle(ribbonColorDisp, !isRibbon);     // show chips only for ribbon
+    _toggle(textureSectionWrap, isAirmail || isRibbon);  // no paper texture for airmail or ribbon
   }
 
   function _applyPremiumLock(isPrem) {
@@ -766,6 +798,7 @@ const Studio = (() => {
   function getActiveTheme() { return _activeTheme; }
   function getActiveTexture() { return _activeTexture; }
   function getActiveAirmailTheme() { return _activeAirmailTheme; }
+  function getActiveRibbonTheme() { return _activeRibbonTheme; }
 
   function updateSidebarBonusStatus() {
     const config = Auth.getInitialConfig() || {};
@@ -786,7 +819,7 @@ const Studio = (() => {
     }
   }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveRibbonTheme, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {

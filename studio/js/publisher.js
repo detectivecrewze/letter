@@ -97,7 +97,8 @@ const Publisher = (() => {
         }
         // Build URL based on template type
         const templateType = state.templateType || 'classic';
-        const basePath = templateType === 'airmail' ? `/airmail/${token}` : `/${token}`;
+        const pathMap = { airmail: `/airmail/${token}`, ribbon: `/ribbon/${token}` };
+        const basePath = pathMap[templateType] || `/${token}`;
         const url = `${location.protocol}//${location.host}${basePath}`;
         _showSuccessModal(url, templateType);
       } else {
@@ -136,7 +137,7 @@ const Publisher = (() => {
       // Vintage Airmail Design
       if (exportContainer) {
         exportContainer.style.background = 'linear-gradient(160deg, #fdf6e3 0%, #f4ebd8 100%)';
-        exportContainer.style.border = 'none'; // Removed dashed lines
+        exportContainer.style.border = 'none';
         exportContainer.style.borderRadius = '8px';
         exportContainer.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.15), 0 4px 12px rgba(181,135,86,0.15)';
       }
@@ -179,6 +180,43 @@ const Publisher = (() => {
         branding.textContent = 'POSTAGE PAID';
         branding.style.color = '#5a3e28';
         branding.style.fontWeight = 'bold';
+      }
+    } else if (templateType === 'ribbon') {
+      // Ribbon & Seal Design — warm parchment with wax seal accent
+      if (exportContainer) {
+        exportContainer.style.background = 'linear-gradient(160deg, #eeeadd 0%, #e4ddd0 50%, #ded9cb 100%)';
+        exportContainer.style.border = '1px solid rgba(139, 107, 74, 0.15)';
+        exportContainer.style.borderRadius = '12px';
+        exportContainer.style.boxShadow = '0 20px 50px -15px rgba(80,60,30,0.15), 0 4px 12px rgba(139,107,74,0.1)';
+      }
+      if (topAccent) {
+        topAccent.style.width = '60px';
+        topAccent.style.height = '4px';
+        topAccent.style.borderRadius = '0 0 4px 4px';
+        topAccent.style.left = '50%';
+        topAccent.style.transform = 'translateX(-50%)';
+        topAccent.style.background = 'linear-gradient(90deg, transparent, #9e3b3b, transparent)';
+        topAccent.style.display = 'block';
+        topAccent.style.overflow = '';
+        topAccent.innerHTML = '';
+      }
+      if (title) {
+        title.textContent = 'Ribbon & Seal';
+        title.style.fontFamily = "'Sacramento', cursive";
+        title.style.fontStyle = 'normal';
+        title.style.fontWeight = 'normal';
+        title.style.fontSize = '28px';
+        title.style.color = '#5a3e28';
+        title.style.letterSpacing = '0';
+      }
+      if (subtitle) {
+        subtitle.textContent = '✦ scan to unseal your letter ✦';
+        subtitle.style.color = '#9e3b3b';
+      }
+      if (branding) {
+        branding.textContent = 'sealed with love';
+        branding.style.color = '#b0967a';
+        branding.style.fontWeight = 'normal';
       }
     } else {
       // Classic Letter Design (Restore defaults)

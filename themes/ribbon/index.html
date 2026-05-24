@@ -114,31 +114,141 @@
           <!-- Flap -->
           <div class="envelope-flap"></div>
 
-          <!-- Decorative vine across envelope (SVG) -->
-          <svg class="envelope-vine" viewBox="0 0 300 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M0 10 Q75 0 150 10 Q225 20 300 10" stroke="#7a9e7e" stroke-width="1.2" fill="none" opacity="0.4"/>
-            <circle cx="50" cy="7" r="3" fill="#9cb8a0" opacity="0.35"/>
-            <circle cx="120" cy="11" r="2.5" fill="#d4b8c8" opacity="0.3"/>
-            <circle cx="180" cy="8" r="3" fill="#9cb8a0" opacity="0.35"/>
-            <circle cx="250" cy="12" r="2.5" fill="#d4b8c8" opacity="0.3"/>
-            <path d="M45 8 Q48 3 55 6" stroke="#7a9e7e" stroke-width="0.8" fill="none" opacity="0.35"/>
-            <path d="M175 9 Q178 4 185 7" stroke="#7a9e7e" stroke-width="0.8" fill="none" opacity="0.35"/>
+          <!-- Decorative botanical vine across envelope (SVG) -->
+          <svg class="envelope-vine" viewBox="0 0 340 38" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Main vine path -->
+            <path d="M0 20 C28 14, 55 26, 85 18 S130 10, 170 19 S215 28, 255 18 S300 10, 340 20" stroke="#7a9e7e" stroke-width="1.3" fill="none" opacity="0.5"/>
+
+            <!-- Sprig 1 — left of center -->
+            <path d="M60 18 Q56 10 50 7" stroke="#7a9e7e" stroke-width="0.9" fill="none" opacity="0.45"/>
+            <ellipse cx="48" cy="6" rx="4" ry="2.5" fill="#9cb8a0" opacity="0.45" transform="rotate(-30 48 6)"/>
+            <ellipse cx="53" cy="9" rx="3.5" ry="2" fill="#9cb8a0" opacity="0.38" transform="rotate(-15 53 9)"/>
+
+            <!-- Sprig 2 — just left of center -->
+            <path d="M120 18 Q118 9 112 6" stroke="#7a9e7e" stroke-width="0.9" fill="none" opacity="0.45"/>
+            <ellipse cx="110" cy="5" rx="4" ry="2.5" fill="#9cb8a0" opacity="0.45" transform="rotate(-25 110 5)"/>
+            <ellipse cx="116" cy="8" rx="3" ry="1.8" fill="#9cb8a0" opacity="0.35" transform="rotate(-40 116 8)"/>
+
+            <!-- Sprig 3 — just right of center -->
+            <path d="M210 18 Q214 9 220 6" stroke="#7a9e7e" stroke-width="0.9" fill="none" opacity="0.45"/>
+            <ellipse cx="222" cy="5" rx="4" ry="2.5" fill="#9cb8a0" opacity="0.45" transform="rotate(25 222 5)"/>
+            <ellipse cx="216" cy="8" rx="3" ry="1.8" fill="#9cb8a0" opacity="0.35" transform="rotate(40 216 8)"/>
+
+            <!-- Sprig 4 — right -->
+            <path d="M285 18 Q289 9 296 7" stroke="#7a9e7e" stroke-width="0.9" fill="none" opacity="0.45"/>
+            <ellipse cx="298" cy="6" rx="4" ry="2.5" fill="#9cb8a0" opacity="0.45" transform="rotate(30 298 6)"/>
+            <ellipse cx="292" cy="9" rx="3.5" ry="2" fill="#9cb8a0" opacity="0.38" transform="rotate(15 292 9)"/>
+
+            <!-- Tiny berries -->
+            <circle cx="85" cy="18" r="2.2" fill="#d4b8c8" opacity="0.5"/>
+            <circle cx="88" cy="15" r="1.6" fill="#c9a0a0" opacity="0.4"/>
+            <circle cx="170" cy="19" r="2.2" fill="#d4b8c8" opacity="0.5"/>
+            <circle cx="173" cy="16" r="1.6" fill="#c9a0a0" opacity="0.4"/>
+            <circle cx="255" cy="18" r="2" fill="#d4b8c8" opacity="0.45"/>
+
+            <!-- Small 5-petal blossom left -->
+            <g transform="translate(38 28)" opacity="0.4">
+              <circle cx="0" cy="-3.5" r="2.2" fill="#d4b8c8"/>
+              <circle cx="3.3" cy="-1.1" r="2.2" fill="#d4b8c8"/>
+              <circle cx="2" cy="2.5" r="2.2" fill="#d4b8c8"/>
+              <circle cx="-2" cy="2.5" r="2.2" fill="#d4b8c8"/>
+              <circle cx="-3.3" cy="-1.1" r="2.2" fill="#d4b8c8"/>
+              <circle cx="0" cy="0" r="1.8" fill="#f5e8d8"/>
+            </g>
+
+            <!-- Small 5-petal blossom right -->
+            <g transform="translate(302 28)" opacity="0.38">
+              <circle cx="0" cy="-3.5" r="2.2" fill="#d4b8c8"/>
+              <circle cx="3.3" cy="-1.1" r="2.2" fill="#d4b8c8"/>
+              <circle cx="2" cy="2.5" r="2.2" fill="#d4b8c8"/>
+              <circle cx="-2" cy="2.5" r="2.2" fill="#d4b8c8"/>
+              <circle cx="-3.3" cy="-1.1" r="2.2" fill="#d4b8c8"/>
+              <circle cx="0" cy="0" r="1.8" fill="#f5e8d8"/>
+            </g>
+
+            <!-- Lower hanging leaf pairs on vine -->
+            <ellipse cx="28" cy="24" rx="4.5" ry="2.5" fill="#9cb8a0" opacity="0.35" transform="rotate(20 28 24)"/>
+            <ellipse cx="145" cy="24" rx="4.5" ry="2.5" fill="#9cb8a0" opacity="0.3" transform="rotate(-15 145 24)"/>
+            <ellipse cx="230" cy="22" rx="4" ry="2.2" fill="#9cb8a0" opacity="0.3" transform="rotate(10 230 22)"/>
+            <ellipse cx="320" cy="24" rx="4" ry="2.2" fill="#9cb8a0" opacity="0.32" transform="rotate(-20 320 24)"/>
           </svg>
 
-          <!-- Wax seal -->
+          <!-- Wax seal (theme icon injected by JS) -->
           <div class="wax-seal" id="wax-seal">
-            <svg viewBox="0 0 52 52" xmlns="http://www.w3.org/2000/svg">
-              <!-- Irregular seal edge -->
-              <path d="M26 2 L30 6 L35 3 L36 9 L42 8 L40 14 L46 16 L42 20 L47 24 L42 27 L46 32 L40 32 L42 38 L36 36 L35 42 L30 39 L26 44 L22 39 L17 42 L16 36 L10 38 L12 32 L6 32 L10 27 L5 24 L10 20 L6 16 L12 14 L10 8 L16 9 L17 3 L22 6 Z" fill="var(--seal-red)" opacity="0.9"/>
-              <circle cx="26" cy="23" r="14" fill="none" stroke="rgba(255,220,200,0.4)" stroke-width="0.8"/>
-              <!-- Leaf icon in seal -->
-              <path d="M22 26 Q26 14 30 20 Q28 24 26 28 Q24 24 22 26Z" fill="rgba(255,220,200,0.6)" stroke="rgba(255,220,200,0.3)" stroke-width="0.5"/>
+            <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" id="wax-seal-svg">
+              <!-- Outer irregular blob seal edge -->
+              <path id="seal-blob" d="
+                M36 3
+                L41 8 L48 4 L50 11 L57 10 L55 17
+                L62 20 L57 26 L63 31 L57 35
+                L62 41 L55 42 L56 50 L49 48
+                L46 55 L39 51 L36 58
+                L33 51 L26 55 L23 48
+                L16 50 L17 42 L10 41
+                L15 35 L9 31 L15 26
+                L10 20 L17 17 L15 10
+                L22 11 L24 4 L31 8 Z"
+                fill="var(--seal-red)"/>
+              <!-- Inner ring embossed detail -->
+              <circle cx="36" cy="30" r="18" fill="none" stroke="rgba(255,228,210,0.35)" stroke-width="1"/>
+              <circle cx="36" cy="30" r="14" fill="rgba(0,0,0,0.08)"/>
+              <!-- Wax drip at bottom -->
+              <ellipse cx="36" cy="57" rx="5" ry="3" fill="var(--seal-red)" opacity="0.75"/>
+              <ellipse cx="36" cy="60" rx="3" ry="2" fill="var(--seal-red)" opacity="0.55"/>
+              <!-- Inner emblem group (replaced per-theme by JS) -->
+              <g id="seal-emblem" fill="rgba(255,228,210,0.70)" stroke="rgba(255,228,210,0.35)" stroke-width="0.6">
+                <!-- Default: dove silhouette -->
+                <path d="M30 35 Q32 28 36 26 Q40 28 42 35 Q39 32 36 33 Q33 32 30 35Z"/>
+                <path d="M36 26 Q34 22 31 23 Q33 25 36 26Z"/>
+                <path d="M36 26 Q38 22 41 23 Q39 25 36 26Z"/>
+                <circle cx="33" cy="23.5" r="1.2" fill="rgba(255,228,210,0.8)"/>
+              </g>
+              <!-- Shine highlight on seal -->
+              <ellipse cx="29" cy="21" rx="5" ry="3" fill="rgba(255,255,255,0.12)" transform="rotate(-35 29 21)"/>
             </svg>
           </div>
 
-          <!-- Ribbon -->
+          <!-- Ribbon + Bow SVG -->
           <div class="ribbon-wrap" id="ribbon-wrap">
             <div class="ribbon-h"></div>
+            <!-- Proper SVG bow: 2 loops + center knot + 2 tails -->
+            <svg class="ribbon-bow-svg" viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" id="ribbon-bow-svg">
+              <!-- Left loop -->
+              <path d="M60 35 C52 20, 28 16, 18 28 C10 38, 22 50, 40 44 C52 40, 58 36, 60 35Z"
+                fill="var(--ribbon-mid)" opacity="0.95"/>
+              <!-- Left loop inner shadow -->
+              <path d="M60 35 C52 20, 28 16, 18 28 C10 38, 22 50, 40 44 C52 40, 58 36, 60 35Z"
+                fill="none" stroke="var(--ribbon-dark)" stroke-width="0.5" opacity="0.4"/>
+              <!-- Left loop satin sheen -->
+              <path d="M55 28 C46 20, 30 18, 22 26" stroke="rgba(255,255,255,0.22)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+              <!-- Right loop -->
+              <path d="M60 35 C68 20, 92 16, 102 28 C110 38, 98 50, 80 44 C68 40, 62 36, 60 35Z"
+                fill="var(--ribbon-mid)" opacity="0.95"/>
+              <!-- Right loop inner shadow -->
+              <path d="M60 35 C68 20, 92 16, 102 28 C110 38, 98 50, 80 44 C68 40, 62 36, 60 35Z"
+                fill="none" stroke="var(--ribbon-dark)" stroke-width="0.5" opacity="0.4"/>
+              <!-- Right loop satin sheen -->
+              <path d="M65 28 C74 20, 90 18, 98 26" stroke="rgba(255,255,255,0.22)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+              <!-- Left tail -->
+              <path d="M56 37 C50 44, 40 52, 32 62 C30 65, 34 67, 36 64 C44 54, 54 46, 59 38Z"
+                fill="var(--ribbon-red)" opacity="0.9"/>
+              <!-- Left tail sheen -->
+              <path d="M54 40 C48 48, 38 56, 34 64" stroke="rgba(255,255,255,0.16)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+              <!-- Right tail -->
+              <path d="M64 37 C70 44, 80 52, 88 62 C90 65, 86 67, 84 64 C76 54, 66 46, 61 38Z"
+                fill="var(--ribbon-red)" opacity="0.9"/>
+              <!-- Right tail sheen -->
+              <path d="M66 40 C72 48, 82 56, 86 64" stroke="rgba(255,255,255,0.16)" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+              <!-- Center knot circle -->
+              <ellipse cx="60" cy="35" rx="8" ry="6" fill="var(--ribbon-dark)" opacity="0.95"/>
+              <ellipse cx="60" cy="35" rx="8" ry="6" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.8"/>
+              <!-- Knot highlight -->
+              <ellipse cx="57" cy="33" rx="3.5" ry="2" fill="rgba(255,255,255,0.18)" transform="rotate(-20 57 33)"/>
+            </svg>
           </div>
 
           <!-- Recipient tag -->

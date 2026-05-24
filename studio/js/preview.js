@@ -6,6 +6,7 @@
 const Preview = (() => {
   function _getBaseUrl(template) {
     if (template === 'airmail') return '../themes/airmail/index.html';
+    if (template === 'ribbon')  return '../themes/ribbon/index.html';
     return '../index.html';
   }
 
@@ -40,6 +41,7 @@ const Preview = (() => {
       const base = _getBaseUrl(Studio.getActiveTemplate());
       let previewUrl = `${base}?to=${token}`;
       if (skipTW) previewUrl += '&skipTW=1&skipAuth=1';
+      if (targetPage) previewUrl += `&previewPage=${encodeURIComponent(targetPage)}`;
 
       previewWin.location.href = previewUrl;
     } catch (e) {
@@ -79,7 +81,8 @@ const Preview = (() => {
     const previewWin = window.open('about:blank', '_blank');
     if (!previewWin) { Studio.showToast('Izinkan popup untuk preview template.'); return; }
 
-    const label = template === 'airmail' ? 'Vintage Airmail' : 'Classic Letter';
+    const labels = { airmail: 'Vintage Airmail', ribbon: 'Ribbon & Seal' };
+    const label = labels[template] || 'Classic Letter';
     Studio.showToast(`Membuka preview ${label}...`);
 
     try {

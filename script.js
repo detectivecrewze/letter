@@ -181,11 +181,14 @@ async function init() {
     envName.textContent = cleanName ? cleanName : 'kamu';
   }
 
-  // Show envelope — wait for user tap
-  // Exception: ?openMemory=1 → skip amplop & bunga, langsung ke surat + memori
+  // ── Handle skipTW (preview from studio section buttons) ──
+  const isSkipTW = params.get('skipTW') === '1';
   const isOpenMemory = params.get('openMemory') === '1';
+  const previewPage = params.get('previewPage');
 
-  if (isOpenMemory) {
+  const shouldDirectToLetter = isOpenMemory || (isSkipTW && previewPage === 'page-surat');
+
+  if (shouldDirectToLetter) {
     // Langsung render surat (instant, tanpa typewriter)
     config._forceSkipTW = true;
     showState('letter');
