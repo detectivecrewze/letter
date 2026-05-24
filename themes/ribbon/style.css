@@ -634,6 +634,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
    ════════════════════════════════════════════════════════════ */
 
 /* 1. Crimson (Default) — warm parchment, crimson ribbon & seal */
+html[data-ribbon-theme="ribbon-crimson"],
 body[data-ribbon-theme="ribbon-crimson"] {
   --bg-top:             #eeeadd;
   --bg-bottom:          #ded9cb;
@@ -650,6 +651,7 @@ body[data-ribbon-theme="ribbon-crimson"] {
 }
 
 /* 2. Forest Green — mossy green bg, olive envelope, forest ribbon */
+html[data-ribbon-theme="ribbon-forest"],
 body[data-ribbon-theme="ribbon-forest"] {
   --bg-top:             #dde8e0;
   --bg-bottom:          #ccd9d0;
@@ -668,6 +670,7 @@ body[data-ribbon-theme="ribbon-forest"] {
 }
 
 /* 3. Midnight Blue — deep navy bg, aged parchment envelope, navy ribbon */
+html[data-ribbon-theme="ribbon-midnight"],
 body[data-ribbon-theme="ribbon-midnight"] {
   --bg-top:             #1a2240;
   --bg-bottom:          #0e1628;
@@ -689,6 +692,7 @@ body[data-ribbon-theme="ribbon-midnight"] {
 }
 
 /* 4. Soft Rose — blush pink bg, rosy envelope, dusty rose ribbon */
+html[data-ribbon-theme="ribbon-rose"],
 body[data-ribbon-theme="ribbon-rose"] {
   --bg-top:             #f0e0e8;
   --bg-bottom:          #e4d0da;
@@ -709,6 +713,7 @@ body[data-ribbon-theme="ribbon-rose"] {
 }
 
 /* 5. Bordeaux — deep wine/burgundy bg, aged ivory paper, crimson-gold ribbon */
+html[data-ribbon-theme="ribbon-bordeaux"],
 body[data-ribbon-theme="ribbon-bordeaux"] {
   --bg-top:             #2d0f18;
   --bg-bottom:          #1c0810;
@@ -729,6 +734,7 @@ body[data-ribbon-theme="ribbon-bordeaux"] {
 }
 
 /* 6. Soft Violet — lavender mist bg, parchment envelope, violet ribbon */
+html[data-ribbon-theme="ribbon-violet"],
 body[data-ribbon-theme="ribbon-violet"] {
   --bg-top:             #ece4f4;
   --bg-bottom:          #dfd4ec;

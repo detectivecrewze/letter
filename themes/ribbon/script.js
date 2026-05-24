@@ -108,6 +108,7 @@ async function init() {
 
   // Apply Theme Colors
   const activeTheme = config.ribbonTheme || 'ribbon-crimson';
+  document.documentElement.setAttribute('data-ribbon-theme', activeTheme);
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
