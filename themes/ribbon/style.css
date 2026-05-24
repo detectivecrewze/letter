@@ -69,9 +69,14 @@ html, body {
   width: 100%;
   overflow: hidden;
   font-family: var(--font-ui);
-  background: var(--bg-top);
+  background-color: var(--bg-top);
   color: var(--ink-primary);
   -webkit-font-smoothing: antialiased;
+}
+
+html {
+  /* Force Safari untuk re-evaluate background saat theme berubah */
+  transition: background-color 0.01ms;
 }
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }

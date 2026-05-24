@@ -112,17 +112,25 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
-  // Sync meta theme-color with the active theme background for mobile Safari
-  setTimeout(() => {
-    const bgTop = getComputedStyle(document.body).getPropertyValue('--bg-top').trim();
-    const metaThemeColor = document.getElementById('theme-color-meta');
-    if (metaThemeColor && bgTop) {
-      metaThemeColor.setAttribute('content', bgTop);
-    }
-    // Force iOS Safari safe area overscroll color update
-    document.documentElement.style.backgroundColor = bgTop;
-    document.body.style.backgroundColor = bgTop;
-  }, 50);
+  // Force reflow dulu baru update meta
+  void document.documentElement.offsetHeight;
+
+  const bgTop = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
+
+  const metaThemeColor = document.getElementById('theme-color-meta');
+  if (metaThemeColor && bgTop) {
+    metaThemeColor.setAttribute('content', bgTop);
+  }
+
+  // Double-fire setelah paint cycle berikutnya (Safari quirk)
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
+      if (metaThemeColor && bg) {
+        metaThemeColor.setAttribute('content', bg);
+      }
+    });
+  });
 
   // Render static skeleton
   _renderLetterSkeleton(config);
