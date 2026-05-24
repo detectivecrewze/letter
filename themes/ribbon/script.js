@@ -112,33 +112,37 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
-  // ── iOS Safari theme-color + overscroll fix ──────────────────
-  // Hardcoded map used because CSS vars aren't reliably resolved yet.
-  const _themeColorMap = {
+  // ── iOS Safari overscroll + status bar color fix ──────────────
+  // Safari caches the html background color for overscroll/safe-area.
+  // We set it directly via inline style AFTER config is fetched,
+  // so the correct theme color is used. Then we update meta theme-color.
+  // The color-scheme CSS property (set per-theme) helps Safari repaint.
+  const _bgMap = {
     'ribbon-crimson':  '#eeeadd',
     'ribbon-rose':     '#f0e0e8',
-    'ribbon-sage':     '#dde8e0',
+    'ribbon-forest':   '#dde8e0',
     'ribbon-midnight': '#1a2240',
     'ribbon-bordeaux': '#2d0f18',
-    'ribbon-lavender': '#ece4f4',
+    'ribbon-violet':   '#ece4f4',
   };
-  const _themeColor = _themeColorMap[activeTheme] || '#eeeadd';
+  const _themeBg = _bgMap[activeTheme] || '#eeeadd';
+
+  // 1. Set html background-color inline — Safari reads this for overscroll
+  document.documentElement.style.backgroundColor = _themeBg;
+
+  // 2. Update meta theme-color — Safari reads this for status bar
   const _metaTC = document.getElementById('theme-color-meta');
+  if (_metaTC) _metaTC.setAttribute('content', _themeBg);
 
-  // Set immediately — no setTimeout
-  if (_metaTC) _metaTC.setAttribute('content', _themeColor);
-
-  // Force reflow so CSS theme selector activates, then clear inline bg
-  // (inline bg was set by the <head> script before CSS loaded)
+  // 3. Force reflow so color-scheme CSS property activates
   void document.documentElement.offsetHeight;
 
-  // Double rAF: after CSS is fully applied, clear the inline style
-  // so CSS [data-ribbon-theme] rules own the background going forward
+  // 4. Remove inline style after 2 frames so CSS owns it going forward,
+  //    but keep meta theme-color updated
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      document.documentElement.style.background = '';
-      // Re-fire theme-color in case Safari missed the first one
-      if (_metaTC) _metaTC.setAttribute('content', _themeColor);
+      document.documentElement.style.backgroundColor = '';
+      if (_metaTC) _metaTC.setAttribute('content', _themeBg);
     });
   });
 

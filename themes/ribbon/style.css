@@ -73,13 +73,12 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* html: NO background — same as airmail pattern.
-   Safari reads html background for overscroll; leaving it unset
-   avoids the parchment color getting cached before theme loads. */
-html { background: none; }
-
-/* body gets the theme color via CSS variable — works after theme attr is set */
-body { background: var(--bg-top); }
+/* html & body: NO background at all.
+   Safari caches html background for overscroll at first paint.
+   Since theme is fetched async, we cannot know the right color at that time.
+   Solution: keep html/body transparent; use .static-bg div for all visuals.
+   We force Safari to repaint overscroll via color-scheme toggle trick in JS. */
+html, body { background: transparent !important; }
 
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 
@@ -643,6 +642,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 /* 1. Crimson (Default) — warm parchment, crimson ribbon & seal */
 html[data-ribbon-theme="ribbon-crimson"],
 body[data-ribbon-theme="ribbon-crimson"] {
+  color-scheme: light;
   --bg-top:             #eeeadd;
   --bg-bottom:          #ded9cb;
   --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(200, 180, 145, 0.2) 0%, transparent 50%),
@@ -660,6 +660,7 @@ body[data-ribbon-theme="ribbon-crimson"] {
 /* 2. Forest Green — mossy green bg, olive envelope, forest ribbon */
 html[data-ribbon-theme="ribbon-forest"],
 body[data-ribbon-theme="ribbon-forest"] {
+  color-scheme: light;
   --bg-top:             #dde8e0;
   --bg-bottom:          #ccd9d0;
   --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(100, 160, 120, 0.2) 0%, transparent 50%),
@@ -679,6 +680,7 @@ body[data-ribbon-theme="ribbon-forest"] {
 /* 3. Midnight Blue — deep navy bg, aged parchment envelope, navy ribbon */
 html[data-ribbon-theme="ribbon-midnight"],
 body[data-ribbon-theme="ribbon-midnight"] {
+  color-scheme: dark;
   --bg-top:             #1a2240;
   --bg-bottom:          #0e1628;
   --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(70, 100, 160, 0.25) 0%, transparent 50%),
@@ -701,6 +703,7 @@ body[data-ribbon-theme="ribbon-midnight"] {
 /* 4. Soft Rose — blush pink bg, rosy envelope, dusty rose ribbon */
 html[data-ribbon-theme="ribbon-rose"],
 body[data-ribbon-theme="ribbon-rose"] {
+  color-scheme: light;
   --bg-top:             #f0e0e8;
   --bg-bottom:          #e4d0da;
   --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(210, 160, 180, 0.25) 0%, transparent 50%),
@@ -722,6 +725,7 @@ body[data-ribbon-theme="ribbon-rose"] {
 /* 5. Bordeaux — deep wine/burgundy bg, aged ivory paper, crimson-gold ribbon */
 html[data-ribbon-theme="ribbon-bordeaux"],
 body[data-ribbon-theme="ribbon-bordeaux"] {
+  color-scheme: dark;
   --bg-top:             #2d0f18;
   --bg-bottom:          #1c0810;
   --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(140, 30, 50, 0.35) 0%, transparent 50%),
@@ -743,6 +747,7 @@ body[data-ribbon-theme="ribbon-bordeaux"] {
 /* 6. Soft Violet — lavender mist bg, parchment envelope, violet ribbon */
 html[data-ribbon-theme="ribbon-violet"],
 body[data-ribbon-theme="ribbon-violet"] {
+  color-scheme: light;
   --bg-top:             #ece4f4;
   --bg-bottom:          #dfd4ec;
   --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(170, 140, 210, 0.22) 0%, transparent 50%),
