@@ -887,7 +887,7 @@ body[data-ribbon-theme="ribbon-violet"] {
   font-family: var(--font-serif);
   font-size: clamp(2.8rem, 8vw, 3.4rem);
   font-style: italic;
-  color: var(--warm-brown);
+  color: var(--ink-primary);
   font-weight: 500;
   text-align: center;
   margin-bottom: 0.2rem;
@@ -933,7 +933,7 @@ body[data-ribbon-theme="ribbon-violet"] {
 .meta-to-name {
   font-family: var(--font-signature);
   font-size: clamp(2.6rem, 7vw, 3.2rem);
-  color: var(--warm-brown);
+  color: var(--ink-primary);
   font-weight: 400;
   line-height: 0.8;
   position: relative;
@@ -947,7 +947,7 @@ body[data-ribbon-theme="ribbon-violet"] {
   position: absolute;
   left: 0;
   height: 2px;
-  background: var(--warm-brown);
+  background: var(--ink-primary);
   border-radius: 2px;
 }
 
@@ -1051,7 +1051,7 @@ body[data-ribbon-theme="ribbon-violet"] {
 .letter-from {
   font-family: var(--font-signature);
   font-size: clamp(2.2rem, 6vw, 2.8rem);
-  color: var(--warm-brown);
+  color: var(--ink-primary);
   font-weight: 400;
   line-height: 1;
   position: relative;
@@ -1065,7 +1065,7 @@ body[data-ribbon-theme="ribbon-violet"] {
   position: absolute;
   right: 0;
   height: 2px;
-  background: var(--warm-brown);
+  background: var(--ink-primary);
   border-radius: 2px;
   opacity: 0;
   transition: opacity 0.4s ease;

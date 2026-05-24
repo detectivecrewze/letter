@@ -1056,9 +1056,13 @@ function _initDownloadButton(config) {
       const ctx = story.getContext('2d');
 
       // Aesthetic static background (matching style.css)
+      const computedStyle = getComputedStyle(document.body);
+      const bgTop = computedStyle.getPropertyValue('--bg-top').trim() || '#eeeadd';
+      const bgBottom = computedStyle.getPropertyValue('--bg-bottom').trim() || '#ded9cb';
+
       const grad = ctx.createLinearGradient(0, 0, storyW, storyH);
-      grad.addColorStop(0, '#eeeadd');
-      grad.addColorStop(1, '#ded9cb');
+      grad.addColorStop(0, bgTop);
+      grad.addColorStop(1, bgBottom);
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, storyW, storyH);
 
