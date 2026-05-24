@@ -111,6 +111,15 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
+  // Sync meta theme-color with the active theme background for mobile Safari
+  setTimeout(() => {
+    const bgTop = getComputedStyle(document.body).getPropertyValue('--bg-top').trim();
+    const metaThemeColor = document.getElementById('theme-color-meta');
+    if (metaThemeColor && bgTop) {
+      metaThemeColor.setAttribute('content', bgTop);
+    }
+  }, 50);
+
   // Render static skeleton
   _renderLetterSkeleton(config);
 
