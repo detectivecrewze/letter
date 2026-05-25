@@ -376,9 +376,6 @@ function _waitForEnvelopeOpen(config) {
       // Play paper tear sound
       _playTearSound();
 
-      // Start music
-      _loadTrack(0, true);
-
       // Animate envelope flap open
       if (envelope) envelope.classList.add('is-opening');
 
@@ -1265,41 +1262,80 @@ function _initDownloadButton(config) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   MUSIC PLAYER (Background audio, same as letter-project)
+   MUSIC PLAYER FAB
+   (icon only, no track title)
    ════════════════════════════════════════════════════════════ */
-let _currentTrack = 0;
-let _playlist = [];
-
 const _audioEl = () => document.getElementById('audio-player');
 
 function _initMusicPlayer(config) {
-  _playlist = (config.playlist || []).filter(t => t.src || t.url);
-  if (_playlist.length === 0) return;
-
   const audio = _audioEl();
-  audio.volume = 0.2;
-  _loadTrack(0, false);
-  audio.addEventListener('ended', () => _loadTrack(_currentTrack + 1, true));
-}
+  if (!audio) return;
 
-function _loadTrack(idx, autoplay) {
-  const len = _playlist.length;
-  if (len === 0) return;
-  _currentTrack = ((idx % len) + len) % len;
+  const playlist = config.playlist || [];
+  if (playlist.length === 0) return;
 
-  const track = _playlist[_currentTrack];
-  const src = track.src || track.url || '';
+  let trackIdx = 0;
+  let playing   = false;
 
-  const audio = _audioEl();
-  const href = new URL(src, window.location.href).href;
+  const fab = document.createElement('button');
+  fab.id = 'music-player-fab';
+  fab.setAttribute('aria-label', 'Toggle music');
+  fab.innerHTML = `<span id="music-fab-icon">♪</span><div class="music-slash"></div>`;
+  document.body.appendChild(fab);
 
-  if (audio.getAttribute('data-src') !== href) {
-    audio.setAttribute('data-src', href);
-    audio.src = src;
+  const iconEl = fab.querySelector('#music-fab-icon');
+
+  const setTrack = (idx) => {
+    trackIdx = idx;
+    const t = playlist[idx];
+    audio.src = t.src || t.url || t;
+    audio.volume = 0.2; 
     audio.load();
-  }
+  };
 
-  if (autoplay) audio.play().catch(() => {});
+  setTrack(0);
+
+  const tryPlay = async () => {
+    try {
+      await audio.play();
+      playing = true;
+      fab.classList.remove('muted');
+    } catch (_) { 
+      playing = false; 
+      fab.classList.add('muted');
+    }
+  };
+
+  const observer = new MutationObserver(() => {
+    const letterState = document.getElementById('state-letter');
+    if (letterState && !letterState.classList.contains('hidden')) {
+      setTimeout(tryPlay, 1200);
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+
+  fab.addEventListener('click', async () => {
+    if (playing) {
+      audio.pause();
+      playing = false;
+      fab.classList.add('muted');
+    } else {
+      await tryPlay();
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    if (trackIdx < playlist.length - 1) {
+      setTrack(trackIdx + 1);
+      tryPlay();
+    } else {
+      playing = false;
+      fab.classList.add('muted');
+    }
+  });
+
+  setTimeout(() => fab.classList.add('visible'), 2000);
 }
 
 /* ════════════════════════════════════════════════════════════
