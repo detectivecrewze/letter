@@ -736,6 +736,54 @@
 
 
       <!-- ══════════════════════════════════════
+           SECTION 5 — KEAMANAN STUDIO
+      ══════════════════════════════════════ -->
+      <section id="section-studio-auth" class="section-card mb-12">
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex-1 min-w-0">
+            <h2 class="text-[10px] uppercase tracking-[0.3em] text-gray-600 font-bold mb-1">Keamanan Studio</h2>
+            <p class="text-[7px] text-[#d4a373] uppercase tracking-[0.2em] font-bold truncate">Kunci Akses Editor Anda</p>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button class="section-collapse-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="section-body-inner p-8">
+            <div class="relative p-6 bg-[#fdf9f4]/50 rounded-[32px] border border-[#d4a373]/10">
+              <div class="flex items-center gap-2 mb-4">
+                <span class="material-symbols-outlined text-[14px] text-[#d4a373]">lock</span>
+                <h3 class="text-[9px] uppercase tracking-[0.2em] font-bold text-gray-700">Studio Password (Optional)</h3>
+              </div>
+              <p class="text-[8px] text-gray-500 leading-relaxed mb-6 font-medium">
+                Password ini digunakan untuk <strong>mengunci akses ke Studio Editor ini</strong>, sehingga orang lain yang memiliki link Anda tidak dapat mengubah isi surat tanpa password.
+              </p>
+
+              <label class="text-[7px] uppercase tracking-widest text-gray-400 font-bold block mb-2">Password Studio</label>
+              <div class="relative mb-6">
+                <input id="input-studio-editor-password" type="password" placeholder="e.g. rahasia123" class="input-minimal pr-8" autocomplete="off" />
+                <button type="button" id="btn-toggle-studio-pass"
+                  class="absolute right-0 bottom-2 text-gray-400 hover:text-gray-600 transition"
+                  style="background:none;border:none;cursor:pointer;padding:0;line-height:1;"
+                  title="Lihat/Sembunyikan password">
+                  <svg id="eye-icon-studio-show" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  <svg id="eye-icon-studio-hide" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════════════════════════
            PUBLISH BUTTONS
       ══════════════════════════════════════ -->
       <div id="publish-container" class="text-center mt-12 pb-12 space-y-3">

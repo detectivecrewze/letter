@@ -77,6 +77,7 @@ const Auth = (() => {
       if (input.value === correctPass) {
         try { sessionStorage.setItem(`letter_auth_${_token}`, 'true'); } catch (e) {}
         document.getElementById('auth-gate').classList.add('hidden');
+        _showStudio();
         Studio.initPostAuth();
       } else {
         if (errorMsg) errorMsg.classList.remove('hidden');

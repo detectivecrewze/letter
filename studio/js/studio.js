@@ -84,6 +84,7 @@ const Studio = (() => {
     _setVal('input-letter-from', config.from || '');
     _setVal('input-login-password', config.login_password || '');
     _setVal('input-login-hint', config.login_hint || '');
+    _setVal('input-studio-editor-password', config.studioPassword || '');
 
     // Section 4 — Memori Rahasia (multi-photo)
     const isEnabled = config.secretMemoryEnabled === true;
@@ -157,6 +158,7 @@ const Studio = (() => {
       'input-letter-from',
       'input-login-password',
       'input-login-hint',
+      'input-studio-editor-password',
     ].forEach(id => {
       document.getElementById(id)?.addEventListener('input', () => Autosave.trigger());
     });
@@ -191,11 +193,23 @@ const Studio = (() => {
       showToast('Draft berhasil disimpan! ✓');
     });
 
-    // Password toggle (show/hide)
+    // Password toggle (show/hide) for login
     document.getElementById('btn-toggle-password')?.addEventListener('click', () => {
       const input = document.getElementById('input-login-password');
       const iconShow = document.getElementById('eye-icon-show');
       const iconHide = document.getElementById('eye-icon-hide');
+      if (!input) return;
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      iconShow?.classList.toggle('hidden', isHidden);
+      iconHide?.classList.toggle('hidden', !isHidden);
+    });
+
+    // Password toggle (show/hide) for studio
+    document.getElementById('btn-toggle-studio-pass')?.addEventListener('click', () => {
+      const input = document.getElementById('input-studio-editor-password');
+      const iconShow = document.getElementById('eye-icon-studio-show');
+      const iconHide = document.getElementById('eye-icon-studio-hide');
       if (!input) return;
       const isHidden = input.type === 'password';
       input.type = isHidden ? 'text' : 'password';

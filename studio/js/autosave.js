@@ -64,7 +64,7 @@ const Autosave = (() => {
       // Token
       studioToken:    token,
       giftId:         token,
-      studioPassword: Studio.getStudioPassword(),
+      studioPassword: document.getElementById('input-studio-editor-password')?.value.trim() || '',
 
       // Section 1 — Penerima
       recipientName: document.getElementById('input-recipient-name')?.value.trim() || '',
