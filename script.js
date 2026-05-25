@@ -324,6 +324,9 @@ function _waitForEnvelopeOpen(config, activeTheme) {
         await _handleAuthentication(config);
       }
 
+      // Play music synchronously on user click
+      if (window.__playMusic) window.__playMusic();
+
       // Prevent double-trigger
       wrapper.removeEventListener('click', openEnvelope);
       wrapper.removeEventListener('keydown', onKeydown);
@@ -1143,14 +1146,7 @@ function _initMusicPlayer(config) {
   };
 
   // Auto-play when letter state becomes visible
-  const observer = new MutationObserver(() => {
-    const letterState = document.getElementById('state-letter');
-    if (letterState && !letterState.classList.contains('hidden')) {
-      setTimeout(tryPlay, 1200);
-      observer.disconnect();
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  window.__playMusic = tryPlay;
 
   fab.addEventListener('click', async () => {
     if (playing) {

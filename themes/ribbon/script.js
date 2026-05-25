@@ -801,6 +801,8 @@ function _waitForEnvelopeOpen(config) {
         if (!unlocked) return;
       }
 
+      if (window.__playMusic) window.__playMusic();
+
       opened = true;
 
       // Hide hint
@@ -1328,14 +1330,7 @@ function _initMusicPlayer(config) {
   };
 
   // Auto-play when letter state becomes visible
-  const observer = new MutationObserver(() => {
-    const letterState = document.getElementById('state-letter');
-    if (letterState && !letterState.classList.contains('hidden')) {
-      setTimeout(tryPlay, 1200);
-      observer.disconnect();
-    }
-  });
-  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  window.__playMusic = tryPlay;
 
   fab.addEventListener('click', async () => {
     if (playing) {
