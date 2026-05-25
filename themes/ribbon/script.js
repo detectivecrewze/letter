@@ -1028,6 +1028,14 @@ function _showSaveContainer(config) {
   if (scrollEl) {
     setTimeout(() => scrollEl.scrollTo({ top: scrollEl.scrollHeight, behavior: 'smooth' }), 600);
   }
+
+  // Auto-open polaroid memory modal (same as classic letter & airmail)
+  if (hasMedia && memBtn) {
+    setTimeout(() => {
+      document.getElementById('letter-end')?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      memBtn.click();
+    }, 150);
+  }
 }
 
 function _initDownloadButton(config) {
