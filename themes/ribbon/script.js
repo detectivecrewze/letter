@@ -112,14 +112,25 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
-  // Update theme-color meta tag to lock Safari's status bar to the exact bg color
-  const metaTheme = document.getElementById('theme-color-meta');
-  if (metaTheme) {
-    const bgTop = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
-    if (bgTop) {
-      metaTheme.setAttribute('content', bgTop);
-    }
+  // Update theme-color meta tag to lock Safari's status bar
+  const themeHexMap = {
+    'ribbon-crimson':  '#eeeadd',
+    'ribbon-rose':     '#f0e0e8',
+    'ribbon-forest':   '#dde8e0',
+    'ribbon-midnight': '#1a2240',
+    'ribbon-bordeaux': '#2d0f18',
+    'ribbon-violet':   '#ece4f4'
+  };
+  const exactHex = themeHexMap[activeTheme] || '#eeeadd';
+
+  let metaTheme = document.getElementById('theme-color-meta');
+  if (!metaTheme) {
+    metaTheme = document.createElement('meta');
+    metaTheme.id = 'theme-color-meta';
+    metaTheme.name = 'theme-color';
+    document.head.appendChild(metaTheme);
   }
+  metaTheme.setAttribute('content', exactHex);
 
   // Render static skeleton
   _renderLetterSkeleton(config);
