@@ -334,9 +334,6 @@ function _waitForEnvelopeOpen(config, activeTheme) {
       // 2. Add opening class — CSS handles flap + letter-peek animations
       wrapper.classList.add('is-opening');
 
-      // 3. Langsung putar lagu saat amplop diklik (seperti sebelumnya)
-      _loadTrack(0, true);
-
       // 4. After flap finishes (~1100ms), start flower transition
       setTimeout(async () => {
         if (scene) scene.classList.add('is-exit');
@@ -1100,73 +1097,82 @@ function _initDownloadButton(config) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   MUSIC PLAYER
+   MUSIC PLAYER FAB
+   (icon only, no track title)
    ════════════════════════════════════════════════════════════ */
-let _currentTrack = 0;
-let _playlist = [];
-
 const _audioEl = () => document.getElementById('audio-player');
 
 function _initMusicPlayer(config) {
-  _playlist = (config.playlist || []).filter(t => t.src || t.url);
-  if (_playlist.length === 0) return;
-
   const audio = _audioEl();
-  audio.volume = 0.2; // Set backsound volume to 20% (diperlembut)
+  if (!audio) return;
 
-  _loadTrack(0, false);
+  const playlist = config.playlist || [];
+  if (playlist.length === 0) return;
 
-  audio.addEventListener('ended', () => _loadTrack(_currentTrack + 1, true));
-}
+  let trackIdx = 0;
+  let playing   = false;
 
-function _loadTrack(idx, autoplay) {
-  const len = _playlist.length;
-  if (len === 0) return; // Safety check
-  _currentTrack = ((idx % len) + len) % len;
+  // Small circular FAB — icon only, no text
+  const fab = document.createElement('button');
+  fab.id = 'music-player-fab';
+  fab.setAttribute('aria-label', 'Toggle music');
+  fab.innerHTML = `<span id="music-fab-icon">♪</span><div class="music-slash"></div>`;
+  document.body.appendChild(fab);
 
-  const track = _playlist[_currentTrack];
-  const src = track.src || track.url || '';
+  const iconEl = fab.querySelector('#music-fab-icon');
 
-  _setText('mp-title', track.title || track.name || 'Untitled');
-  _setText('mp-artist', track.artist || '');
-
-  const audio = _audioEl();
-  const href = new URL(src, window.location.href).href;
-
-  if (audio.getAttribute('data-src') !== href) {
-    audio.setAttribute('data-src', href);
-    audio.src = src;
+  const setTrack = (idx) => {
+    trackIdx = idx;
+    const t = playlist[idx];
+    audio.src = t.src || t.url || t;
+    audio.volume = 0.2; // Set backsound volume to 20%
     audio.load();
-  }
+  };
 
-  if (autoplay) audio.play().catch(() => { });
+  setTrack(0);
 
-  // Reset progress
-  const bar = document.getElementById('mp-progress-bar');
-  if (bar) bar.style.width = '0%';
-}
+  const tryPlay = async () => {
+    try {
+      await audio.play();
+      playing = true;
+      fab.classList.remove('muted');
+    } catch (_) { 
+      playing = false; 
+      fab.classList.add('muted');
+    }
+  };
 
-function _togglePlay() {
-  const audio = _audioEl();
-  if (audio.paused) {
-    audio.play().catch(() => { });
-  } else {
-    audio.pause();
-  }
-}
+  // Auto-play when letter state becomes visible
+  const observer = new MutationObserver(() => {
+    const letterState = document.getElementById('state-letter');
+    if (letterState && !letterState.classList.contains('hidden')) {
+      setTimeout(tryPlay, 1200);
+      observer.disconnect();
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
 
-function _setPlayState(playing) {
-  const playIcon = document.querySelector('#mp-play .mp-play-icon');
-  const pauseIcon = document.querySelector('#mp-play .mp-pause-icon');
-  if (playIcon) playIcon.classList.toggle('hidden', playing);
-  if (pauseIcon) pauseIcon.classList.toggle('hidden', !playing);
-}
+  fab.addEventListener('click', async () => {
+    if (playing) {
+      audio.pause();
+      playing = false;
+      fab.classList.add('muted');
+    } else {
+      await tryPlay();
+    }
+  });
 
-function _updateProgress() {
-  const audio = _audioEl();
-  if (!audio.duration) return;
-  const bar = document.getElementById('mp-progress-bar');
-  if (bar) bar.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
+  audio.addEventListener('ended', () => {
+    if (trackIdx < playlist.length - 1) {
+      setTrack(trackIdx + 1);
+      tryPlay();
+    } else {
+      playing = false;
+      fab.classList.add('muted');
+    }
+  });
+
+  setTimeout(() => fab.classList.add('visible'), 2000);
 }
 
 /* ════════════════════════════════════════════════════════════
