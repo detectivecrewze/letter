@@ -1309,7 +1309,7 @@ body::before {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
-  color: var(--text);
+  color: #4a3f35;
   transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease;
   box-shadow: 0 4px 16px var(--shadow);
   cursor: pointer;
@@ -1345,7 +1345,7 @@ body::before {
   position: absolute;
   width: 18px;
   height: 2px;
-  background: var(--text);
+  background: #4a3f35;
   transform: rotate(-45deg) scaleX(0);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 2px;
