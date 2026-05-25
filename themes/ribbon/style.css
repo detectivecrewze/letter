@@ -94,17 +94,9 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .static-bg {
   position: fixed;
   inset: 0;
-  background: linear-gradient(135deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background: var(--bg-top);
   z-index: 0;
   transition: background 0.6s ease;
-}
-
-.static-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--bg-accent);
-  pointer-events: none;
 }
 
 /* ════════════════════════════════════════════════════════════
