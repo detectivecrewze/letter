@@ -1447,10 +1447,10 @@ body {
   justify-content: center;
   width: 42px;
   height: 42px;
-  background: var(--bg-card2, rgba(250, 246, 238, 0.88));
-  border: 1px solid var(--border, rgba(200, 185, 155, 0.5));
+  background: var(--env-paper, rgba(250, 246, 238, 0.88));
+  border: var(--env-border, 1px solid rgba(200, 185, 155, 0.5));
   border-radius: 50%;
-  color: var(--text, #4a3f35);
+  color: var(--typewriter-ink, #4a3f35);
   transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease;
   box-shadow: 0 4px 16px var(--shadow, rgba(0,0,0,0.2));
   cursor: pointer;
@@ -1486,7 +1486,7 @@ body {
   position: absolute;
   width: 18px;
   height: 2px;
-  background: var(--text, #4a3f35);
+  background: var(--typewriter-ink, #4a3f35);
   transform: rotate(-45deg) scaleX(0);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 2px;
