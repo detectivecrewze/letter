@@ -1304,12 +1304,10 @@ body::before {
   justify-content: center;
   width: 42px;
   height: 42px;
-  background: rgba(250, 246, 238, 0.88);
-  border: 1px solid rgba(200, 185, 155, 0.5);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-card2);
+  border: 1px solid var(--border);
   border-radius: 50%;
-  color: #4a3f35;
+  color: var(--text);
   transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.3s ease;
   box-shadow: 0 4px 16px var(--shadow);
   cursor: pointer;
@@ -1345,7 +1343,7 @@ body::before {
   position: absolute;
   width: 18px;
   height: 2px;
-  background: #4a3f35;
+  background: var(--text);
   transform: rotate(-45deg) scaleX(0);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 2px;
