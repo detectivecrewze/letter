@@ -8,6 +8,22 @@
   <meta name="description" content="A heartfelt letter, delivered with magic across the sky.">
   <meta name="robots" content="noindex, nofollow">
 
+  <!-- Inline script: Set theme BEFORE first paint to fix Safari overscroll bug -->
+  <script>
+    (function() {
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var theme = params.get('ribbonTheme') || 'ribbon-crimson';
+        var configStr = params.get('config');
+        if (configStr) {
+          var cfg = JSON.parse(decodeURIComponent(atob(configStr)));
+          if (cfg && cfg.ribbonTheme) theme = cfg.ribbonTheme;
+        }
+        document.documentElement.setAttribute('data-ribbon-theme', theme);
+      } catch(e) {}
+    })();
+  </script>
+
   <!-- Open Graph (WhatsApp preview) -->
   <meta property="og:title" content="Ada surat untukmu 💌">
   <meta property="og:description" content="Seseorang mengirimkan sesuatu yang sangat spesial untukmu.">

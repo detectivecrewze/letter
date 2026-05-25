@@ -43,6 +43,11 @@ const Preview = (() => {
       if (skipTW) previewUrl += '&skipTW=1&skipAuth=1';
       if (targetPage) previewUrl += `&previewPage=${encodeURIComponent(targetPage)}`;
 
+      // Pass themes so template can set background before first paint
+      const activeTheme = Studio.getActiveTheme() || '';
+      const activeRibbon = Studio.getActiveRibbonTheme() || '';
+      previewUrl += `&theme=${encodeURIComponent(activeTheme)}&ribbonTheme=${encodeURIComponent(activeRibbon)}`;
+
       previewWin.location.href = previewUrl;
     } catch (e) {
       previewWin.close();
@@ -88,7 +93,12 @@ const Preview = (() => {
     try {
       await Autosave.saveNow();
       const base = _getBaseUrl(template);
-      const previewUrl = `${base}?to=${token}&skipTW=1&skipAuth=1`;
+      let previewUrl = `${base}?to=${token}&skipTW=1&skipAuth=1`;
+
+      const activeTheme = Studio.getActiveTheme() || '';
+      const activeRibbon = Studio.getActiveRibbonTheme() || '';
+      previewUrl += `&theme=${encodeURIComponent(activeTheme)}&ribbonTheme=${encodeURIComponent(activeRibbon)}`;
+
       previewWin.location.href = previewUrl;
     } catch (e) {
       previewWin.close();
