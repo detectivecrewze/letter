@@ -61,6 +61,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    let currentFilter = 'all';
+
+    window.filterTable = (type) => {
+        currentFilter = type;
+        renderTable(allGifts);
+    };
+
     const renderSummary = (gifts) => {
         if (!gifts || gifts.length === 0) {
             summarySection.classList.add('hidden');
@@ -72,18 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Count templates
         let airmailCount = 0;
+        let ribbonCount = 0;
         let classicCount = 0;
 
         gifts.forEach(g => {
             if (g.templateType === 'airmail') {
                 airmailCount++;
+            } else if (g.templateType === 'ribbon') {
+                ribbonCount++;
             } else {
-                // If templateType is undefined or 'classic', count as classic
                 classicCount++;
             }
         });
 
         const pctAirmail = total > 0 ? Math.round((airmailCount / total) * 100) : 0;
+        const pctRibbon = total > 0 ? Math.round((ribbonCount / total) * 100) : 0;
         const pctClassic = total > 0 ? Math.round((classicCount / total) * 100) : 0;
 
         document.getElementById('stat-total').innerText = total;
@@ -93,6 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('stat-airmail').innerText = airmailCount;
         document.getElementById('pct-airmail').innerText = `${pctAirmail}% dari total`;
+
+        const statRibbon = document.getElementById('stat-ribbon');
+        if (statRibbon) {
+            statRibbon.innerText = ribbonCount;
+            document.getElementById('pct-ribbon').innerText = `${pctRibbon}% dari total`;
+        }
     };
 
     const renderTable = (gifts) => {
@@ -101,29 +117,53 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        tableBody.innerHTML = gifts.map(gift => {
+        let filteredGifts = gifts;
+        if (currentFilter !== 'all') {
+            filteredGifts = gifts.filter(g => {
+                if (currentFilter === 'classic') return !g.templateType || g.templateType === 'classic';
+                return g.templateType === currentFilter;
+            });
+        }
+
+        if (filteredGifts.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="p-12 text-center text-slate-600 text-[11px] italic">Tidak ada user yang memakai template ini.</td></tr>`;
+            return;
+        }
+
+        tableBody.innerHTML = filteredGifts.map(gift => {
             const timeStr = gift.publishedAt ? new Date(gift.publishedAt).toLocaleString('id-ID', {
                 day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
             }) : '-';
 
             const isAirmail = gift.templateType === 'airmail';
-            const theme = String(isAirmail ? (gift.airmailTheme || 'airmail-parchment') : (gift.theme || 'blush-cream')).toLowerCase();
+            const isRibbon = gift.templateType === 'ribbon';
+            let theme = gift.theme || 'blush-cream';
+            if (isAirmail) theme = gift.airmailTheme || 'airmail-parchment';
+            if (isRibbon) theme = gift.ribbonTheme || 'ribbon-crimson';
+            theme = String(theme).toLowerCase();
+            
             let badgeClass = 'badge-blush';
             let themeName = 'Blush';
 
-            if (theme.includes('sage')) { badgeClass = 'badge-sage'; themeName = 'Sage'; }
+            if (theme.includes('sage') || theme.includes('forest')) { badgeClass = 'badge-sage'; themeName = theme.includes('forest') ? 'Forest' : 'Sage'; }
             else if (theme.includes('rose')) { badgeClass = 'badge-rose'; themeName = 'Rose'; }
             else if (theme.includes('midnight')) { badgeClass = 'badge-midnight'; themeName = 'Midnight'; }
             else if (theme.includes('crimson')) { badgeClass = 'badge-crimson'; themeName = 'Crimson'; }
             else if (theme.includes('obsidian')) { badgeClass = 'badge-obsidian'; themeName = 'Obsidian'; }
-            else if (theme.includes('lilac')) { badgeClass = 'badge-lilac'; themeName = 'Lilac'; }
+            else if (theme.includes('lilac') || theme.includes('violet')) { badgeClass = 'badge-lilac'; themeName = theme.includes('violet') ? 'Violet' : 'Lilac'; }
             else if (theme.includes('parchment')) { badgeClass = 'badge-parchment'; themeName = 'Parchment'; }
             else if (theme.includes('bordeaux')) { badgeClass = 'badge-bordeaux'; themeName = 'Bordeaux'; }
 
-            const templateType = gift.templateType === 'airmail' ? 'Vintage Airmail' : 'Classic Letter';
-            const templateBadgeClass = gift.templateType === 'airmail' 
-                ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' 
-                : 'bg-[#d4a373]/20 text-[#d4a373] border border-[#d4a373]/30';
+            let templateType = 'Classic Letter';
+            let templateBadgeClass = 'bg-[#d4a373]/20 text-[#d4a373] border border-[#d4a373]/30';
+            
+            if (isAirmail) {
+                templateType = 'Vintage Airmail';
+                templateBadgeClass = 'bg-amber-500/20 text-amber-500 border border-amber-500/30';
+            } else if (isRibbon) {
+                templateType = 'Ribbon & Seal';
+                templateBadgeClass = 'bg-emerald-500/20 text-emerald-500 border border-emerald-500/30';
+            }
 
             const giftUrl = `${window.location.origin}/index.html?to=${gift.id}`;
             const editorUrl = `../../studio/index.html?token=${gift.id}`;

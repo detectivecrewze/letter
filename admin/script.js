@@ -106,7 +106,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const themeCounts = {};
         gifts.forEach(g => {
             const isAirmail = g.templateType === 'airmail';
-            const t = String(isAirmail ? (g.airmailTheme || 'airmail-parchment') : (g.theme || 'blush-cream')).toLowerCase();
+            const isRibbon = g.templateType === 'ribbon';
+            let t = g.theme || 'blush-cream';
+            if (isAirmail) t = g.airmailTheme || 'airmail-parchment';
+            if (isRibbon) t = g.ribbonTheme || 'ribbon-crimson';
+            t = String(t).toLowerCase();
             themeCounts[t] = (themeCounts[t] || 0) + 1;
         });
         const topThemeRaw = Object.keys(themeCounts).reduce((a, b) => themeCounts[a] > themeCounts[b] ? a : b, 'blush-cream');
@@ -120,9 +124,19 @@ document.addEventListener('DOMContentLoaded', () => {
             'airmail-sage': 'Sage',
             'airmail-rose': 'Rose',
             'airmail-midnight': 'Midnight',
-            'airmail-bordeaux': 'Bordeaux'
+            'airmail-bordeaux': 'Bordeaux',
+            'ribbon-crimson': 'Crimson',
+            'ribbon-rose': 'Rose',
+            'ribbon-forest': 'Forest',
+            'ribbon-midnight': 'Midnight',
+            'ribbon-bordeaux': 'Bordeaux',
+            'ribbon-violet': 'Violet'
         };
-        document.getElementById('stat-theme').innerText = (themeNames[topThemeRaw] || topThemeRaw.replace('airmail-', '').split('-')[0]).toUpperCase();
+        let friendlyName = themeNames[topThemeRaw];
+        if (!friendlyName) {
+            friendlyName = topThemeRaw.replace('airmail-', '').replace('ribbon-', '').split('-')[0];
+        }
+        document.getElementById('stat-theme').innerText = friendlyName.toUpperCase();
 
         // Top Audio
         const audioCounts = {};
@@ -157,16 +171,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const isStale = gift.lastOpened && (new Date() - new Date(gift.lastOpened)) > (30 * 24 * 60 * 60 * 1000);
 
             const isAirmail = gift.templateType === 'airmail';
-            const theme = String(isAirmail ? (gift.airmailTheme || 'airmail-parchment') : (gift.theme || 'blush-cream')).toLowerCase();
+            const isRibbon = gift.templateType === 'ribbon';
+            let theme = gift.theme || 'blush-cream';
+            if (isAirmail) theme = gift.airmailTheme || 'airmail-parchment';
+            if (isRibbon) theme = gift.ribbonTheme || 'ribbon-crimson';
+            theme = String(theme).toLowerCase();
+            
             let badgeClass = 'badge-blush';
             let themeName = 'Blush';
 
-            if (theme.includes('sage')) { badgeClass = 'badge-sage'; themeName = 'Sage'; }
+            if (theme.includes('sage') || theme.includes('forest')) { badgeClass = 'badge-sage'; themeName = theme.includes('forest') ? 'Forest' : 'Sage'; }
             else if (theme.includes('rose')) { badgeClass = 'badge-rose'; themeName = 'Rose'; }
             else if (theme.includes('midnight')) { badgeClass = 'badge-midnight'; themeName = 'Midnight'; }
             else if (theme.includes('crimson')) { badgeClass = 'badge-crimson'; themeName = 'Crimson'; }
             else if (theme.includes('obsidian')) { badgeClass = 'badge-obsidian'; themeName = 'Obsidian'; }
-            else if (theme.includes('lilac')) { badgeClass = 'badge-lilac'; themeName = 'Lilac'; }
+            else if (theme.includes('lilac') || theme.includes('violet')) { badgeClass = 'badge-lilac'; themeName = theme.includes('violet') ? 'Violet' : 'Lilac'; }
             else if (theme.includes('parchment')) { badgeClass = 'badge-parchment'; themeName = 'Parchment'; }
             else if (theme.includes('bordeaux')) { badgeClass = 'badge-bordeaux'; themeName = 'Bordeaux'; }
 
