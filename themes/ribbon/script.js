@@ -112,6 +112,15 @@ async function init() {
   document.body.setAttribute('data-ribbon-theme', activeTheme);
   _applyEnvelopeTheme(activeTheme);
 
+  // Update theme-color meta tag to lock Safari's status bar to the exact bg color
+  const metaTheme = document.getElementById('theme-color-meta');
+  if (metaTheme) {
+    const bgTop = getComputedStyle(document.documentElement).getPropertyValue('--bg-top').trim();
+    if (bgTop) {
+      metaTheme.setAttribute('content', bgTop);
+    }
+  }
+
   // Render static skeleton
   _renderLetterSkeleton(config);
 
