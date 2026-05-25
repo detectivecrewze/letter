@@ -543,6 +543,8 @@ var index_default = {
                 from: config.from || '',
                 status: config.status || 'unknown',
                 theme: config.theme || 'blush-cream',
+                airmailTheme: config.airmailTheme || null,
+                ribbonTheme: config.ribbonTheme || null,
                 paperTexture: config.paperTexture || 'normal',
                 playlist: config.playlist || [],
                 lastOpened: config.lastOpened || null,
