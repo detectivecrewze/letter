@@ -319,17 +319,17 @@ function _waitForEnvelopeOpen(config, activeTheme) {
     const hint = document.getElementById('envelope-hint');
 
     async function openEnvelope() {
+      // Prevent double-trigger immediately (before any async work)
+      wrapper.removeEventListener('click', openEnvelope);
+      wrapper.removeEventListener('keydown', onKeydown);
+
       // 1. Check for Password Gate before anything else
       if (config.login_password && config.login_password.trim() !== '') {
         await _handleAuthentication(config);
       }
 
-      // Play music synchronously on user click
+      // Play music synchronously after auth (still triggered by user gesture chain)
       if (window.__playMusic) window.__playMusic();
-
-      // Prevent double-trigger
-      wrapper.removeEventListener('click', openEnvelope);
-      wrapper.removeEventListener('keydown', onKeydown);
 
       // Hide hint immediately
       if (hint) hint.style.opacity = '0';

@@ -368,10 +368,10 @@ function _waitForEnvelopeOpen(config) {
         await _handleAuthentication(config);
       }
 
+      opened = true;
+
       // Play music synchronously on user click
       if (window.__playMusic) window.__playMusic();
-
-      opened = true;
 
       // Hide tap hint
       if (tapHint) tapHint.style.opacity = '0';
