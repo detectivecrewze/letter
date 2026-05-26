@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png" />
   <link rel="manifest" href="../assets/favicon/site.webmanifest" />
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sacramento&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Inter', sans-serif; background: #fcfaf7; }
     .shake { animation: shake 0.4s ease; }
@@ -123,17 +123,49 @@
         <input id="qr-link" type="text" placeholder="e.g. https://letter.for-you-always.my.id/?to=dinda"
           class="w-full border-b border-gray-200 py-2.5 text-sm focus:outline-none focus:border-gray-800 transition-colors bg-transparent placeholder-gray-300">
       </div>
+
+      <!-- Template Picker -->
+      <div>
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-semibold block mb-3">Pilih Desain Barcode</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button data-tpl="classic" class="tpl-pick active flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 border-[#d4a373] bg-[#fffaf5] transition-all">
+            <span style="font-family:serif;font-style:italic;font-size:14px;color:#1a1a1a;">A Letter</span>
+            <span class="text-[7px] uppercase tracking-widest font-bold text-[#b58756]">Classic</span>
+          </button>
+          <button data-tpl="airmail" class="tpl-pick flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 border-gray-100 hover:border-gray-300 bg-white transition-all">
+            <span style="font-family:'Courier New',monospace;font-weight:900;font-size:11px;color:#c0392b;letter-spacing:0.1em;">AIRMAIL</span>
+            <span class="text-[7px] uppercase tracking-widest font-bold text-gray-400">Airmail</span>
+          </button>
+          <button data-tpl="ribbon" class="tpl-pick flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 border-gray-100 hover:border-gray-300 bg-white transition-all">
+            <span style="font-family:cursive;font-size:14px;color:#5a3e28;">Ribbon</span>
+            <span class="text-[7px] uppercase tracking-widest font-bold text-gray-400">Ribbon</span>
+          </button>
+        </div>
+      </div>
+
       <button id="btn-generate-qr" class="w-full bg-gray-900 text-white py-3.5 rounded-xl text-[10px] font-semibold uppercase tracking-widest hover:bg-black transition-colors shadow-sm mt-2">
         <span class="btn-text">Buat Barcode</span>
       </button>
 
       <div id="qr-result" class="hidden mt-6 flex-col items-center">
-        <div id="qr-export-container" style="background: linear-gradient(160deg, #fffaf5 0%, #fff8f0 50%, #f5efe6 100%); padding: 28px 24px 20px; border-radius: 16px; border: 1px solid rgba(212,174,106,0.2); box-shadow: 0 20px 50px -15px rgba(0,0,0,0.12), 0 4px 12px rgba(212,174,106,0.08); position: relative; max-width: 220px; width: 100%; margin: 0 auto;">
-          <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: linear-gradient(90deg, transparent, #d4a373, transparent); border-radius: 0 0 4px 4px;"></div>
-          <p style="font-family: serif; font-style: italic; font-size: 22px; color: #1a1a1a; margin-bottom: 2px; letter-spacing: -0.02em; text-align: center;">For You</p>
-          <p style="font-size: 7px; text-transform: uppercase; letter-spacing: 0.35em; color: #d4a373; font-weight: 600; margin-bottom: 16px; text-align: center;">scan to open your gift</p>
-          <div id="qr-code-box" style="background: white; border-radius: 10px; padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 148px; width: 148px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.04); box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);"></div>
-          <p style="font-size: 6px; text-transform: uppercase; letter-spacing: 0.4em; color: #c4b49a; margin-top: 14px; text-align: center;">letter edition</p>
+        <!-- Same card structure as studio/index.html -->
+        <div id="qr-export-container"
+          style="background: linear-gradient(160deg, #fffaf5 0%, #fff8f0 50%, #f5efe6 100%); padding: 28px 24px 20px; border-radius: 16px; border: 1px solid rgba(212,174,106,0.2); box-shadow: 0 20px 50px -15px rgba(0,0,0,0.12), 0 4px 12px rgba(212,174,106,0.08); position: relative; max-width: 220px; width: 100%; margin: 0 auto;">
+          <div id="qr-top-accent"
+            style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 3px; background: linear-gradient(90deg, transparent, #d4a373, transparent); border-radius: 0 0 4px 4px;">
+          </div>
+          <p id="qr-title"
+            style="font-family: serif; font-style: italic; font-size: 22px; color: #1a1a1a; margin-bottom: 2px; letter-spacing: -0.02em;">
+            A Letter</p>
+          <p id="qr-subtitle"
+            style="font-size: 7px; text-transform: uppercase; letter-spacing: 0.35em; color: #d4a373; font-weight: 600; margin-bottom: 16px;">
+            ✦ scan to open your letter ✦</p>
+          <div id="qr-code-box"
+            style="background: white; border-radius: 10px; padding: 10px; display: flex; justify-content: center; align-items: center; min-height: 148px; width: 148px; margin: 0 auto; border: 1px solid rgba(0,0,0,0.04); box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);">
+          </div>
+          <p id="qr-branding"
+            style="font-size: 6px; text-transform: uppercase; letter-spacing: 0.4em; color: #c4b49a; margin-top: 14px; text-align: center;">
+            letter edition</p>
         </div>
         <button id="btn-download-qr" class="w-full mt-6 py-3.5 text-[9px] uppercase tracking-[0.2em] font-bold rounded-lg transition-all flex items-center justify-center gap-2" style="background: linear-gradient(135deg, #d4a373 0%, #c4956a 100%); color: white; border: none; box-shadow: 0 4px 14px rgba(212,174,106,0.35);">
           <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -404,6 +436,152 @@
       document.getElementById('gen-id').disabled = false;
     });
 
+    // ── Template Picker ──────────────────────────────────────────────
+    let _selectedTpl = 'classic';
+    document.querySelectorAll('.tpl-pick').forEach(btn => {
+      btn.addEventListener('click', () => {
+        _selectedTpl = btn.dataset.tpl;
+        document.querySelectorAll('.tpl-pick').forEach(b => {
+          b.className = 'tpl-pick flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 border-gray-100 hover:border-gray-300 bg-white transition-all';
+          b.querySelector('span:last-child').className = 'text-[7px] uppercase tracking-widest font-bold text-gray-400';
+        });
+        btn.className = 'tpl-pick active flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl border-2 border-[#d4a373] bg-[#fffaf5] transition-all';
+        btn.querySelector('span:last-child').className = 'text-[7px] uppercase tracking-widest font-bold text-[#b58756]';
+      });
+    });
+
+    // ── Apply card style (1:1 copy from studio/js/publisher.js _showSuccessModal) ──
+    function _applyCardStyle(templateType) {
+      const exportContainer = document.getElementById('qr-export-container');
+      const topAccent = document.getElementById('qr-top-accent');
+      const title = document.getElementById('qr-title');
+      const subtitle = document.getElementById('qr-subtitle');
+      const branding = document.getElementById('qr-branding');
+
+      if (templateType === 'airmail') {
+        // Vintage Airmail Design
+        if (exportContainer) {
+          exportContainer.style.background = 'linear-gradient(160deg, #fdf6e3 0%, #f4ebd8 100%)';
+          exportContainer.style.border = 'none';
+          exportContainer.style.borderRadius = '8px';
+          exportContainer.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.15), 0 4px 12px rgba(181,135,86,0.15)';
+        }
+        if (topAccent) {
+          topAccent.style.width = '100%';
+          topAccent.style.height = '8px';
+          topAccent.style.borderRadius = '0';
+          topAccent.style.left = '0';
+          topAccent.style.transform = 'none';
+          topAccent.style.background = 'transparent';
+          topAccent.style.display = 'flex';
+          topAccent.style.overflow = 'hidden';
+          topAccent.innerHTML = '';
+          for (let i = 0; i < 15; i++) {
+            const b1 = document.createElement('div');
+            b1.style.minWidth = '16px'; b1.style.height = '100%'; b1.style.backgroundColor = '#c0392b'; b1.style.transform = 'skewX(-45deg)'; b1.style.marginLeft = i === 0 ? '-8px' : '0';
+            const b2 = document.createElement('div');
+            b2.style.minWidth = '16px'; b2.style.height = '100%'; b2.style.backgroundColor = 'transparent'; b2.style.transform = 'skewX(-45deg)';
+            const b3 = document.createElement('div');
+            b3.style.minWidth = '16px'; b3.style.height = '100%'; b3.style.backgroundColor = '#2c3e80'; b3.style.transform = 'skewX(-45deg)';
+            const b4 = document.createElement('div');
+            b4.style.minWidth = '16px'; b4.style.height = '100%'; b4.style.backgroundColor = 'transparent'; b4.style.transform = 'skewX(-45deg)';
+            topAccent.appendChild(b1); topAccent.appendChild(b2); topAccent.appendChild(b3); topAccent.appendChild(b4);
+          }
+        }
+        if (title) {
+          title.textContent = 'AIRMAIL';
+          title.style.fontFamily = '"Courier New", Courier, monospace';
+          title.style.fontStyle = 'normal';
+          title.style.fontWeight = '900';
+          title.style.fontSize = '24px';
+          title.style.color = '#c0392b';
+          title.style.letterSpacing = '0.15em';
+        }
+        if (subtitle) {
+          subtitle.textContent = 'PAR AVION ✦ PRIORITY';
+          subtitle.style.color = '#2c3e80';
+        }
+        if (branding) {
+          branding.textContent = 'POSTAGE PAID';
+          branding.style.color = '#5a3e28';
+          branding.style.fontWeight = 'bold';
+        }
+      } else if (templateType === 'ribbon') {
+        // Ribbon & Seal Design
+        if (exportContainer) {
+          exportContainer.style.background = 'linear-gradient(160deg, #eeeadd 0%, #e4ddd0 50%, #ded9cb 100%)';
+          exportContainer.style.border = '1px solid rgba(139, 107, 74, 0.15)';
+          exportContainer.style.borderRadius = '12px';
+          exportContainer.style.boxShadow = '0 20px 50px -15px rgba(80,60,30,0.15), 0 4px 12px rgba(139,107,74,0.1)';
+        }
+        if (topAccent) {
+          topAccent.style.width = '60px';
+          topAccent.style.height = '4px';
+          topAccent.style.borderRadius = '0 0 4px 4px';
+          topAccent.style.left = '50%';
+          topAccent.style.transform = 'translateX(-50%)';
+          topAccent.style.background = 'linear-gradient(90deg, transparent, #9e3b3b, transparent)';
+          topAccent.style.display = 'block';
+          topAccent.style.overflow = '';
+          topAccent.innerHTML = '';
+        }
+        if (title) {
+          title.textContent = 'Ribbon & Seal';
+          title.style.fontFamily = "'Sacramento', cursive";
+          title.style.fontStyle = 'normal';
+          title.style.fontWeight = 'normal';
+          title.style.fontSize = '28px';
+          title.style.color = '#5a3e28';
+          title.style.letterSpacing = '0';
+        }
+        if (subtitle) {
+          subtitle.textContent = '✦ scan to unseal your letter ✦';
+          subtitle.style.color = '#9e3b3b';
+        }
+        if (branding) {
+          branding.textContent = 'sealed with love';
+          branding.style.color = '#b0967a';
+          branding.style.fontWeight = 'normal';
+        }
+      } else {
+        // Classic Letter Design (defaults)
+        if (exportContainer) {
+          exportContainer.style.background = 'linear-gradient(160deg, #fffaf5 0%, #fff8f0 50%, #f5efe6 100%)';
+          exportContainer.style.border = '1px solid rgba(212,174,106,0.2)';
+          exportContainer.style.borderRadius = '16px';
+          exportContainer.style.boxShadow = '0 20px 50px -15px rgba(0,0,0,0.12), 0 4px 12px rgba(212,174,106,0.08)';
+        }
+        if (topAccent) {
+          topAccent.style.width = '40px';
+          topAccent.style.height = '3px';
+          topAccent.style.borderRadius = '0 0 4px 4px';
+          topAccent.style.left = '50%';
+          topAccent.style.transform = 'translateX(-50%)';
+          topAccent.style.background = 'linear-gradient(90deg, transparent, #d4a373, transparent)';
+          topAccent.style.display = 'block';
+          topAccent.innerHTML = '';
+        }
+        if (title) {
+          title.textContent = 'A Letter';
+          title.style.fontFamily = 'serif';
+          title.style.fontStyle = 'italic';
+          title.style.fontWeight = 'normal';
+          title.style.fontSize = '22px';
+          title.style.color = '#1a1a1a';
+          title.style.letterSpacing = '-0.02em';
+        }
+        if (subtitle) {
+          subtitle.textContent = '✦ scan to open your letter ✦';
+          subtitle.style.color = '#d4a373';
+        }
+        if (branding) {
+          branding.textContent = 'letter edition';
+          branding.style.color = '#c4b49a';
+          branding.style.fontWeight = 'normal';
+        }
+      }
+    }
+
     // ── Generate QR ──────────────────────────────────────────────────
     document.getElementById('btn-generate-qr').addEventListener('click', () => {
       const linkInput = document.getElementById('qr-link').value.trim();
@@ -414,22 +592,23 @@
         return;
       }
 
+      // Apply selected template style (1:1 from publisher.js)
+      _applyCardStyle(_selectedTpl);
+
+      // Generate QR code
       qrBox.innerHTML = '';
       if (typeof QRCode !== 'undefined') {
         new QRCode(qrBox, {
           text: linkInput,
-          width: 128,
-          height: 128,
+          width: 148,
+          height: 148,
           colorDark: '#1a1a1a',
           colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
-        setTimeout(() => {
-          const img = qrBox.querySelector('img');
-          const canvas = qrBox.querySelector('canvas');
-          if (img) { img.style.margin = '0 auto'; img.style.display = 'block'; img.style.borderRadius = '4px'; }
-          if (canvas) canvas.style.display = 'none';
-        }, 100);
+        const styleTag = document.createElement('style');
+        styleTag.textContent = '#qr-code-box img, #qr-code-box canvas { margin: 0 auto !important; display: block; border-radius: 8px; }';
+        qrBox.appendChild(styleTag);
       }
 
       document.getElementById('qr-result').classList.remove('hidden');
