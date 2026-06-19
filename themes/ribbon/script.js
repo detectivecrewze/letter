@@ -187,18 +187,20 @@ async function init() {
   showState('envelope');
   await _waitForEnvelopeOpen(config);
 
-  // ── Switch to letter state & start dove transition concurrently ──
-  // Doves fly first, then paper rises mid-flight (like airmail planes)
+  // ── Flap is now open. Get envelope position for flower burst origin ──
+  const envEl = document.getElementById('ribbon-envelope');
+  const envRect = envEl ? envEl.getBoundingClientRect() : null;
+
+  // Switch to letter state in background (the flower overlay covers it)
   showState('letter');
-  await _delay(300);
+  await _delay(150);
 
-  // Start doves (no await — runs in background)
-  _playDoveTransition(config.ribbonTheme || 'ribbon-crimson');
+  // Floral fountain bursts from the envelope flap opening
+  // (overlay is z-index 9999, covers both states during animation)
+  await _playFlowerTransition(envRect);
 
-  // Delay paper reveal to ~2/3 point of dove animation (~2800ms)
-  // so the letter appears later as most doves have already swept across
+  // Reveal paper after flowers have cleared
   const paper = document.getElementById('letter-paper');
-  await _delay(2800);
   if (paper) {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -328,293 +330,176 @@ function _applyEnvelopeTheme(theme) {
 
 
 /* ════════════════════════════════════════════════════════════
-   DOVE TRANSITION
+   FLORAL FOUNTAIN TRANSITION
+   Replaces dove animation with a popcorn-style flower burst.
+   Flowers erupt from the envelope flap, spin, fill the screen,
+   then swipe left/right to reveal the letter.
    ════════════════════════════════════════════════════════════ */
-function _playDoveTransition(ribbonTheme) {
+function _playFlowerTransition(envRect) {
   return new Promise(resolve => {
+    // ── Asset paths (relative to the ribbon theme folder) ────────
+    const FLOWER_SRCS = [
+      'assets/flower_daisy-removebg-preview.png',
+      'assets/flower_hydrangea-removebg-preview.png',
+      'assets/flower_rose-removebg-preview.png',
+      'assets/flower_sunflower-removebg-preview.png',
+    ];
 
-    // ── Colour palette per theme ──────────────────────────────
-    const palette = {
-      //                 wing          body           sky tint                      feather trail           light bg?
-      'ribbon-crimson':  { wing: '#b8956a', body: '#c4a07a', sky: 'rgba(180,140,100,0.10)', trail: 'rgba(180,140,90,0.30)',  light: true  },
-      'ribbon-forest':   { wing: '#f0fff4', body: '#edfbf0', sky: 'rgba(40,120,70,0.10)',   trail: 'rgba(180,240,200,0.20)', light: false },
-      'ribbon-midnight': { wing: '#e8eeff', body: '#dde6ff', sky: 'rgba(30,50,120,0.15)',   trail: 'rgba(160,180,255,0.20)', light: false },
-      'ribbon-rose':     { wing: '#c48090', body: '#d49090', sky: 'rgba(200,80,140,0.10)',  trail: 'rgba(210,150,160,0.28)', light: true  },
-      'ribbon-bordeaux': { wing: '#f0d8c0', body: '#e8c8a8', sky: 'rgba(120,20,35,0.20)',   trail: 'rgba(220,160,130,0.25)', light: false },
-      'ribbon-violet':   { wing: '#c8a0e0', body: '#d8b0f0', sky: 'rgba(130,80,190,0.10)', trail: 'rgba(200,160,240,0.25)', light: true  },
-    };
-    const clr = palette[ribbonTheme] || palette['ribbon-crimson'];
+    // ── Inject required keyframes & styles once ──────────────────
+    if (!document.getElementById('_floral-styles')) {
+      const style = document.createElement('style');
+      style.id = '_floral-styles';
+      style.textContent = `
+        @keyframes _floral-spin { to { transform: rotate(360deg); } }
+        @keyframes _floral-spin-rev { to { transform: rotate(-360deg); } }
+        #_floral-overlay { position:fixed;inset:0;z-index:9998;pointer-events:none;overflow:hidden; }
+        ._floral-img {
+          position: absolute;
+          will-change: transform, opacity;
+          transform-origin: center center;
+        }
+      `;
+      document.head.appendChild(style);
+    }
 
-    // ── Canvas setup ─────────────────────────────────────────
-    const canvas = document.createElement('canvas');
-    canvas.style.cssText = [
-      'position:fixed', 'inset:0', 'width:100%', 'height:100%',
-      'z-index:9999', 'pointer-events:none'
-    ].join(';');
-    document.body.appendChild(canvas);
+    // ── Overlay container ────────────────────────────────────────
+    const overlay = document.createElement('div');
+    overlay.id = '_floral-overlay';
+    document.body.appendChild(overlay);
 
-    const W = canvas.width  = window.innerWidth;
-    const H = canvas.height = window.innerHeight;
-    const ctx = canvas.getContext('2d');
-
-    // ── Sky wash overlay ─────────────────────────────────────
-    // Fades in then out as a colour-tinted veil
-    let skyAlpha = 0;
-    let skyPhase = 'in'; // 'in' | 'hold' | 'out'
-
-    // ── Bird definitions ─────────────────────────────────────
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    // Use the envelope's center as the burst origin, fallback to window center
+    const cx = envRect ? (envRect.left + envRect.width / 2) : W / 2;
+    const cy = envRect ? (envRect.top + envRect.height * 0.35) : H / 2; // top-third = flap area
     const isMobile = W < 600;
-    const BIRD_COUNT = isMobile ? 30 : 65;
+    const COUNT = 300;
 
-    // Each bird flies from bottom-left quadrant to upper-right
-    // with slight variation in angle, speed and wing phase
-    const birds = [];
-    for (let i = 0; i < BIRD_COUNT; i++) {
-      // Launch position: clustered at bottom-left with spread
-      const startX = -80 + (Math.random() * W * 0.35);
-      const startY =  H + 40 + Math.random() * 120;
+    // ── Preload images ───────────────────────────────────────────
+    const images = FLOWER_SRCS.map(src => {
+      const img = new Image();
+      img.src = src;
+      return img;
+    });
 
-      // Destination: upper-right, varied
-      const endX = W * 0.55 + Math.random() * W * 0.65;
-      const endY = -80 - Math.random() * 180;
+    // ── Seeded RNG (same as loves-edition for consistency) ───────
+    let seed = 42;
+    const rng = () => { seed = (seed * 16807 + 0) % 2147483647; return (seed - 1) / 2147483646; };
 
-      // Staggered launch delay — spread across ~3500ms so last bird launches well before end
-      const delay = i * 50 + Math.random() * 120;
+    // ── Build particles ──────────────────────────────────────────
+    const particles = [];
+    for (let i = 0; i < COUNT; i++) {
+      const frac = i / COUNT;
 
-      // Travel duration — slightly faster for concurrent mode
-      const duration = 1800 + Math.random() * 1000;
+      // Fan angle: sweeping 240-degree upward arc
+      const spread = 240;
+      const baseAngleDeg = -90 + (frac - 0.5) * spread;
+      const jitter = (rng() - 0.5) * 18;
+      const angleRad = ((baseAngleDeg + jitter) * Math.PI) / 180;
 
-      // Wing flap frequency & starting phase
-      const flapSpeed = 0.008 + Math.random() * 0.006;
-      const flapPhase = Math.random() * Math.PI * 2;
+      // Distance & end positions
+      const sidePull = 1 + Math.abs(frac - 0.5) * 1.8;
+      const dist = 350 + rng() * 650;
+      const xEnd = Math.cos(angleRad) * dist * sidePull + (rng() - 0.5) * 100;
+      const yPeak = Math.sin(angleRad) * dist - 50 - rng() * 150;
+      const yFinal = yPeak + 400 + rng() * 650;
 
-      // Bird scale (slight variation for depth)
-      const scale = (isMobile ? 0.55 : 0.75) + Math.random() * 0.45;
+      // EXACT SAME SIZES AS PREVIOUSLY APPROVED MEDIUM in loves-edition
+      const size = 140 + rng() * 140; // 140–280px
+      const finalScale = 1.0 + rng() * 0.6;
 
-      // Gentle horizontal sway amplitude
-      const swayAmp = 10 + Math.random() * 18;
-      const swayFreq = 0.003 + Math.random() * 0.003;
+      const rotateDir = rng() > 0.5 ? 1 : -1;
+      const rotateSpeed = (6 + rng() * 10).toFixed(2); // seconds per 360deg
 
-      birds.push({ startX, startY, endX, endY, delay, duration, flapSpeed, flapPhase, scale, swayAmp, swayFreq, born: null, done: false });
+      // Dramatic popcorn stagger over 1.6s
+      const delay = frac * 1.6 + rng() * 0.15;
+      const duration = 2.0 + rng() * 1.6;
+
+      particles.push({ i, frac, xEnd, yPeak, yFinal, size, finalScale, rotateDir, rotateSpeed, delay, duration });
     }
 
-    // ── Draw a single dove at (0,0), facing right ─────────────
-    // Uses pure canvas paths — no external assets needed.
-    // wingAngle: 0 = neutral, positive = wings up, negative = wings down
-    function _drawDove(ctx, wingAngle, scale, clr) {
-      ctx.save();
-      ctx.scale(scale, scale);
+    // ── Create & animate DOM elements ───────────────────────────
+    const els = particles.map(p => {
+      // Outer wrapper: handles position (translate) + opacity via transition
+      const wrapper = document.createElement('div');
+      wrapper.className = '_floral-img';
 
-      const up = wingAngle;   // positive = wings raised
+      const half = p.size / 2;
+      wrapper.style.cssText = `
+        position:absolute;
+        width:${p.size}px;
+        height:${p.size}px;
+        left:${cx - half}px;
+        top:${cy - half}px;
+        opacity:0;
+        transform:translate(0,0) scale(0.12);
+        transition:
+          transform ${p.duration}s cubic-bezier(0.22,1,0.36,1) ${p.delay}s,
+          opacity ${p.duration * 0.25}s ease ${p.delay}s;
+        will-change:transform,opacity;
+      `;
 
-      // Body (teardrop, pointing right)
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 14, 6.5, 0, 0, Math.PI * 2);
-      ctx.fillStyle = clr.body;
-      // Light themes: add shadow so doves contrast against pale background
-      if (clr.light) {
-        ctx.shadowColor = 'rgba(80,50,30,0.45)';
-        ctx.shadowBlur  = 8;
-      } else {
-        ctx.shadowColor = 'rgba(200,180,170,0.35)';
-        ctx.shadowBlur  = 6;
-      }
-      ctx.fill();
-      ctx.shadowBlur = 0;
+      // Inner img: handles continuous spin only (no translate/scale)
+      const img = document.createElement('img');
+      img.src = FLOWER_SRCS[p.i % FLOWER_SRCS.length];
+      img.draggable = false;
+      img.style.cssText = `
+        width:100%;height:100%;
+        display:block;
+        animation:${p.rotateDir > 0 ? '_floral-spin' : '_floral-spin-rev'} ${p.rotateSpeed}s linear ${p.delay}s infinite;
+        will-change:transform;
+      `;
 
-      // Stroke outline for visibility on light backgrounds
-      if (clr.light) {
-        ctx.strokeStyle = 'rgba(100,65,40,0.35)';
-        ctx.lineWidth = 0.8 / scale;
-        ctx.stroke();
-      }
+      wrapper.appendChild(img);
+      overlay.appendChild(wrapper);
 
-      // Tail (small fan behind body)
-      ctx.beginPath();
-      ctx.moveTo(-14, 0);
-      ctx.lineTo(-22, -5 + up * 0.3);
-      ctx.lineTo(-21,  0);
-      ctx.lineTo(-22,  5 - up * 0.3);
-      ctx.closePath();
-      ctx.fillStyle = clr.wing;
-      ctx.fill();
+      return { el: wrapper, p };
+    });
 
-      // Head (small circle ahead of body)
-      ctx.beginPath();
-      ctx.arc(16, -4, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = clr.body;
-      ctx.fill();
-
-      // Beak
-      ctx.beginPath();
-      ctx.moveTo(20, -4.5);
-      ctx.lineTo(25, -4);
-      ctx.lineTo(20, -3.5);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(220,180,160,0.9)';
-      ctx.fill();
-
-      // Left wing (top wing — rises when flapping up)
-      ctx.beginPath();
-      ctx.moveTo(0, -2);
-      // Control points create a curved wing
-      ctx.bezierCurveTo(
-        -2, -12 - up * 9,
-         8, -20 - up * 12,
-        14, -10 - up * 6
-      );
-      ctx.bezierCurveTo(10, -4, 4, -1, 0, -2);
-      ctx.fillStyle = clr.wing;
-      ctx.globalAlpha = 0.95;
-      ctx.fill();
-      if (clr.light) {
-        ctx.globalAlpha = 0.5;
-        ctx.strokeStyle = 'rgba(100,65,40,0.4)';
-        ctx.lineWidth = 0.7 / scale;
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-
-      // Right wing (bottom wing — dips when left rises)
-      ctx.beginPath();
-      ctx.moveTo(0, 2);
-      ctx.bezierCurveTo(
-        -2,  12 + up * 6,
-         8,  18 + up * 9,
-        14,   8 + up * 5
-      );
-      ctx.bezierCurveTo(10, 3, 4, 1, 0, 2);
-      ctx.fillStyle = clr.wing;
-      ctx.globalAlpha = 0.85;
-      ctx.fill();
-      if (clr.light) {
-        ctx.globalAlpha = 0.45;
-        ctx.strokeStyle = 'rgba(100,65,40,0.35)';
-        ctx.lineWidth = 0.7 / scale;
-        ctx.stroke();
-      }
-      ctx.globalAlpha = 1;
-
-      ctx.restore();
-    }
-
-    // ── Tiny feather sparkles trail ────────────────────────────
-    const sparkles = [];
-    function _spawnSparkle(x, y) {
-      if (Math.random() > 0.25) return; // sparse
-      sparkles.push({
-        x, y,
-        vx: (Math.random() - 0.5) * 1.2,
-        vy: -Math.random() * 0.8,
-        life: 1.0,
-        size: 2 + Math.random() * 3,
-        angle: Math.random() * Math.PI * 2
+    // ── Trigger burst (next frame so initial style applies) ──────
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        els.forEach(({ el, p }) => {
+          el.style.transform = `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`;
+          el.style.opacity = '1';
+        });
       });
-    }
+    });
 
-    function _updateSparkles() {
-      for (let i = sparkles.length - 1; i >= 0; i--) {
-        const s = sparkles[i];
-        s.x += s.vx; s.y += s.vy;
-        s.vy += 0.015; // gentle gravity
-        s.life -= 0.022;
-        if (s.life <= 0) { sparkles.splice(i, 1); continue; }
-        ctx.save();
-        ctx.globalAlpha = s.life * 0.6;
-        ctx.translate(s.x, s.y);
-        ctx.rotate(s.angle);
-        // draw a tiny feather-like oval
-        ctx.beginPath();
-        ctx.ellipse(0, 0, s.size * 0.35, s.size, 0, 0, Math.PI * 2);
-        ctx.fillStyle = clr.trail;
-        ctx.fill();
-        ctx.restore();
-      }
-    }
+    // ── Sequential swipe out ─────────────────────────────────────
+    // After flowers settle (~3.6s), swipe left side out, then right
+    const SETTLE_MS   = 3600;
+    const LEFT_MS     = SETTLE_MS + 600;   // left swipe start
+    const RIGHT_MS    = LEFT_MS + 500;     // right swipe start
+    const RESOLVE_MS  = RIGHT_MS + 1400;  // all done
 
-    // ── Animation loop ────────────────────────────────────────
-    let startTime = null;
-    const TOTAL_DURATION = 4200; // ms — runs concurrently with letter rise
-    const SKY_IN_END    = 700;
-    const SKY_HOLD_END  = 2800;
+    setTimeout(() => {
+      // Swipe LEFT flowers to the far left
+      els.forEach(({ el, p }) => {
+        if (p.xEnd < 0) {
+          el.style.transition = 'transform 1.2s ease-in, opacity 1.2s ease-in';
+          el.style.transform = `translate(${p.xEnd - 1500}px, ${p.yFinal}px) scale(${p.finalScale})`;
+          el.style.opacity = '0';
+        }
+      });
+    }, LEFT_MS);
 
-    function _ease(t) {
-      // ease-in-out cubic
-      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
-    }
+    setTimeout(() => {
+      // Swipe RIGHT flowers to the far right
+      els.forEach(({ el, p }) => {
+        if (p.xEnd >= 0) {
+          el.style.transition = 'transform 1.2s ease-in, opacity 1.2s ease-in';
+          el.style.transform = `translate(${p.xEnd + 1500}px, ${p.yFinal}px) scale(${p.finalScale})`;
+          el.style.opacity = '0';
+        }
+      });
+    }, RIGHT_MS);
 
-    function _loop(ts) {
-      if (!startTime) startTime = ts;
-      const elapsed = ts - startTime;
-
-      ctx.clearRect(0, 0, W, H);
-
-      // Sky veil — max alpha 0.22 so it's a subtle tint, not a heavy wash
-      if (elapsed < SKY_IN_END) {
-        skyAlpha = _ease(elapsed / SKY_IN_END) * 0.22;
-      } else if (elapsed < SKY_HOLD_END) {
-        skyAlpha = 0.22;
-      } else {
-        skyAlpha = 0.22 * (1 - _ease((elapsed - SKY_HOLD_END) / (TOTAL_DURATION - SKY_HOLD_END)));
-      }
-      // Build sky colour with live alpha (extract RGB from palette string)
-      const skyRgb = clr.sky.match(/[\d.]+/g);
-      ctx.fillStyle = `rgba(${skyRgb[0]},${skyRgb[1]},${skyRgb[2]},${skyAlpha.toFixed(3)})`;
-      ctx.fillRect(0, 0, W, H);
-
-      // Sparkle trails
-      _updateSparkles();
-
-      // Birds
-      let allDone = true;
-      for (const b of birds) {
-        const bornAt = b.delay;
-        if (elapsed < bornAt) { allDone = false; continue; }
-
-        const t = Math.min((elapsed - bornAt) / b.duration, 1);
-        const et = _ease(t);
-
-        const x = b.startX + (b.endX - b.startX) * et
-                + Math.sin(elapsed * b.swayFreq) * b.swayAmp * (1 - t);
-        const y = b.startY + (b.endY - b.startY) * et;
-
-        // Wing flap — sine wave, more vigorous at launch
-        const flapVigor = 1 - t * 0.35;
-        const wingAngle = Math.sin((elapsed * b.flapSpeed * 2 * Math.PI) + b.flapPhase) * 7 * flapVigor;
-
-        // Bird opacity — fade in/out gently
-        const birdAlpha = t < 0.08 ? t / 0.08 : t > 0.88 ? (1 - t) / 0.12 : 1;
-
-        ctx.save();
-        ctx.globalAlpha = birdAlpha * 0.92;
-        ctx.translate(x, y);
-        // Tilt slightly in direction of travel
-        const tiltAngle = -0.18 - (1 - t) * 0.15;
-        ctx.rotate(tiltAngle);
-        _drawDove(ctx, wingAngle, b.scale, clr);
-        ctx.restore();
-
-        // Spawn feather sparkles mid-flight
-        if (t > 0.1 && t < 0.9) _spawnSparkle(x, y);
-
-        if (t < 1) allDone = false;
-      }
-
-      if (elapsed < TOTAL_DURATION || !allDone) {
-        requestAnimationFrame(_loop);
-      } else {
-        // Fade canvas out gently
-        canvas.style.transition = 'opacity 0.5s ease';
-        canvas.style.opacity = '0';
-        setTimeout(() => {
-          canvas.remove();
-          window.dispatchEvent(new CustomEvent('doves-gone'));
-          resolve();
-        }, 520);
-      }
-    }
-
-    requestAnimationFrame(_loop);
+    // ── Cleanup & resolve ────────────────────────────────────────
+    setTimeout(() => {
+      overlay.remove();
+      resolve();
+    }, RESOLVE_MS);
   });
 }
 
@@ -821,17 +706,15 @@ function _waitForEnvelopeOpen(config) {
 
       // 3. (Sparkles removed)
 
-      // 4. Envelope lifts and fades
+      // 4. Open flap with 3D flip — flowers will erupt from here!
       setTimeout(() => {
-        if (env) {
-          env.style.transition = 'transform 0.8s ease, opacity 0.8s ease';
-          env.style.transform = 'scale(1.04) translateY(-25px)';
-          env.style.opacity = '0';
-        }
+        const envBody = env.querySelector('.envelope-body');
+        if (envBody) envBody.classList.add('flap-opening');
+        env.classList.add('popping'); // little physical "pop" shake
       }, 650);
 
-      // 5. Resolve
-      setTimeout(resolve, 1400);
+      // 5. Resolve after flap is open (flowers can now burst)
+      setTimeout(resolve, 1250);
     };
 
     const onKey = (e) => {
