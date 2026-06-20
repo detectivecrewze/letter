@@ -1030,7 +1030,7 @@ async function _typewriteLetter(config) {
 
     body.innerHTML = _formatContent(config.letterContent || config.letter_body || '');
 
-    const fromStr = config.senderName || config.from || '';
+    const fromStr = config.from || config.senderName || '';
     const fromEl = document.getElementById('letter-from');
     if (fromEl && fromStr) {
       fromEl.textContent = fromStr;
@@ -1110,7 +1110,7 @@ async function _typewriteLetter(config) {
   }
 
   // ── 4. Type signature ──
-  const fromStr = config.senderName || config.from || '';
+  const fromStr = config.from || config.senderName || '';
   if (fromStr) {
     await _delay(800);
     const fromEl = document.getElementById('letter-from');
