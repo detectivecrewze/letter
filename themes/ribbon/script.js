@@ -679,10 +679,17 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
           will-change:transform,opacity;
         `;
 
+        const rotateDir = i % 2 === 0 ? 1 : -1;
+        const rotateSpeed = (4 + (i % 3) * 2).toFixed(2); // Varied speeds: 4s, 6s, 8s
+
         const img = document.createElement('img');
         img.src = FLOWER_SRCS[i % FLOWER_SRCS.length];
         img.decoding = 'async';
-        img.style.cssText = `width:100%;height:100%;display:block;border-radius:50%;`;
+        img.style.cssText = `
+          width:100%;height:100%;display:block;border-radius:50%;
+          animation: ${rotateDir > 0 ? '_floral-spin' : '_floral-spin-rev'} ${rotateSpeed}s linear infinite;
+          will-change: transform;
+        `;
 
         el.appendChild(img);
         heartWrapper.appendChild(el);
