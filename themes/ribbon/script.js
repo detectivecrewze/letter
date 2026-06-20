@@ -507,18 +507,42 @@ function _playFlowerTransition(envRect, config) {
     }, VORTEX_MS);
 
     // ── From / To Card — appears after vortex, lingers through heart ─
-    const TEXT_MS   = HEART_MS + 500;  // Fade in right as the heart is finishing its formation
-    const TEXT_OUT_MS = HEART_MS + HEART_STAY - 600; // Fade out before heart exits
+    const TEXT_MS   = HEART_MS + 500;
+    const TEXT_OUT_MS = HEART_MS + HEART_STAY - 600;
     setTimeout(() => {
-      // toName: strip salutation prefixes (Dearest, Dear, To:) + trailing punctuation
+      // toName: strip salutation prefixes
       const rawTo = (config.letterTo || config.salutation || config.recipientName || config.to || '')
         .replace(/^(Dearest|Dear|To|For)[,:\s]+/i, '')
         .replace(/[,;:.]+$/, '')
         .trim();
       const toName = rawTo;
-      // fromName: check all possible sender fields
       const fromName = (config.senderName || config.from || config.sender || '').trim();
-      if (!toName && !fromName) return; // Don't render if no names at all
+      if (!toName && !fromName) return;
+
+      // ── Detect if current theme is light or dark ──────────────────
+      // Check the overlay's background color to determine luminance
+      const bgColor = window.getComputedStyle(overlay).backgroundColor;
+      const rgbMatch = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      let isLightTheme = false;
+      if (rgbMatch) {
+        const [, r, g, b] = rgbMatch.map(Number);
+        // Relative luminance formula
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        isLightTheme = luminance > 0.5;
+      }
+      // Also check via config ribbonTheme key (light themes: rose, forest, violet/parchment)
+      const theme = (config.ribbonTheme || config.theme || '').toLowerCase();
+      if (['ribbon-rose', 'ribbon-forest', 'ribbon-violet', 'ribbon-parchment', 'ribbon-crimson'].some(t => theme.includes(t.replace('ribbon-','')))) {
+        if (['rose', 'forest', 'violet', 'parchment', 'crimson'].some(t => theme.includes(t))) {
+          isLightTheme = true;
+        }
+      }
+
+      // ── Adaptive palette ──────────────────────────────────────────
+      const introColor  = isLightTheme ? 'rgba(90, 55, 30, 0.75)'    : 'rgba(255,225,185,0.8)';
+      const nameColor   = isLightTheme ? 'rgba(50, 30, 15, 0.92)'    : 'rgba(255,240,220,0.95)';
+      const dividerBg   = isLightTheme ? 'rgba(100, 60, 20, 0.3)'    : 'rgba(255,210,160,0.35)';
+      const nameShadow  = isLightTheme ? '0 1px 8px rgba(255,255,255,0.5)' : '0 2px 20px rgba(0,0,0,0.4)';
 
       const card = document.createElement('div');
       card.style.cssText = `
@@ -546,7 +570,7 @@ function _playFlowerTransition(envRect, config) {
         letter-spacing: 0.12em;
         line-height: 1.3;
         font-size: clamp(12px, 1.8vw, 15px);
-        color: rgba(255,225,185,0.8);
+        color: ${introColor};
         font-weight: 400;
         display: block;
       `;
@@ -555,9 +579,9 @@ function _playFlowerTransition(envRect, config) {
         letter-spacing: 0.15em;
         text-transform: uppercase;
         line-height: 1.3;
-        text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+        text-shadow: ${nameShadow};
         font-size: clamp(14px, 2.5vw, 22px);
-        color: rgba(255,240,220,0.95);
+        color: ${nameColor};
         font-weight: 600;
         display: -webkit-box;
         -webkit-line-clamp: 2;
@@ -571,7 +595,7 @@ function _playFlowerTransition(envRect, config) {
           <span style="${introStyle} margin-bottom: 6px;">a letter from</span>
           <span style="${nameStyle} margin-bottom: 16px;">${fromName}</span>
         ` : ''}
-        <span style="width: 32px; height: 1px; background: rgba(255,210,160,0.35); margin-bottom: 16px; display: block;"></span>
+        <span style="width: 32px; height: 1px; background: ${dividerBg}; margin-bottom: 16px; display: block;"></span>
         ${toName ? `
           <span style="${introStyle} margin-bottom: 6px;">for</span>
           <span style="${nameStyle}">${toName}</span>
@@ -579,14 +603,12 @@ function _playFlowerTransition(envRect, config) {
       `;
 
       overlay.appendChild(card);
-      // Trigger fade in
       requestAnimationFrame(() => requestAnimationFrame(() => { 
         card.style.opacity = '1'; 
         card.style.filter = 'blur(0px)';
         card.style.transform = 'translate(-50%, -50%)'; 
       }));
 
-      // Fade out
       setTimeout(() => {
         card.style.opacity = '0';
         card.style.filter = 'blur(4px)';
