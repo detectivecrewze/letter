@@ -375,6 +375,7 @@ function _playFlowerTransition(envRect, config) {
     const isMobile = W < 600;
     const COUNT = 300;
 
+
     // ── Preload images ───────────────────────────────────────────
     const images = FLOWER_SRCS.map(src => {
       const img = new Image();
