@@ -468,37 +468,149 @@ function _playFlowerTransition(envRect) {
       });
     });
 
-    // ── The Curtain Reveal (Tirai Megah) ─────────────────────────
-    // After flowers settle (~3.6s), they sweep diagonally upwards to the sides without fading
+    // ── The Whirlwind / Vortex (Tersapu Pusaran Angin) ───────────
+    // After flowers settle (~3.6s), they are swept off-screen in a swirling motion
     const SETTLE_MS   = 3600;
-    const CURTAIN_MS  = SETTLE_MS + 400;   // When the curtain sweep starts
-    const RESOLVE_MS  = CURTAIN_MS + 1500; // Allow time to clear the screen
+    const VORTEX_MS   = SETTLE_MS + 400;   // When the vortex starts
+    const HEART_MS    = VORTEX_MS + 2000;  // When vortex finishes, heart starts
+    const HEART_STAY  = 2500;              // How long the heart stays
+    const RESOLVE_MS  = HEART_MS + HEART_STAY + 800; // Allow time to fade out the heart
 
     setTimeout(() => {
       els.forEach(({ el, p }) => {
-        // Determine which side of the "curtain" this petal belongs to
-        const isLeft = p.xEnd < 0;
+        // Calculate current angle from center
+        const angle = Math.atan2(p.yFinal, p.xEnd);
         
-        // Sweep diagonally upwards and outwards off-screen
-        const sweepX = isLeft ? p.xEnd - 1500 : p.xEnd + 1500;
-        const sweepY = p.yFinal - 1000 - Math.random() * 500; // Fly upwards
+        // Add a 90-degree twist to the angle to create a spiral/vortex tangential trajectory
+        // Math.PI / 2 is 90 degrees in radians. We make them all swirl in the same direction.
+        const swirlAngle = angle + (Math.PI / 2); 
+        const dist = 2500; // Push them very far off-screen
         
-        // Add a slight stagger for a flowing, dramatic curtain effect
-        const staggerDelay = Math.random() * 300; 
-        const sweepDuration = 1000 + Math.random() * 400; // Fast and punchy
+        const vortexX = p.xEnd + Math.cos(swirlAngle) * dist + (Math.random() - 0.5) * 500;
+        const vortexY = p.yFinal + Math.sin(swirlAngle) * dist + (Math.random() - 0.5) * 500;
+        
+        // Fast, chaotic duration with slight stagger
+        const staggerDelay = Math.random() * 400; 
+        const sweepDuration = 1000 + Math.random() * 600; 
 
         setTimeout(() => {
           el.animate([
-            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})` },
-            { transform: `translate(${sweepX}px, ${sweepY}px) scale(${p.finalScale})` }
+            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale}) rotate(0deg)` },
+            { transform: `translate(${vortexX}px, ${vortexY}px) scale(${p.finalScale}) rotate(360deg)` }
           ], {
             duration: sweepDuration,
-            easing: 'cubic-bezier(0.55, 0.055, 0.675, 0.19)', // ease-in-cubic (starts slow, shoots off fast)
+            easing: 'cubic-bezier(0.55, 0.085, 0.68, 0.53)', // ease-in for acceleration
             fill: 'both' // Opacity remains 100% (solid), no fading out
           });
         }, staggerDelay);
       });
-    }, CURTAIN_MS);
+    }, VORTEX_MS);
+
+    // ── Heart Formation (Formasi Hati) ───────────────────────────
+    // Uses arc-length parameterization for perfectly even flower spacing
+    setTimeout(() => {
+      const heartWrapper = document.createElement('div');
+      heartWrapper.style.cssText = `position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none;z-index:100;`;
+      overlay.appendChild(heartWrapper);
+
+      // --- Step 1: Pre-sample many raw points along the heart curve ---
+      const SAMPLES = 2000;
+      const rawPts = [];
+      for (let i = 0; i < SAMPLES; i++) {
+        const t = (i / SAMPLES) * Math.PI * 2;
+        rawPts.push({
+          x: 16 * Math.pow(Math.sin(t), 3),
+          y: -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t))
+        });
+      }
+
+      // --- Step 2: Compute cumulative arc-lengths ---
+      const arcLens = [0];
+      for (let i = 1; i < SAMPLES; i++) {
+        const dx = rawPts[i].x - rawPts[i-1].x;
+        const dy = rawPts[i].y - rawPts[i-1].y;
+        arcLens.push(arcLens[i-1] + Math.sqrt(dx*dx + dy*dy));
+      }
+      const totalLen = arcLens[SAMPLES - 1];
+
+      // --- Step 3: Sample evenly spaced points ---
+      const HEART_COUNT = 54; // Even number for clean petal cycling
+      const FLOWER_SIZE = 38; // Perfectly uniform size for a clean "wreath" look
+      const S = 13;           // Scale multiplier for the heart (controls overall size)
+      
+      const heartEls   = [];
+      const heartPts   = [];
+      let sampleIdx = 0;
+
+      for (let i = 0; i < HEART_COUNT; i++) {
+        const targetLen = (i / HEART_COUNT) * totalLen;
+        while (sampleIdx < SAMPLES - 1 && arcLens[sampleIdx + 1] < targetLen) sampleIdx++;
+        const pt = rawPts[sampleIdx];
+
+        const px = cx + pt.x * S;
+        const py = cy + pt.y * S - 30; // Shift up slightly for visual centering
+
+        heartPts.push({ px, py });
+
+        const el = document.createElement('div');
+        el.className = '_floral-img';
+        el.style.cssText = `
+          position:absolute;
+          width:${FLOWER_SIZE}px; height:${FLOWER_SIZE}px;
+          left:${px - FLOWER_SIZE/2}px; top:${py - FLOWER_SIZE/2}px;
+          opacity:0; transform:scale(0.1) rotate(0deg);
+          will-change:transform,opacity;
+        `;
+
+        const img = document.createElement('img');
+        img.src = FLOWER_SRCS[i % FLOWER_SRCS.length];
+        img.decoding = 'async';
+        img.style.cssText = `width:100%;height:100%;display:block;border-radius:50%;`;
+
+        el.appendChild(img);
+        heartWrapper.appendChild(el);
+        heartEls.push(el);
+
+        // Staggered pop-in radiating from the top of the heart (index 0) clockwise
+        const staggerIn = (i / HEART_COUNT) * 600;
+        setTimeout(() => {
+          el.animate([
+            { transform: 'scale(0) rotate(-30deg)', opacity: 0 },
+            { transform: 'scale(1.25) rotate(5deg)', opacity: 1, offset: 0.65 },
+            { transform: 'scale(1.0) rotate(0deg)', opacity: 1 }
+          ], {
+            duration: 550,
+            easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // spring-like pop
+            fill: 'both'
+          });
+        }, staggerIn);
+      }
+
+      // Gentle collective pulse while the heart is displayed
+      setTimeout(() => {
+        heartEls.forEach(el => {
+          el.animate([
+            { transform: 'scale(1.0)' },
+            { transform: 'scale(1.08)' },
+            { transform: 'scale(1.0)' }
+          ], { duration: 900, easing: 'ease-in-out', iterations: 3 });
+        });
+      }, 700); // Start pulsing after all flowers have popped in
+
+      // Fade out the heart before revealing the letter
+      setTimeout(() => {
+        heartEls.forEach((el, i) => {
+          const staggerOut = (i / HEART_COUNT) * 300;
+          setTimeout(() => {
+            el.animate([
+              { transform: 'scale(1.0)', opacity: 1 },
+              { transform: 'scale(0.3) rotate(20deg)', opacity: 0 }
+            ], { duration: 400, easing: 'ease-in', fill: 'both' });
+          }, staggerOut);
+        });
+      }, HEART_STAY);
+
+    }, HEART_MS);
 
     // ── Cleanup & resolve ────────────────────────────────────────
     setTimeout(() => {
