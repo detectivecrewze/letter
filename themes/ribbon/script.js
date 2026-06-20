@@ -18,6 +18,17 @@
    ════════════════════════════════════════════════════════════ */
 const WORKER_URL = 'https://letter-edition.aldoramadhan16.workers.dev';
 
+// Capture the base URL of THIS script at load time, so asset paths
+// are always resolved relative to the script folder — not the page URL.
+// (document.currentScript is only available synchronously at parse time)
+const _SCRIPT_BASE = (() => {
+  try {
+    const src = document.currentScript && document.currentScript.src;
+    if (src) return src.substring(0, src.lastIndexOf('/') + 1);
+  } catch(e) {}
+  return '';
+})();
+
 const TW_CHAR_DELAY = 38;
 const TW_PARA_PAUSE = 700;
 
@@ -335,10 +346,10 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
   return new Promise(resolve => {
     // ── Asset paths (relative to the ribbon theme folder) ────────
     const FLOWER_SRCS = [
-      'assets/flower_daisy-removebg-preview.png',
-      'assets/flower_hydrangea-removebg-preview.png',
-      'assets/flower_rose-removebg-preview.png',
-      'assets/flower_sunflower-removebg-preview.png',
+      _SCRIPT_BASE + 'assets/flower_daisy-removebg-preview.png',
+      _SCRIPT_BASE + 'assets/flower_hydrangea-removebg-preview.png',
+      _SCRIPT_BASE + 'assets/flower_rose-removebg-preview.png',
+      _SCRIPT_BASE + 'assets/flower_sunflower-removebg-preview.png',
     ];
 
     // ── Inject required keyframes & styles once ──────────────────
