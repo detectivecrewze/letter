@@ -523,8 +523,8 @@ function _playFlowerTransition(envRect, config) {
       const card = document.createElement('div');
       card.style.cssText = `
         position: absolute;
-        top: 44%; left: 50%;
-        transform: translate(-50%, -40%);
+        top: calc(50% - 30px); left: 50%;
+        transform: translate(-50%, -20px);
         z-index: 200;
         text-align: center;
         pointer-events: none;
@@ -626,8 +626,8 @@ function _playFlowerTransition(envRect, config) {
 
       // --- Step 3: Sample evenly spaced points ---
       const HEART_COUNT = 54; // Even number for clean petal cycling
-      const FLOWER_SIZE = 46; // Slightly larger for a fuller look
-      const S = 13;           // Scale multiplier for the heart (controls overall size)
+      const FLOWER_SIZE = Math.min(46, window.innerWidth * 0.1); // Slightly smaller on mobile
+      const S = Math.min(13, window.innerWidth * 0.028);         // Responsive scale multiplier
       
       const heartEls   = [];
       const heartPts   = [];
