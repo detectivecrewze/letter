@@ -547,7 +547,7 @@ function _playFlowerTransition(envRect, config) {
       const card = document.createElement('div');
       card.style.cssText = `
         position: absolute;
-        top: calc(50% - 30px); left: 50%;
+        top: ${cy - 30}px; left: ${cx}px;
         transform: translate(-50%, -20px);
         z-index: 200;
         text-align: center;
