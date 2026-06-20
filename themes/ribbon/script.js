@@ -544,11 +544,15 @@ function _playFlowerTransition(envRect, config) {
       const dividerBg   = isLightTheme ? 'rgba(100, 60, 20, 0.3)'    : 'rgba(255,210,160,0.35)';
       const nameShadow  = isLightTheme ? '0 1px 8px rgba(255,255,255,0.5)' : '0 2px 20px rgba(0,0,0,0.4)';
 
+      const S_val = Math.min(13, window.innerWidth * 0.028);
+      // Heart parametric y ranges roughly from -12.3 (lobes) to +17 (bottom tip). Center is ~ +2.35
+      const heartCenterY = cy + (2.35 * S_val) - 30;
+
       const card = document.createElement('div');
       card.style.cssText = `
         position: absolute;
-        top: ${cy - 30}px; left: ${cx}px;
-        transform: translate(-50%, -20px);
+        top: ${heartCenterY}px; left: ${cx}px;
+        transform: translate(-50%, calc(-50% + 15px));
         z-index: 200;
         text-align: center;
         pointer-events: none;
