@@ -78,6 +78,7 @@ const Studio = (() => {
     _setVal('input-letter-title', config.title || '');
     _setVal('input-letter-date', config.date || '');
     _setVal('input-letter-to', config.letterTo || config.salutation || '');
+    _setVal('input-sender-name', config.senderName || '');
     _setVal('select-font-family', config.fontFamily || 'caveat');
     _setVal('select-font-size', config.fontSize || 'size-medium');
     _setVal('input-letter-msg', config.message || config.letter_body || '');
@@ -152,6 +153,7 @@ const Studio = (() => {
       'input-letter-title',
       'input-letter-date',
       'input-letter-to',
+      'input-sender-name',
       'select-font-family',
       'select-font-size',
       'input-letter-msg',
@@ -334,6 +336,7 @@ const Studio = (() => {
     const airmailColorDisp  = document.getElementById('airmail-color-display');
     const ribbonColorDisp   = document.getElementById('ribbon-color-display');
     const textureSectionWrap = document.getElementById('texture-section-wrap');
+    const ribbonSenderWrap  = document.getElementById('ribbon-sender-wrap');
     const isAirmail       = template === 'airmail';
     const isRibbon        = template === 'ribbon';
 
@@ -355,6 +358,7 @@ const Studio = (() => {
     _toggle(airmailColorDisp, !isAirmail);   // show single chip only for airmail
     _toggle(ribbonColorDisp, !isRibbon);     // show chips only for ribbon
     _toggle(textureSectionWrap, isAirmail || isRibbon);  // no paper texture for airmail or ribbon
+    _toggle(ribbonSenderWrap, !isRibbon);    // show "Dari" field ONLY for Ribbon & Seal
   }
 
   function _applyPremiumLock(isPrem) {

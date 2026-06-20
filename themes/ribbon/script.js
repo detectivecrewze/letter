@@ -197,7 +197,7 @@ async function init() {
 
   // Floral fountain bursts from the envelope flap opening
   // (overlay is z-index 9999, covers both states during animation)
-  await _playFlowerTransition(envRect);
+  await _playFlowerTransition(envRect, config);
 
   // Reveal paper after flowers have cleared
   const paper = document.getElementById('letter-paper');
@@ -335,7 +335,7 @@ function _applyEnvelopeTheme(theme) {
    Flowers erupt from the envelope flap, spin, fill the screen,
    then swipe left/right to reveal the letter.
    ════════════════════════════════════════════════════════════ */
-function _playFlowerTransition(envRect) {
+function _playFlowerTransition(envRect, config) {
   return new Promise(resolve => {
     // ── Asset paths (relative to the ribbon theme folder) ────────
     const FLOWER_SRCS = [
@@ -473,7 +473,7 @@ function _playFlowerTransition(envRect) {
     const SETTLE_MS   = 3600;
     const VORTEX_MS   = SETTLE_MS + 400;   // When the vortex starts
     const HEART_MS    = VORTEX_MS + 2000;  // When vortex finishes, heart starts
-    const HEART_STAY  = 2500;              // How long the heart stays
+    const HEART_STAY  = 4500;              // How long the heart stays (increased from 2500)
     const RESOLVE_MS  = HEART_MS + HEART_STAY + 800; // Allow time to fade out the heart
 
     setTimeout(() => {
@@ -506,6 +506,97 @@ function _playFlowerTransition(envRect) {
       });
     }, VORTEX_MS);
 
+    // ── From / To Card — appears after vortex, lingers through heart ─
+    const TEXT_MS   = HEART_MS + 500;  // Fade in right as the heart is finishing its formation
+    const TEXT_OUT_MS = HEART_MS + HEART_STAY - 600; // Fade out before heart exits
+    setTimeout(() => {
+      // toName: strip salutation prefixes (Dearest, Dear, To:) + trailing punctuation
+      const rawTo = (config.letterTo || config.salutation || config.recipientName || config.to || '')
+        .replace(/^(Dearest|Dear|To|For)[,:\s]+/i, '')
+        .replace(/[,;:.]+$/, '')
+        .trim();
+      const toName = rawTo;
+      // fromName: check all possible sender fields
+      const fromName = (config.senderName || config.from || config.sender || '').trim();
+      if (!toName && !fromName) return; // Don't render if no names at all
+
+      const card = document.createElement('div');
+      card.style.cssText = `
+        position: absolute;
+        top: 44%; left: 50%;
+        transform: translate(-50%, -40%);
+        z-index: 200;
+        text-align: center;
+        pointer-events: none;
+        opacity: 0;
+        filter: blur(4px);
+        transition: opacity 1500ms ease, transform 1500ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 1500ms ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        width: 60%;
+        max-width: 300px;
+      `;
+
+      const introStyle = `
+        font-family: 'Cormorant Garamond', 'Georgia', serif;
+        font-style: italic;
+        text-transform: lowercase;
+        letter-spacing: 0.12em;
+        line-height: 1.3;
+        font-size: clamp(12px, 1.8vw, 15px);
+        color: rgba(255,225,185,0.8);
+        font-weight: 400;
+        display: block;
+      `;
+      const nameStyle = `
+        font-family: 'Cormorant Garamond', 'Georgia', serif;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        line-height: 1.3;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+        font-size: clamp(14px, 2.5vw, 22px);
+        color: rgba(255,240,220,0.95);
+        font-weight: 600;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      `;
+      card.innerHTML = `
+        ${fromName ? `
+          <span style="${introStyle} margin-bottom: 6px;">a letter from</span>
+          <span style="${nameStyle} margin-bottom: 16px;">${fromName}</span>
+        ` : ''}
+        <span style="width: 32px; height: 1px; background: rgba(255,210,160,0.35); margin-bottom: 16px; display: block;"></span>
+        ${toName ? `
+          <span style="${introStyle} margin-bottom: 6px;">for</span>
+          <span style="${nameStyle}">${toName}</span>
+        ` : ''}
+      `;
+
+      overlay.appendChild(card);
+      // Trigger fade in
+      requestAnimationFrame(() => requestAnimationFrame(() => { 
+        card.style.opacity = '1'; 
+        card.style.filter = 'blur(0px)';
+        card.style.transform = 'translate(-50%, -50%)'; 
+      }));
+
+      // Fade out
+      setTimeout(() => {
+        card.style.opacity = '0';
+        card.style.filter = 'blur(4px)';
+        card.style.transform = 'translate(-50%, -60%)';
+        setTimeout(() => card.remove(), 1500);
+      }, TEXT_OUT_MS - TEXT_MS);
+
+    }, TEXT_MS);
+
+
     // ── Heart Formation (Formasi Hati) ───────────────────────────
     // Uses arc-length parameterization for perfectly even flower spacing
     setTimeout(() => {
@@ -535,7 +626,7 @@ function _playFlowerTransition(envRect) {
 
       // --- Step 3: Sample evenly spaced points ---
       const HEART_COUNT = 54; // Even number for clean petal cycling
-      const FLOWER_SIZE = 38; // Perfectly uniform size for a clean "wreath" look
+      const FLOWER_SIZE = 46; // Slightly larger for a fuller look
       const S = 13;           // Scale multiplier for the heart (controls overall size)
       
       const heartEls   = [];

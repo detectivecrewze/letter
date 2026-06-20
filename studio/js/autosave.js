@@ -75,6 +75,7 @@ const Autosave = (() => {
       // Section 2 — Surat
       letterTo:      document.getElementById('input-letter-to')?.value.trim()  || '',
       salutation:    document.getElementById('input-letter-to')?.value.trim()  || '',
+      senderName:    document.getElementById('input-sender-name')?.value.trim() || '',
       fontFamily:    document.getElementById('select-font-family')?.value      || 'caveat',
       fontSize:      document.getElementById('select-font-size')?.value        || 'size-medium',
       message:       document.getElementById('input-letter-msg')?.value        || '',
