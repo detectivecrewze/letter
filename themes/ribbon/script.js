@@ -468,44 +468,37 @@ function _playFlowerTransition(envRect) {
       });
     });
 
-    // ── Sequential swipe out ─────────────────────────────────────
-    // After flowers settle (~3.6s), swipe left side out, then right
+    // ── The Curtain Reveal (Tirai Megah) ─────────────────────────
+    // After flowers settle (~3.6s), they sweep diagonally upwards to the sides without fading
     const SETTLE_MS   = 3600;
-    const LEFT_MS     = SETTLE_MS + 600;   // left swipe start
-    const RIGHT_MS    = LEFT_MS + 500;     // right swipe start
-    const RESOLVE_MS  = RIGHT_MS + 1400;  // all done
+    const CURTAIN_MS  = SETTLE_MS + 400;   // When the curtain sweep starts
+    const RESOLVE_MS  = CURTAIN_MS + 1500; // Allow time to clear the screen
 
     setTimeout(() => {
-      // Swipe LEFT flowers to the far left
       els.forEach(({ el, p }) => {
-        if (p.xEnd < 0) {
-          el.animate([
-            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 1 },
-            { transform: `translate(${p.xEnd - 1500}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 0 }
-          ], {
-            duration: 1200,
-            easing: 'ease-in',
-            fill: 'both'
-          });
-        }
-      });
-    }, LEFT_MS);
+        // Determine which side of the "curtain" this petal belongs to
+        const isLeft = p.xEnd < 0;
+        
+        // Sweep diagonally upwards and outwards off-screen
+        const sweepX = isLeft ? p.xEnd - 1500 : p.xEnd + 1500;
+        const sweepY = p.yFinal - 1000 - Math.random() * 500; // Fly upwards
+        
+        // Add a slight stagger for a flowing, dramatic curtain effect
+        const staggerDelay = Math.random() * 300; 
+        const sweepDuration = 1000 + Math.random() * 400; // Fast and punchy
 
-    setTimeout(() => {
-      // Swipe RIGHT flowers to the far right
-      els.forEach(({ el, p }) => {
-        if (p.xEnd >= 0) {
+        setTimeout(() => {
           el.animate([
-            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 1 },
-            { transform: `translate(${p.xEnd + 1500}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 0 }
+            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})` },
+            { transform: `translate(${sweepX}px, ${sweepY}px) scale(${p.finalScale})` }
           ], {
-            duration: 1200,
-            easing: 'ease-in',
-            fill: 'both'
+            duration: sweepDuration,
+            easing: 'cubic-bezier(0.55, 0.055, 0.675, 0.19)', // ease-in-cubic (starts slow, shoots off fast)
+            fill: 'both' // Opacity remains 100% (solid), no fading out
           });
-        }
+        }, staggerDelay);
       });
-    }, RIGHT_MS);
+    }, CURTAIN_MS);
 
     // ── Cleanup & resolve ────────────────────────────────────────
     setTimeout(() => {
