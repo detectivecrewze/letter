@@ -191,13 +191,9 @@ async function init() {
   const envEl = document.getElementById('ribbon-envelope');
   const envRect = envEl ? envEl.getBoundingClientRect() : null;
 
-  // Switch to letter state in background (the flower overlay covers it)
-  showState('letter');
-  await _delay(150);
-
-  // Floral fountain bursts from the envelope flap opening
-  // (overlay is z-index 9999, covers both states during animation)
-  await _playFlowerTransition(envRect, config);
+  // Delay showState('letter') until flowers fully cover the screen.
+  // The overlay is transparent — envelope stays visible below during burst.
+  await _playFlowerTransition(envRect, config, () => showState('letter'));
 
   // Reveal paper after flowers have cleared
   const paper = document.getElementById('letter-paper');
@@ -335,7 +331,7 @@ function _applyEnvelopeTheme(theme) {
    Flowers erupt from the envelope flap, spin, fill the screen,
    then swipe left/right to reveal the letter.
    ════════════════════════════════════════════════════════════ */
-function _playFlowerTransition(envRect, config) {
+function _playFlowerTransition(envRect, config, onSwitchState) {
   return new Promise(resolve => {
     // ── Asset paths (relative to the ribbon theme folder) ────────
     const FLOWER_SRCS = [
@@ -476,6 +472,9 @@ function _playFlowerTransition(envRect, config) {
     const HEART_MS    = VORTEX_MS + 2000;  // When vortex finishes, heart starts
     const HEART_STAY  = 4500;              // How long the heart stays (increased from 2500)
     const RESOLVE_MS  = HEART_MS + HEART_STAY + 800; // Allow time to fade out the heart
+
+    // Switch page state while flowers fully cover the screen (invisible to user)
+    setTimeout(() => { if (onSwitchState) onSwitchState(); }, SETTLE_MS - 200);
 
     setTimeout(() => {
       els.forEach(({ el, p }) => {
