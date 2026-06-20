@@ -433,9 +433,6 @@ function _playFlowerTransition(envRect) {
         top:${cy - half}px;
         opacity:0;
         transform:translate(0,0) scale(0.12);
-        transition:
-          transform ${p.duration}s cubic-bezier(0.22,1,0.36,1) ${p.delay}s,
-          opacity ${p.duration * 0.25}s ease ${p.delay}s;
         will-change:transform,opacity;
       `;
 
@@ -443,6 +440,7 @@ function _playFlowerTransition(envRect) {
       const img = document.createElement('img');
       img.src = FLOWER_SRCS[p.i % FLOWER_SRCS.length];
       img.draggable = false;
+      img.decoding = 'async'; // optimize loading
       img.style.cssText = `
         width:100%;height:100%;
         display:block;
@@ -456,13 +454,17 @@ function _playFlowerTransition(envRect) {
       return { el: wrapper, p };
     });
 
-    // ── Trigger burst (next frame so initial style applies) ──────
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        els.forEach(({ el, p }) => {
-          el.style.transform = `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`;
-          el.style.opacity = '1';
-        });
+    // ── Trigger burst (Web Animations API) ───────────────────────
+    els.forEach(({ el, p }) => {
+      el.animate([
+        { transform: `translate(0px, 0px) scale(0.12)`, opacity: 0 },
+        { transform: `translate(${p.xEnd * 0.4}px, ${p.yPeak}px) scale(0.85)`, opacity: 1, offset: 0.38 },
+        { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 1 }
+      ], {
+        duration: p.duration * 1000,
+        delay: p.delay * 1000,
+        easing: 'ease-out',
+        fill: 'both' // Keeps the final state after animation
       });
     });
 
@@ -477,9 +479,14 @@ function _playFlowerTransition(envRect) {
       // Swipe LEFT flowers to the far left
       els.forEach(({ el, p }) => {
         if (p.xEnd < 0) {
-          el.style.transition = 'transform 1.2s ease-in, opacity 1.2s ease-in';
-          el.style.transform = `translate(${p.xEnd - 1500}px, ${p.yFinal}px) scale(${p.finalScale})`;
-          el.style.opacity = '0';
+          el.animate([
+            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 1 },
+            { transform: `translate(${p.xEnd - 1500}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 0 }
+          ], {
+            duration: 1200,
+            easing: 'ease-in',
+            fill: 'both'
+          });
         }
       });
     }, LEFT_MS);
@@ -488,9 +495,14 @@ function _playFlowerTransition(envRect) {
       // Swipe RIGHT flowers to the far right
       els.forEach(({ el, p }) => {
         if (p.xEnd >= 0) {
-          el.style.transition = 'transform 1.2s ease-in, opacity 1.2s ease-in';
-          el.style.transform = `translate(${p.xEnd + 1500}px, ${p.yFinal}px) scale(${p.finalScale})`;
-          el.style.opacity = '0';
+          el.animate([
+            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 1 },
+            { transform: `translate(${p.xEnd + 1500}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 0 }
+          ], {
+            duration: 1200,
+            easing: 'ease-in',
+            fill: 'both'
+          });
         }
       });
     }, RIGHT_MS);
