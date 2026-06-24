@@ -25,7 +25,7 @@ const Publisher = (() => {
         `Letter ID: ${token}\n\n` +
         `Halo admin, saya ingin request upgrade akun Premium untuk membuka fitur Upload Musik dan Password Lock.`
       );
-      window.open(`https://wa.me/6281381543981?text=${waMsg}`, '_blank');
+      window.open(`https://wa.me/6281936109076?text=${waMsg}`, '_blank');
     });
 
     // Success modal
@@ -391,7 +391,7 @@ const Publisher = (() => {
       `Halo admin, saya ingin request link personal untuk surat digital saya.`
     );
     const waBtn = document.getElementById('btn-contact-admin-vip');
-    if (waBtn) waBtn.href = `https://wa.me/6281381543981?text=${waMsg}`;
+    if (waBtn) waBtn.href = `https://wa.me/6281936109076?text=${waMsg}`;
     _toggleModal('modal-success-vip', true);
   }
 
