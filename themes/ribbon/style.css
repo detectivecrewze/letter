@@ -792,10 +792,10 @@ body[data-ribbon-theme="ribbon-violet"] {
 html[data-ribbon-theme="ribbon-sunflower"],
 body[data-ribbon-theme="ribbon-sunflower"] {
   color-scheme: light;
-  --bg-top:             #fcf7e1;
-  --bg-bottom:          #f2e8c4;
-  --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(212, 178, 94, 0.22) 0%, transparent 50%),
-                        radial-gradient(ellipse at 70% 80%, rgba(198, 160, 75, 0.16) 0%, transparent 50%);
+  --bg-top:             #fffde7;
+  --bg-bottom:          #ffeaa7;
+  --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(253, 203, 110, 0.25) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(253, 216, 53, 0.15) 0%, transparent 50%);
   --kraft-highlight:    #fef9eb;
   --kraft-light:        #fcf2d4;
   --kraft-mid:          #ecdcaa;
