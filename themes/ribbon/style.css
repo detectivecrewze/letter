@@ -788,6 +788,29 @@ body[data-ribbon-theme="ribbon-violet"] {
   --paper-bg2:          #f7f0fc;
 }
 
+/* 7. Sunflower (Golden) — warm buttery yellow bg, golden parchment, mustard ribbon */
+html[data-ribbon-theme="ribbon-sunflower"],
+body[data-ribbon-theme="ribbon-sunflower"] {
+  color-scheme: light;
+  --bg-top:             #fcf7e1;
+  --bg-bottom:          #f2e8c4;
+  --bg-accent:          radial-gradient(ellipse at 30% 20%, rgba(212, 178, 94, 0.22) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(198, 160, 75, 0.16) 0%, transparent 50%);
+  --kraft-highlight:    #fef9eb;
+  --kraft-light:        #fcf2d4;
+  --kraft-mid:          #ecdcaa;
+  --seal-red:           #c29729;
+  --seal-red-light:     #dca72f;
+  --ribbon-red:         #e0a618;
+  --ribbon-mid:         #f5b61d;
+  --ribbon-dark:        #bc8209;
+  --warm-brown:         #8a6b1c;
+  --ink-secondary:      #967b2d;
+  --paper-bg:           #fffdf7;
+  --paper-bg2:          #fcf6e8;
+}
+
+
 /* ════════════════════════════════════════════════════════════
    LETTER STATE
    ════════════════════════════════════════════════════════════ */
