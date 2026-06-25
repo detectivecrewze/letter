@@ -309,6 +309,7 @@ function _applyEnvelopeTheme(theme) {
     'ribbon-rose':     { stroke: '#9a7880', berry: '#e8c0c8', flower: '#e8c0cc' },
     'ribbon-bordeaux': { stroke: '#7a5040', berry: '#c8a888', flower: '#d4b898' },
     'ribbon-violet':   { stroke: '#7a68a0', berry: '#c8b8e0', flower: '#d0c0e8' },
+    'ribbon-sunflower':{ stroke: '#8a6b1c', berry: '#e0a618', flower: '#fcf2d4' },
   };
   const vc = vineThemeColors[theme] || vineThemeColors['ribbon-crimson'];
 
@@ -541,10 +542,10 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
         const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
         isLightTheme = luminance > 0.5;
       }
-      // Also check via config ribbonTheme key (light themes: rose, forest, violet/parchment)
+      // Also check via config ribbonTheme key (light themes: rose, forest, violet/parchment, sunflower)
       const theme = (config.ribbonTheme || config.theme || '').toLowerCase();
-      if (['ribbon-rose', 'ribbon-forest', 'ribbon-violet', 'ribbon-parchment', 'ribbon-crimson'].some(t => theme.includes(t.replace('ribbon-','')))) {
-        if (['rose', 'forest', 'violet', 'parchment', 'crimson'].some(t => theme.includes(t))) {
+      if (['ribbon-rose', 'ribbon-forest', 'ribbon-violet', 'ribbon-parchment', 'ribbon-crimson', 'ribbon-sunflower'].some(t => theme.includes(t.replace('ribbon-','')))) {
+        if (['rose', 'forest', 'violet', 'parchment', 'crimson', 'sunflower'].some(t => theme.includes(t))) {
           isLightTheme = true;
         }
       }
