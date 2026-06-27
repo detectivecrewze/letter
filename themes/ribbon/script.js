@@ -522,8 +522,9 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
     const TEXT_MS   = HEART_MS + 500;
     const TEXT_OUT_MS = HEART_MS + HEART_STAY - 600;
     setTimeout(() => {
-      // toName: strip salutation prefixes
-      const rawTo = (config.letterTo || config.salutation || config.recipientName || config.to || '')
+      // toName: read from PENERIMA SURAT section first (recipientName/to),
+      // NOT from the letter's salutation (letterTo) which may contain "To My Favorite Human" etc.
+      const rawTo = (config.recipientName || config.to || config.letterTo || config.salutation || '')
         .replace(/^(Dearest|Dear|To|For)[,:\s]+/i, '')
         .replace(/[,;:.]+$/, '')
         .trim();
