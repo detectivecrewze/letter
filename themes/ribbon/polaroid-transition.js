@@ -134,6 +134,12 @@ window.RibbonPolaroid = (() => {
       const pool  = [];
       while (pool.length < COUNT) rawList.forEach(item => pool.push(item));
       const photos = pool.slice(0, COUNT);
+      
+      // Shuffle the photos array so they appear in truly random order and z-index
+      for (let i = photos.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [photos[i], photos[j]] = [photos[j], photos[i]];
+      }
 
       // ── Polaroid card dimensions (BIGGER) ────────────────────────────────
       // Photo area: 170x135px on desktop, 125x100px on mobile
