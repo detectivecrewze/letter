@@ -202,9 +202,14 @@ async function init() {
   const envEl = document.getElementById('ribbon-envelope');
   const envRect = envEl ? envEl.getBoundingClientRect() : null;
 
-  // Delay showState('letter') until flowers fully cover the screen.
-  // The overlay is transparent — envelope stays visible below during burst.
-  await _playFlowerTransition(envRect, config, () => showState('letter'));
+  // ── Choose transition: Polaroid (if photos exist) or Flowers ──
+  const _mediaList = config.secretMediaList || [];
+  const _hasPolaroid = _mediaList.length > 0 && typeof window.RibbonPolaroid !== 'undefined';
+  if (_hasPolaroid) {
+    await window.RibbonPolaroid.play(envRect, config, () => showState('letter'));
+  } else {
+    await _playFlowerTransition(envRect, config, () => showState('letter'));
+  }
 
   // Reveal paper after flowers have cleared
   const paper = document.getElementById('letter-paper');

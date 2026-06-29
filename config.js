@@ -36,5 +36,12 @@ window.STANDALONE_CONFIG = {
   "publishedAt": "2026-04-15T09:23:04.043Z",
   "requestedAt": "2026-04-15T09:24:14.010Z",
   "secretMedia": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=80",
-  "secretCaption": "Us. Always. ♡"
+  "secretCaption": "Us. Always. ♡",
+  "secretMediaList": [
+    { "url": "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&q=80", "caption": "Us. Always. ♡" },
+    { "url": "https://images.unsplash.com/photo-1529634806980-85c3dd6d34ac?w=400&q=80", "caption": "First trip together 🌸" },
+    { "url": "https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=400&q=80", "caption": "Sunset vibes ✨" },
+    { "url": "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&q=80", "caption": "My favorite person 💛" },
+    { "url": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&q=80", "caption": "Birthday magic 🎂" }
+  ]
 };
