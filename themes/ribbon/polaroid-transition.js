@@ -115,7 +115,7 @@ window.RibbonPolaroid = (() => {
       const rawList = (config.secretMediaList || []).filter(item => item && item.url);
       if (rawList.length === 0) { resolve(); return; }
 
-      const COUNT = 150;
+      const COUNT = 350;
       const pool  = [];
       while (pool.length < COUNT) rawList.forEach(item => pool.push(item));
       const photos = pool.slice(0, COUNT);
