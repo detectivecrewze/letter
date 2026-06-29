@@ -236,7 +236,7 @@ window.RibbonPolaroid = (() => {
 
       // ── Timing — mirrors _playFlowerTransition ────────────────────────────
       const SETTLE_MS  = 3600;
-      const VORTEX_MS  = SETTLE_MS + 2500; // Stay longer on screen before sweeping out
+      const VORTEX_MS  = SETTLE_MS + 1200; // Stay for ~1.2s before sweeping out
       const HEART_MS   = VORTEX_MS + 2000;
       const HEART_STAY = 4500;
       const RESOLVE_MS = HEART_MS + HEART_STAY + 800;
