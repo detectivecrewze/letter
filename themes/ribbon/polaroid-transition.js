@@ -121,7 +121,13 @@ window.RibbonPolaroid = (() => {
       const cy = envRect ? (envRect.top  + envRect.height * 0.35) : H / 2;
 
       // ── Build photo pool — loop to reach COUNT ────────────────────────────
-      const rawList = (config.secretMediaList || []).filter(item => item && item.url);
+      // Filter out invalid items and videos
+      const rawList = (config.secretMediaList || []).filter(item => {
+        if (!item || !item.url) return false;
+        const urlNoQuery = item.url.split('?')[0];
+        const isVideo = /\.(mp4|webm|mov|ogg)$/i.test(urlNoQuery);
+        return !isVideo;
+      });
       if (rawList.length === 0) { resolve(); return; }
 
       const COUNT = 150;
