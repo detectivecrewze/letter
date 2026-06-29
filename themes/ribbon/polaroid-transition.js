@@ -63,7 +63,8 @@ window.RibbonPolaroid = (() => {
         transform-origin: center center;
       }
 
-      ._pol-card-inner img {
+      ._pol-card-inner img,
+      ._pol-card-inner video {
         display: block;
         width: 100%;
         height: 100%;
@@ -190,19 +191,30 @@ window.RibbonPolaroid = (() => {
         // We set the animation directly via inline style
         inner.style.animation = `_pol-float ${floatDur}s ease-in-out ${floatDelay}s infinite alternate`;
 
-        const img = document.createElement('img');
-        img.src       = p.item.url;
-        img.alt       = p.item.caption || '';
-        img.draggable = false;
-        img.decoding  = 'async';
-        img.width     = PHOTO_W;
-        img.height    = PHOTO_H;
+        const isVideo = /\.(mp4|webm|mov|ogg)$/i.test(p.item.url);
+        let mediaEl;
+        if (isVideo) {
+          mediaEl = document.createElement('video');
+          mediaEl.src = p.item.url;
+          mediaEl.autoplay = true;
+          mediaEl.loop = true;
+          mediaEl.muted = true;
+          mediaEl.playsInline = true;
+        } else {
+          mediaEl = document.createElement('img');
+          mediaEl.src       = p.item.url;
+          mediaEl.alt       = p.item.caption || '';
+          mediaEl.draggable = false;
+          mediaEl.decoding  = 'async';
+        }
+        mediaEl.width  = PHOTO_W;
+        mediaEl.height = PHOTO_H;
 
         const cap = document.createElement('div');
         cap.className   = '_pol-caption';
         cap.textContent = p.item.caption || '';
 
-        inner.appendChild(img);
+        inner.appendChild(mediaEl);
         inner.appendChild(cap);
         wrapper.appendChild(inner);
         overlay.appendChild(wrapper);
