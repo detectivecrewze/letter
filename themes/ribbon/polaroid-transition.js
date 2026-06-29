@@ -115,15 +115,15 @@ window.RibbonPolaroid = (() => {
       const rawList = (config.secretMediaList || []).filter(item => item && item.url);
       if (rawList.length === 0) { resolve(); return; }
 
-      const COUNT = 350;
+      const COUNT = 150;
       const pool  = [];
       while (pool.length < COUNT) rawList.forEach(item => pool.push(item));
       const photos = pool.slice(0, COUNT);
 
       // ── Polaroid card dimensions (BIGGER) ────────────────────────────────
-      // Photo area: 130×105px on desktop, 95×76px on mobile
-      const PHOTO_W = isMobile ? 95  : 130;
-      const PHOTO_H = isMobile ? 76  : 105;
+      // Photo area: 170x135px on desktop, 125x100px on mobile
+      const PHOTO_W = isMobile ? 125 : 170;
+      const PHOTO_H = isMobile ? 100 : 135;
       const CARD_W  = PHOTO_W + 20;       // 10px each side
       const CARD_H  = PHOTO_H + 10 + 42; // 10px top + 42px caption bottom
 
