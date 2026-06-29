@@ -191,7 +191,8 @@ window.RibbonPolaroid = (() => {
         // We set the animation directly via inline style
         inner.style.animation = `_pol-float ${floatDur}s ease-in-out ${floatDelay}s infinite alternate`;
 
-        const isVideo = /\.(mp4|webm|mov|ogg)$/i.test(p.item.url);
+        const urlNoQuery = p.item.url.split('?')[0];
+        const isVideo = /\.(mp4|webm|mov|ogg)$/i.test(urlNoQuery);
         let mediaEl;
         if (isVideo) {
           mediaEl = document.createElement('video');
