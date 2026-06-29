@@ -45,20 +45,25 @@ window.RibbonPolaroid = (() => {
         overflow: hidden;
       }
 
-      ._pol-card {
+      ._pol-card-wrapper {
         position: absolute;
-        background: #ffffff;
         will-change: transform, opacity;
         transform-origin: center center;
+      }
+
+      ._pol-card-inner {
+        width: 100%; height: 100%;
+        background: #ffffff;
         padding: 10px 10px 42px 10px;
         border-radius: 2px;
         box-shadow:
           0 8px 28px rgba(0,0,0,0.22),
           0 3px 8px rgba(0,0,0,0.14),
           0 0 0 1px rgba(0,0,0,0.04);
+        transform-origin: center center;
       }
 
-      ._pol-card img {
+      ._pol-card-inner img {
         display: block;
         width: 100%;
         height: 100%;
@@ -84,6 +89,10 @@ window.RibbonPolaroid = (() => {
         text-overflow: ellipsis;
       }
 
+      @keyframes _pol-float {
+        0%   { transform: translateY(-6px) rotate(-3deg); }
+        100% { transform: translateY(6px) rotate(3deg); }
+      }
       @keyframes _pol-spin     { to { transform: rotate(360deg);  } }
       @keyframes _pol-spin-rev { to { transform: rotate(-360deg); } }
       @keyframes _floral-spin     { to { transform: rotate(360deg);  } }
@@ -136,7 +145,7 @@ window.RibbonPolaroid = (() => {
       const particles = photos.map((item, i) => {
         const frac = i / COUNT;
 
-        // 200° upward fan — same as flower burst, nothing flies downward
+        // 200° upward fan
         const spread       = 200;
         const baseAngleDeg = -90 + (frac - 0.5) * spread;
         const jitter       = (rng() - 0.5) * 18;
@@ -149,23 +158,37 @@ window.RibbonPolaroid = (() => {
         const yFinal     = yPeak + 400 + rng() * 650; // gravity
 
         const finalScale = 1.0 + rng() * 0.5;
-        const rotFinal   = (rng() - 0.5) * 32; // tilt -16° to +16°
+        const rotFinal   = (rng() - 0.5) * 32; // final tilt
+        
+        // Sway amount during burst: overshoot the rotation by up to 40 degrees
+        const swayAmount = (rng() > 0.5 ? 1 : -1) * (20 + rng() * 20); 
+
         const delay      = frac * 1.6 + rng() * 0.15;
         const duration   = 2.0 + rng() * 1.6;
 
-        return { i, item, frac, xEnd, yPeak, yFinal, finalScale, rotFinal, delay, duration };
+        return { i, item, frac, xEnd, yPeak, yFinal, finalScale, rotFinal, swayAmount, delay, duration };
       });
 
       // ── Create DOM elements ───────────────────────────────────────────────
       const cards = particles.map(p => {
-        const card = document.createElement('div');
-        card.className = '_pol-card';
-        card.style.cssText = `
+        const wrapper = document.createElement('div');
+        wrapper.className = '_pol-card-wrapper';
+        wrapper.style.cssText = `
           width:${CARD_W}px; height:${CARD_H}px;
           left:${cx - CARD_W / 2}px; top:${cy - CARD_H / 2}px;
           opacity:0;
           transform:translate(0,0) scale(0.12) rotate(${p.rotFinal * 0.3}deg);
         `;
+
+        const inner = document.createElement('div');
+        inner.className = '_pol-card-inner';
+        // Random float animation timing
+        const floatDelay = -(Math.random() * 4);
+        const floatDur   = 3 + Math.random() * 2;
+        // Start the float animation slightly after the burst
+        const startFloat = p.delay + p.duration;
+        // We set the animation directly via inline style
+        inner.style.animation = `_pol-float ${floatDur}s ease-in-out ${floatDelay}s infinite alternate`;
 
         const img = document.createElement('img');
         img.src       = p.item.url;
@@ -179,11 +202,12 @@ window.RibbonPolaroid = (() => {
         cap.className   = '_pol-caption';
         cap.textContent = p.item.caption || '';
 
-        card.appendChild(img);
-        card.appendChild(cap);
-        overlay.appendChild(card);
+        inner.appendChild(img);
+        inner.appendChild(cap);
+        wrapper.appendChild(inner);
+        overlay.appendChild(wrapper);
 
-        return { el: card, p };
+        return { el: wrapper, p };
       });
 
       // ── PHASE 1: Burst — identical 3-keyframe parabola as flowers ─────────
@@ -194,7 +218,7 @@ window.RibbonPolaroid = (() => {
             opacity: 0
           },
           {
-            transform: `translate(${p.xEnd * 0.4}px, ${p.yPeak}px) scale(0.78) rotate(${p.rotFinal * 0.7}deg)`,
+            transform: `translate(${p.xEnd * 0.4}px, ${p.yPeak}px) scale(0.78) rotate(${p.rotFinal + p.swayAmount}deg)`,
             opacity: 1,
             offset: 0.38
           },
