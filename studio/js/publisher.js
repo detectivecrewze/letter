@@ -133,6 +133,15 @@ const Publisher = (() => {
     const subtitle = document.getElementById('qr-subtitle');
     const branding = document.getElementById('qr-branding');
 
+    // Reset qrBox styles to default
+    if (qrBox) {
+      qrBox.style.borderRadius = '10px';
+      qrBox.style.border = '1px solid rgba(0,0,0,0.04)';
+      qrBox.style.boxShadow = 'inset 0 1px 3px rgba(0,0,0,0.04)';
+      qrBox.style.background = 'white';
+      qrBox.style.padding = '10px';
+    }
+
     if (templateType === 'airmail') {
       // Vintage Airmail Design
       if (exportContainer) {
@@ -219,41 +228,60 @@ const Publisher = (() => {
         branding.style.fontWeight = 'normal';
       }
     } else if (templateType === 'vintage') {
-      // Vintage Flowers Design
+      // Vintage Flowers Design - Cute & Aesthetic
       if (exportContainer) {
-        exportContainer.style.background = 'linear-gradient(160deg, #f4ede0 0%, #eadcc2 100%)';
-        exportContainer.style.border = '1px solid rgba(139, 107, 74, 0.2)';
-        exportContainer.style.borderRadius = '8px';
-        exportContainer.style.boxShadow = '0 15px 40px -10px rgba(100,70,50,0.15), 0 5px 15px rgba(0,0,0,0.05)';
+        exportContainer.style.background = '#fbf7f4';
+        exportContainer.style.border = 'none';
+        exportContainer.style.borderRadius = '24px';
+        exportContainer.style.boxShadow = '0 15px 35px -5px rgba(160, 130, 120, 0.15), inset 0 0 0 6px #fbf7f4, inset 0 0 0 8px rgba(220, 190, 180, 0.5)';
       }
       if (topAccent) {
-        topAccent.style.width = '100%';
-        topAccent.style.height = '6px';
-        topAccent.style.borderRadius = '8px 8px 0 0';
-        topAccent.style.left = '0';
-        topAccent.style.transform = 'none';
-        topAccent.style.background = 'linear-gradient(90deg, #c9a0a0, #9cb8a0)'; // floral pink & green
+        topAccent.style.width = '64px';
+        topAccent.style.height = '18px';
+        topAccent.style.borderRadius = '4px';
+        topAccent.style.left = '50%';
+        topAccent.style.top = '-10px';
+        topAccent.style.transform = 'translateX(-50%) rotate(-2deg)';
+        topAccent.style.background = 'rgba(235, 205, 195, 0.9)'; // pastel pink washi tape
+        topAccent.style.boxShadow = '1px 2px 4px rgba(0,0,0,0.06)';
         topAccent.style.display = 'block';
         topAccent.style.overflow = '';
         topAccent.innerHTML = '';
       }
       if (title) {
-        title.textContent = 'Vintage Flowers';
+        title.innerHTML = '✿ <span style="margin: 0 4px;">Vintage</span> ✿';
         title.style.fontFamily = "'Playfair Display', serif";
         title.style.fontStyle = 'italic';
-        title.style.fontWeight = 'normal';
-        title.style.fontSize = '26px';
-        title.style.color = '#5a4634';
+        title.style.fontWeight = 'bold';
+        title.style.fontSize = '24px';
+        title.style.color = '#7d685e';
         title.style.letterSpacing = '1px';
+        title.style.marginBottom = '6px';
+        title.style.display = 'flex';
+        title.style.alignItems = 'center';
+        title.style.justifyContent = 'center';
       }
       if (subtitle) {
-        subtitle.textContent = '✦ scan to view your letter ✦';
-        subtitle.style.color = '#7d6450';
+        subtitle.textContent = 'scan for a lovely letter';
+        subtitle.style.color = '#a08f88';
+        subtitle.style.fontFamily = "'Quicksand', sans-serif";
+        subtitle.style.fontWeight = '600';
+        subtitle.style.letterSpacing = '0.15em';
+        subtitle.style.textTransform = 'lowercase';
       }
       if (branding) {
-        branding.textContent = 'pressed with memories';
-        branding.style.color = '#a38f7d';
-        branding.style.fontWeight = 'normal';
+        branding.textContent = 'crafted with memories';
+        branding.style.color = '#cbb8ae';
+        branding.style.fontWeight = 'bold';
+        branding.style.letterSpacing = '0.25em';
+        branding.style.textTransform = 'lowercase';
+      }
+      if (qrBox) {
+        qrBox.style.borderRadius = '16px';
+        qrBox.style.border = '2px dashed rgba(220, 190, 180, 0.8)';
+        qrBox.style.boxShadow = '0 8px 20px -8px rgba(180, 150, 140, 0.2)';
+        qrBox.style.background = '#ffffff';
+        qrBox.style.padding = '12px';
       }
     } else {
       // Classic Letter Design (Restore defaults)
