@@ -339,6 +339,7 @@ const Studio = (() => {
     const ribbonSenderWrap  = document.getElementById('ribbon-sender-wrap');
     const isAirmail       = template === 'airmail';
     const isRibbon        = template === 'ribbon';
+    const isVintage       = template === 'vintage';
 
     // Helper: hide or show with transition
     function _toggle(el, shouldHide) {
@@ -352,12 +353,12 @@ const Studio = (() => {
       }
     }
 
-    _toggle(titleWrap,         isAirmail);               // no title for airmail only (ribbon HAS title)
-    _toggle(typoSec,           isAirmail || isRibbon);   // no font/size for airmail or ribbon
-    _toggle(themeSelectorWrap, isAirmail || isRibbon);   // hide multi-color for airmail or ribbon
+    _toggle(titleWrap,         isAirmail || isVintage);  // no title for airmail or vintage
+    _toggle(typoSec,           isAirmail || isRibbon || isVintage);   // no font/size for airmail, ribbon, or vintage
+    _toggle(themeSelectorWrap, isAirmail || isRibbon || isVintage);   // hide multi-color for airmail, ribbon, or vintage
     _toggle(airmailColorDisp, !isAirmail);   // show single chip only for airmail
     _toggle(ribbonColorDisp, !isRibbon);     // show chips only for ribbon
-    _toggle(textureSectionWrap, isAirmail || isRibbon);  // no paper texture for airmail or ribbon
+    _toggle(textureSectionWrap, isAirmail || isRibbon || isVintage);  // no paper texture for airmail, ribbon, or vintage
     _toggle(ribbonSenderWrap, !isRibbon);    // show "Dari" field ONLY for Ribbon & Seal
   }
 
