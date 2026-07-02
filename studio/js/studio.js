@@ -360,7 +360,8 @@ const Studio = (() => {
           'flower1': 'Tipe 1',
           'flower2': 'Tipe 2',
           'flower3': 'Tipe 3',
-          'flower4': 'Tipe 4'
+          'flower4': 'Tipe 4',
+          'flower5': 'Tipe 5'
         };
         showToast(`Bunga '${names[flower] || flower}' ${btn.classList.contains('active') ? 'dipilih' : 'dihapus'}`);
       });

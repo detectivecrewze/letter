@@ -37,6 +37,10 @@ const VINTAGE_FLOWER_ASSETS = {
   'flower4': [
     _SCRIPT_BASE + 'assets/test4.png',
     _SCRIPT_BASE + 'assets/test4.png'
+  ],
+  'flower5': [
+    _SCRIPT_BASE + 'assets/test5.png',
+    _SCRIPT_BASE + 'assets/test5.png'
   ]
 };
 
