@@ -1277,6 +1277,8 @@ textarea,
 #typography-section,
 #theme-selector-wrap,
 #airmail-color-display,
+#ribbon-color-display,
+#vintage-flower-display,
 #texture-section-wrap {
   transition: opacity 0.25s ease, max-height 0.35s cubic-bezier(0.4,0,0.2,1);
 }
@@ -1286,6 +1288,7 @@ textarea,
 #theme-selector-wrap.field-hidden,
 #airmail-color-display.field-hidden,
 #ribbon-color-display.field-hidden,
+#vintage-flower-display.field-hidden,
 #texture-section-wrap.field-hidden {
   opacity: 0;
   max-height: 0 !important;
