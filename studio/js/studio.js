@@ -9,7 +9,7 @@ const Studio = (() => {
   let _activeTemplate = 'classic';
   let _activeAirmailTheme = 'airmail-parchment';
   let _activeRibbonTheme = 'ribbon-crimson'; // default airmail colour
-  let _activeVintageFlower = ['flower1'];
+  let _activeVintageFlower = ['flower1', 'flower2', 'flower3', 'flower4', 'flower5'];
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -143,7 +143,7 @@ const Studio = (() => {
     });
 
     // Vintage Flower Initial State
-    _activeVintageFlower = (config.vintageFlower || 'flower1').split(',');
+    _activeVintageFlower = (config.vintageFlower || 'flower1,flower2,flower3,flower4,flower5').split(',');
     document.querySelectorAll('.vintage-flower-option').forEach(btn => {
       btn.classList.toggle('active', _activeVintageFlower.includes(btn.dataset.vintageFlower));
     });

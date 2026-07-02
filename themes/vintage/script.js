@@ -46,7 +46,7 @@ const VINTAGE_FLOWER_ASSETS = {
 
 // Get all selected flowers
 function getFlowerSrcs(config) {
-  const flowerStr = config.vintageFlower || 'flower1';
+  const flowerStr = config.vintageFlower || 'flower1,flower2,flower3,flower4,flower5';
   const flowerTypes = flowerStr.split(',');
   let srcs = [];
   flowerTypes.forEach(t => {
