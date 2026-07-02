@@ -22,28 +22,24 @@ const _SCRIPT_BASE = (() => {
 
 // Flower assets map based on selection
 const VINTAGE_FLOWER_ASSETS = {
-  'sage': [
-    _SCRIPT_BASE + '../../assets/flowers_sage1.png',
-    _SCRIPT_BASE + '../../assets/flowers_sage2.png'
+  'flower1': [
+    _SCRIPT_BASE + 'assets/test1.webp',
+    _SCRIPT_BASE + 'assets/test1.webp'
   ],
-  'crimson': [
-    _SCRIPT_BASE + '../../assets/crimson1.png',
-    _SCRIPT_BASE + '../../assets/crimson2.png'
+  'flower2': [
+    _SCRIPT_BASE + 'assets/test2.webp',
+    _SCRIPT_BASE + 'assets/test2.webp'
   ],
-  'midnight': [
-    _SCRIPT_BASE + '../../assets/flower_midnight1.png',
-    _SCRIPT_BASE + '../../assets/flower_midnight2.png'
-  ],
-  'obsidian': [
-    _SCRIPT_BASE + '../../assets/obsidian1.png',
-    _SCRIPT_BASE + '../../assets/obsidian2.png'
+  'flower3': [
+    _SCRIPT_BASE + 'assets/test3.png',
+    _SCRIPT_BASE + 'assets/test3.png'
   ]
 };
 
-// Fallback to sage if none specified
+// Fallback to flower1 if none specified
 function getFlowerSrcs(config) {
-  const flowerType = config.vintageFlower || 'sage';
-  return VINTAGE_FLOWER_ASSETS[flowerType] || VINTAGE_FLOWER_ASSETS['sage'];
+  const flowerType = config.vintageFlower || 'flower1';
+  return VINTAGE_FLOWER_ASSETS[flowerType] || VINTAGE_FLOWER_ASSETS['flower1'];
 }
 
 const TW_CHAR_DELAY = 38;

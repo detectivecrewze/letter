@@ -9,7 +9,7 @@ const Studio = (() => {
   let _activeTemplate = 'classic';
   let _activeAirmailTheme = 'airmail-parchment';
   let _activeRibbonTheme = 'ribbon-crimson'; // default airmail colour
-  let _activeVintageFlower = 'sage';
+  let _activeVintageFlower = 'flower1';
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -143,7 +143,7 @@ const Studio = (() => {
     });
 
     // Vintage Flower Initial State
-    _activeVintageFlower = config.vintageFlower || 'sage';
+    _activeVintageFlower = config.vintageFlower || 'flower1';
     document.querySelectorAll('.vintage-flower-option').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.vintageFlower === _activeVintageFlower);
     });
@@ -347,10 +347,9 @@ const Studio = (() => {
         btn.classList.add('active');
         Autosave.trigger();
         const names = {
-          'sage': 'Sage',
-          'crimson': 'Crimson',
-          'midnight': 'Midnight',
-          'obsidian': 'Obsidian'
+          'flower1': 'Tipe 1',
+          'flower2': 'Tipe 2',
+          'flower3': 'Tipe 3'
         };
         showToast(`Bunga '${names[flower] || flower}' dipilih`);
       });
