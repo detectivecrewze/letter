@@ -97,7 +97,7 @@ const Publisher = (() => {
         }
         // Build URL based on template type
         const templateType = state.templateType || 'classic';
-        const pathMap = { airmail: `/airmail/${token}`, ribbon: `/ribbon/${token}` };
+        const pathMap = { airmail: `/airmail/${token}`, ribbon: `/ribbon/${token}`, vintage: `/vintage/${token}` };
         const basePath = pathMap[templateType] || `/${token}`;
         const url = `${location.protocol}//${location.host}${basePath}`;
         _showSuccessModal(url, templateType);
@@ -216,6 +216,43 @@ const Publisher = (() => {
       if (branding) {
         branding.textContent = 'sealed with love';
         branding.style.color = '#b0967a';
+        branding.style.fontWeight = 'normal';
+      }
+    } else if (templateType === 'vintage') {
+      // Vintage Flowers Design
+      if (exportContainer) {
+        exportContainer.style.background = 'linear-gradient(160deg, #f4ede0 0%, #eadcc2 100%)';
+        exportContainer.style.border = '1px solid rgba(139, 107, 74, 0.2)';
+        exportContainer.style.borderRadius = '8px';
+        exportContainer.style.boxShadow = '0 15px 40px -10px rgba(100,70,50,0.15), 0 5px 15px rgba(0,0,0,0.05)';
+      }
+      if (topAccent) {
+        topAccent.style.width = '100%';
+        topAccent.style.height = '6px';
+        topAccent.style.borderRadius = '8px 8px 0 0';
+        topAccent.style.left = '0';
+        topAccent.style.transform = 'none';
+        topAccent.style.background = 'linear-gradient(90deg, #c9a0a0, #9cb8a0)'; // floral pink & green
+        topAccent.style.display = 'block';
+        topAccent.style.overflow = '';
+        topAccent.innerHTML = '';
+      }
+      if (title) {
+        title.textContent = 'Vintage Flowers';
+        title.style.fontFamily = "'Playfair Display', serif";
+        title.style.fontStyle = 'italic';
+        title.style.fontWeight = 'normal';
+        title.style.fontSize = '26px';
+        title.style.color = '#5a4634';
+        title.style.letterSpacing = '1px';
+      }
+      if (subtitle) {
+        subtitle.textContent = '✦ scan to view your letter ✦';
+        subtitle.style.color = '#7d6450';
+      }
+      if (branding) {
+        branding.textContent = 'pressed with memories';
+        branding.style.color = '#a38f7d';
         branding.style.fontWeight = 'normal';
       }
     } else {

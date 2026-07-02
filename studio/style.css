@@ -1079,6 +1079,88 @@ textarea,
   border: 0.5px solid rgba(255,220,200,0.5);
 }
 
+/* ── Vintage Flowers Thumbnail ── */
+.thumb-vintage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--surface-hover);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+}
+
+.thumb-vintage-paper {
+  position: absolute;
+  top: 15%;
+  left: 10%;
+  right: 10%;
+  bottom: 15%;
+  background: #f4ede0; /* cream/vintage paper */
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.thumb-vintage-paper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  /* Top triangle flap */
+  background: linear-gradient(180deg, rgba(0,0,0,0.05), transparent);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.thumb-vintage-seal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, #a13232 40%, #7d2626 100%);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  z-index: 2;
+}
+
+.thumb-vintage-flowers {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  z-index: 1;
+}
+
+.thumb-vintage-flowers::before,
+.thumb-vintage-flowers::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: #c9a0a0; /* soft pink petal */
+  opacity: 0.8;
+}
+
+.thumb-vintage-flowers::before {
+  width: 6px;
+  height: 10px;
+  top: 5px;
+  left: 2px;
+  transform: rotate(-30deg);
+}
+
+.thumb-vintage-flowers::after {
+  width: 6px;
+  height: 10px;
+  top: 5px;
+  right: 2px;
+  transform: rotate(30deg);
+  background: #9cb8a0; /* soft green leaf */
+}
+
 /* ── Card text ── */
 .template-card-label {
   font-family: 'Inter', sans-serif;

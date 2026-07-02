@@ -268,7 +268,7 @@ const Studio = (() => {
 
         _applyTemplateUI(tmpl);
         Autosave.trigger();
-        const labels = { airmail: 'Vintage Airmail', ribbon: 'Ribbon & Seal' };
+        const labels = { airmail: 'Vintage Airmail', ribbon: 'Ribbon & Seal', vintage: 'Vintage Flowers' };
         showToast(`Template '${labels[tmpl] || 'Classic Letter'}' dipilih`);
       });
     });
