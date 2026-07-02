@@ -285,157 +285,152 @@ function _waitForEnvelopeOpen(config) {
 function _playFlowerTransition(envRect, config, onSwitchState) {
   return new Promise(resolve => {
 
-    // ── Inject required keyframes & styles once ──────────────────
-    if (!document.getElementById('_floral-styles')) {
-      const style = document.createElement('style');
-      style.id = '_floral-styles';
-      style.textContent = `
-        @keyframes _floral-spin { to { transform: rotate(360deg); } }
-        @keyframes _floral-spin-rev { to { transform: rotate(-360deg); } }
-        #_floral-overlay { position:fixed;inset:0;z-index:9998;pointer-events:none;overflow:hidden; }
-        ._floral-img {
-          position: absolute;
-          will-change: transform, opacity;
-          transform-origin: center center;
-        }
-      `;
-      document.head.appendChild(style);
-    }
+    // Canvas overlay - zero DOM reflow, correct aspect ratio, GPU efficient
+    const canvas = document.createElement('canvas');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.cssText = 'position:fixed;inset:0;z-index:9998;pointer-events:none;';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
 
-    // ── Overlay container ────────────────────────────────────────
-    const overlay = document.createElement('div');
-    overlay.id = '_floral-overlay';
-    document.body.appendChild(overlay);
-
-    const W  = window.innerWidth;
-    const H  = window.innerHeight;
-    const cx = envRect ? (envRect.left + envRect.width / 2)   : W / 2;
+    const W  = canvas.width;
+    const H  = canvas.height;
+    const cx = envRect ? (envRect.left + envRect.width / 2)    : W / 2;
     const cy = envRect ? (envRect.top  + envRect.height * 0.35) : H / 2;
     const COUNT = 300;
 
-    // ── Preload images ───────────────────────────────────────────
-    const srcs = getFlowerSrcs(config);
-    srcs.forEach(src => { const img = new Image(); img.src = src; });
+    // Load all images first, then start
+    const rawSrcs    = getFlowerSrcs(config);
+    const uniqueSrcs = [...new Set(rawSrcs)];
+    const imageMap   = {};
 
-    // ── Seeded RNG ───────────────────────────────────────────────
-    let seed = 42;
-    const rng = () => { seed = (seed * 16807 + 0) % 2147483647; return (seed - 1) / 2147483646; };
+    Promise.all(uniqueSrcs.map(src => new Promise(res => {
+      const img = new Image();
+      img.onload  = () => { imageMap[src] = img; res(); };
+      img.onerror = () => res();
+      img.src = src;
+    }))).then(() => {
+      const imgPool = rawSrcs.map(s => imageMap[s]).filter(Boolean);
+      if (!imgPool.length) { canvas.remove(); resolve(); return; }
+      _runCanvas(imgPool);
+    });
 
-    // ── Build particles ──────────────────────────────────────────
-    const particles = [];
-    for (let i = 0; i < COUNT; i++) {
-      const frac = i / COUNT;
+    function _runCanvas(imgPool) {
+      // Seeded RNG
+      let seed = 42;
+      const rng = () => { seed = (seed * 16807 + 0) % 2147483647; return (seed - 1) / 2147483646; };
 
-      const spread = 240;
-      const baseAngleDeg = -90 + (frac - 0.5) * spread;
-      const jitter = (rng() - 0.5) * 18;
-      const angleRad = ((baseAngleDeg + jitter) * Math.PI) / 180;
+      // Build particles
+      const particles = [];
+      for (let i = 0; i < COUNT; i++) {
+        const frac        = i / COUNT;
+        const spread      = 240;
+        const baseAngle   = -90 + (frac - 0.5) * spread;
+        const jitter      = (rng() - 0.5) * 18;
+        const angleRad    = ((baseAngle + jitter) * Math.PI) / 180;
+        const sidePull    = 1 + Math.abs(frac - 0.5) * 1.8;
+        const dist        = 350 + rng() * 650;
+        const xEnd        = Math.cos(angleRad) * dist * sidePull + (rng() - 0.5) * 100;
+        const yPeak       = Math.sin(angleRad) * dist - 50 - rng() * 150;
+        const yFinal      = yPeak + 400 + rng() * 650;
+        const size        = 240 + rng() * 240;
+        const finalScale  = 1.0 + rng() * 0.6;
+        const rotateDir   = rng() > 0.5 ? 1 : -1;
+        const rotateSpeed = 6 + rng() * 10;
+        const delay       = frac * 1.6 + rng() * 0.15;
+        const duration    = 2.0 + rng() * 1.6;
+        const img         = imgPool[i % imgPool.length];
+        const vAngle      = Math.atan2(yFinal, xEnd) + Math.PI / 2;
+        const vDist       = 2500;
+        const vortexX     = xEnd   + Math.cos(vAngle) * vDist + (Math.random() - 0.5) * 500;
+        const vortexY     = yFinal + Math.sin(vAngle) * vDist + (Math.random() - 0.5) * 500;
+        const vDelay      = Math.random() * 400;
+        const vDur        = 1000 + Math.random() * 600;
 
-      const sidePull = 1 + Math.abs(frac - 0.5) * 1.8;
-      const dist  = 350 + rng() * 650;
-      const xEnd  = Math.cos(angleRad) * dist * sidePull + (rng() - 0.5) * 100;
-      const yPeak = Math.sin(angleRad) * dist - 50 - rng() * 150;
-      const yFinal = yPeak + 400 + rng() * 650;
+        particles.push({ img, xEnd, yPeak, yFinal, size, finalScale,
+                         rotateDir, rotateSpeed, delay, duration,
+                         vortexX, vortexY, vDelay, vDur });
+      }
 
-      const size       = 240 + rng() * 240;
-      const finalScale = 1.0 + rng() * 0.6;
+      const SETTLE_MS  = 3600;
+      const VORTEX_MS  = SETTLE_MS + 1200;
+      const RESOLVE_MS = VORTEX_MS + 2400;
 
-      const rotateDir   = rng() > 0.5 ? 1 : -1;
-      const rotateSpeed = (6 + rng() * 10).toFixed(2);
+      let switchDone = false;
+      const t0 = performance.now();
 
-      const delay    = frac * 1.6 + rng() * 0.15;
-      const duration = 2.0 + rng() * 1.6;
+      function draw(now) {
+        const elapsed = now - t0;
 
-      particles.push({ i, frac, xEnd, yPeak, yFinal, size, finalScale, rotateDir, rotateSpeed, delay, duration });
+        if (!switchDone && elapsed >= SETTLE_MS - 200) {
+          switchDone = true;
+          if (onSwitchState) onSwitchState();
+        }
+
+        ctx.clearRect(0, 0, W, H);
+
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          const delayMs = p.delay * 1000;
+          if (elapsed < delayMs) continue;
+
+          const t = Math.min((elapsed - delayMs) / (p.duration * 1000), 1);
+          let px, py, scale, opacity;
+
+          if (elapsed < VORTEX_MS) {
+            if (t < 0.38) {
+              const t2 = t / 0.38;
+              const e  = 1 - Math.pow(1 - t2, 3);
+              px = cx + p.xEnd * 0.4 * e;
+              py = cy + p.yPeak * e;
+              scale = 0.12 + (0.85 - 0.12) * e;
+              opacity = e;
+            } else {
+              const t2 = (t - 0.38) / 0.62;
+              const e  = 1 - Math.pow(1 - t2, 2);
+              px = cx + p.xEnd * 0.4 + (p.xEnd - p.xEnd * 0.4) * e;
+              py = cy + p.yPeak + (p.yFinal - p.yPeak) * e;
+              scale = 0.85 + (p.finalScale - 0.85) * e;
+              opacity = 1;
+            }
+          } else {
+            const vElapsed = Math.max(0, elapsed - VORTEX_MS - p.vDelay);
+            const vt = Math.min(vElapsed / p.vDur, 1);
+            const ve = vt * vt * vt;
+            px = cx + p.xEnd   + (p.vortexX - p.xEnd)   * ve;
+            py = cy + p.yFinal + (p.vortexY - p.yFinal) * ve;
+            scale = p.finalScale;
+            opacity = 1 - vt;
+          }
+
+          if (opacity <= 0) continue;
+
+          const rot      = (elapsed / 1000 / p.rotateSpeed) * Math.PI * 2 * p.rotateDir;
+          const drawSize = p.size * scale;
+          const iw       = p.img.naturalWidth  || 1;
+          const ih       = p.img.naturalHeight || 1;
+          const ar       = iw / ih;
+          const dw       = ar >= 1 ? drawSize : drawSize * ar;
+          const dh       = ar >= 1 ? drawSize / ar : drawSize;
+
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, Math.min(1, opacity));
+          ctx.translate(px, py);
+          ctx.rotate(rot);
+          ctx.drawImage(p.img, -dw / 2, -dh / 2, dw, dh);
+          ctx.restore();
+        }
+
+        if (elapsed < RESOLVE_MS) {
+          requestAnimationFrame(draw);
+        } else {
+          canvas.remove();
+          resolve();
+        }
+      }
+
+      requestAnimationFrame(draw);
     }
-
-    // ── Create & animate DOM elements ───────────────────────────
-    const els = particles.map(p => {
-      const wrapper = document.createElement('div');
-      wrapper.className = '_floral-img';
-
-      const half = p.size / 2;
-      wrapper.style.cssText = `
-        position:absolute;
-        width:${p.size}px;
-        height:${p.size}px;
-        left:${cx - half}px;
-        top:${cy - half}px;
-        opacity:0;
-        transform:translate(0,0) scale(0.12);
-        will-change:transform,opacity;
-      `;
-
-      const img = document.createElement('img');
-      img.src = srcs[p.i % srcs.length];
-      img.draggable = false;
-      img.decoding  = 'async';
-      img.style.cssText = `
-        width:100%;height:100%;
-        display:block;
-        animation:${p.rotateDir > 0 ? '_floral-spin' : '_floral-spin-rev'} ${p.rotateSpeed}s linear ${p.delay}s infinite;
-        will-change:transform;
-      `;
-
-      wrapper.appendChild(img);
-      overlay.appendChild(wrapper);
-
-      return { el: wrapper, p };
-    });
-
-    // ── Trigger burst ────────────────────────────────────────────
-    els.forEach(({ el, p }) => {
-      el.animate([
-        { transform: `translate(0px, 0px) scale(0.12)`, opacity: 0 },
-        { transform: `translate(${p.xEnd * 0.4}px, ${p.yPeak}px) scale(0.85)`, opacity: 1, offset: 0.38 },
-        { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale})`, opacity: 1 }
-      ], {
-        duration: p.duration * 1000,
-        delay:    p.delay * 1000,
-        easing:   'ease-out',
-        fill:     'both'
-      });
-    });
-
-    // ── Timing ───────────────────────────────────────────────────
-    const SETTLE_MS  = 3600;
-    const VORTEX_MS  = SETTLE_MS + 1200;  // 1.2s pause before vortex
-    const RESOLVE_MS = VORTEX_MS + 2400;  // vortex sweep (~2s) + 400ms buffer
-
-    // Switch page state while flowers cover screen
-    setTimeout(() => { if (onSwitchState) onSwitchState(); }, SETTLE_MS - 200);
-
-    // ── Vortex sweep ─────────────────────────────────────────────
-    setTimeout(() => {
-      els.forEach(({ el, p }) => {
-        const angle = Math.atan2(p.yFinal, p.xEnd);
-        const swirlAngle = angle + (Math.PI / 2);
-        const dist = 2500;
-
-        const vortexX = p.xEnd + Math.cos(swirlAngle) * dist + (Math.random() - 0.5) * 500;
-        const vortexY = p.yFinal + Math.sin(swirlAngle) * dist + (Math.random() - 0.5) * 500;
-
-        const staggerDelay  = Math.random() * 400;
-        const sweepDuration = 1000 + Math.random() * 600;
-
-        setTimeout(() => {
-          el.animate([
-            { transform: `translate(${p.xEnd}px, ${p.yFinal}px) scale(${p.finalScale}) rotate(0deg)` },
-            { transform: `translate(${vortexX}px, ${vortexY}px) scale(${p.finalScale}) rotate(360deg)` }
-          ], {
-            duration: sweepDuration,
-            easing:   'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
-            fill:     'both'
-          });
-        }, staggerDelay);
-      });
-    }, VORTEX_MS);
-
-    // ── Cleanup & resolve ─────────────────────────────────────────
-    setTimeout(() => {
-      overlay.remove();
-      resolve();
-    }, RESOLVE_MS);
   });
 }
 
