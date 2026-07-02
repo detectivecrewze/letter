@@ -360,6 +360,16 @@ const Studio = (() => {
     _toggle(ribbonColorDisp, !isRibbon);     // show chips only for ribbon
     _toggle(textureSectionWrap, isAirmail || isRibbon || isVintage);  // no paper texture for airmail, ribbon, or vintage
     _toggle(ribbonSenderWrap, !isRibbon);    // show "Dari" field ONLY for Ribbon & Seal
+
+    // Adjust spacing for Recipient Info since all elements above it are hidden for Vintage
+    const recipientInfoWrap = document.getElementById('recipient-info-wrap');
+    if (recipientInfoWrap) {
+      if (isVintage) {
+        recipientInfoWrap.classList.remove('pt-10', 'border-t', 'border-gray-50');
+      } else {
+        recipientInfoWrap.classList.add('pt-10', 'border-t', 'border-gray-50');
+      }
+    }
   }
 
   function _applyPremiumLock(isPrem) {
