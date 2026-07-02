@@ -1222,8 +1222,12 @@ button {
     height: 65px;
   }
 
+  .vintage-envelope-scene {
+    padding: 0.5rem;
+  }
+  
   .vintage-envelope-wrap {
-    width: clamp(280px, 92vw, 480px);
+    width: clamp(340px, 115vw, 480px);
   }
 }
 
