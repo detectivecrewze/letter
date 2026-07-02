@@ -20,11 +20,31 @@ const _SCRIPT_BASE = (() => {
   return '';
 })();
 
-// Flower assets: reuse from ribbon theme folder (no duplication needed)
-const FLOWER_SRCS = [
-  _SCRIPT_BASE + 'assets/test1.webp',
-  _SCRIPT_BASE + 'assets/test2.webp',
-];
+// Flower assets map based on selection
+const VINTAGE_FLOWER_ASSETS = {
+  'sage': [
+    _SCRIPT_BASE + '../../assets/flowers_sage1.png',
+    _SCRIPT_BASE + '../../assets/flowers_sage2.png'
+  ],
+  'crimson': [
+    _SCRIPT_BASE + '../../assets/crimson1.png',
+    _SCRIPT_BASE + '../../assets/crimson2.png'
+  ],
+  'midnight': [
+    _SCRIPT_BASE + '../../assets/flower_midnight1.png',
+    _SCRIPT_BASE + '../../assets/flower_midnight2.png'
+  ],
+  'obsidian': [
+    _SCRIPT_BASE + '../../assets/obsidian1.png',
+    _SCRIPT_BASE + '../../assets/obsidian2.png'
+  ]
+};
+
+// Fallback to sage if none specified
+function getFlowerSrcs(config) {
+  const flowerType = config.vintageFlower || 'sage';
+  return VINTAGE_FLOWER_ASSETS[flowerType] || VINTAGE_FLOWER_ASSETS['sage'];
+}
 
 const TW_CHAR_DELAY = 38;
 const TW_PARA_PAUSE = 700;
@@ -282,7 +302,8 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
     const COUNT = 300;
 
     // ── Preload images ───────────────────────────────────────────
-    FLOWER_SRCS.forEach(src => { const img = new Image(); img.src = src; });
+    const srcs = getFlowerSrcs(config);
+    srcs.forEach(src => { const img = new Image(); img.src = src; });
 
     // ── Seeded RNG ───────────────────────────────────────────────
     let seed = 42;
@@ -333,7 +354,8 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
       `;
 
       const img = document.createElement('img');
-      img.src = FLOWER_SRCS[p.i % FLOWER_SRCS.length];
+      const srcs = getFlowerSrcs(config);
+      img.src = srcs[p.i % srcs.length];
       img.draggable = false;
       img.decoding  = 'async';
       img.style.cssText = `
@@ -419,6 +441,11 @@ function _renderLetterSkeleton(config) {
   document.querySelector('.title-underline')?.classList.remove('is-visible');
   const bodyEl = document.getElementById('letter-body');
   if (bodyEl) bodyEl.innerHTML = '';
+  const footerFlower = document.getElementById('footer-flower');
+  if (footerFlower) {
+    const srcs = getFlowerSrcs(config);
+    footerFlower.src = srcs[0];
+  }
 }
 
 /* ════════════════════════════════════════════════════════════
