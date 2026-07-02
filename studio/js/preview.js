@@ -47,7 +47,8 @@ const Preview = (() => {
       // Pass themes so template can set background before first paint
       const activeTheme = Studio.getActiveTheme() || '';
       const activeRibbon = Studio.getActiveRibbonTheme() || '';
-      previewUrl += `&theme=${encodeURIComponent(activeTheme)}&ribbonTheme=${encodeURIComponent(activeRibbon)}`;
+      const activeVintageFlower = Studio.getActiveVintageFlower() || '';
+      previewUrl += `&theme=${encodeURIComponent(activeTheme)}&ribbonTheme=${encodeURIComponent(activeRibbon)}&vintageFlower=${encodeURIComponent(activeVintageFlower)}`;
 
       previewWin.location.href = previewUrl;
     } catch (e) {
@@ -98,7 +99,8 @@ const Preview = (() => {
 
       const activeTheme = Studio.getActiveTheme() || '';
       const activeRibbon = Studio.getActiveRibbonTheme() || '';
-      previewUrl += `&theme=${encodeURIComponent(activeTheme)}&ribbonTheme=${encodeURIComponent(activeRibbon)}`;
+      const activeVintageFlower = Studio.getActiveVintageFlower() || '';
+      previewUrl += `&theme=${encodeURIComponent(activeTheme)}&ribbonTheme=${encodeURIComponent(activeRibbon)}&vintageFlower=${encodeURIComponent(activeVintageFlower)}`;
 
       previewWin.location.href = previewUrl;
     } catch (e) {

@@ -93,6 +93,7 @@ const Autosave = (() => {
       templateType: Studio.getActiveTemplate(),
       airmailTheme: Studio.getActiveAirmailTheme(),
       ribbonTheme:  Studio.getActiveRibbonTheme(),
+      vintageFlower: Studio.getActiveVintageFlower(),
 
       // Section 4 — Memori Rahasia (multi-photo carousel)
       // Only include if admin has whitelisted this letter for secret memory
