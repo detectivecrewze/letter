@@ -447,11 +447,6 @@ function _renderLetterSkeleton(config) {
   document.querySelector('.title-underline')?.classList.remove('is-visible');
   const bodyEl = document.getElementById('letter-body');
   if (bodyEl) bodyEl.innerHTML = '';
-  const footerFlower = document.getElementById('footer-flower');
-  if (footerFlower) {
-    const srcs = getFlowerSrcs(config);
-    footerFlower.src = srcs[0];
-  }
 }
 
 /* ════════════════════════════════════════════════════════════
