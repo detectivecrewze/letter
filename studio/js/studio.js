@@ -9,7 +9,7 @@ const Studio = (() => {
   let _activeTemplate = 'classic';
   let _activeAirmailTheme = 'airmail-parchment';
   let _activeRibbonTheme = 'ribbon-crimson'; // default airmail colour
-  let _activeVintageFlower = 'flower1';
+  let _activeVintageFlower = ['flower1'];
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
@@ -143,9 +143,9 @@ const Studio = (() => {
     });
 
     // Vintage Flower Initial State
-    _activeVintageFlower = config.vintageFlower || 'flower1';
+    _activeVintageFlower = (config.vintageFlower || 'flower1').split(',');
     document.querySelectorAll('.vintage-flower-option').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.vintageFlower === _activeVintageFlower);
+      btn.classList.toggle('active', _activeVintageFlower.includes(btn.dataset.vintageFlower));
     });
   }
 
@@ -341,17 +341,27 @@ const Studio = (() => {
     document.querySelectorAll('.vintage-flower-option').forEach(btn => {
       btn.addEventListener('click', () => {
         const flower = btn.dataset.vintageFlower;
-        if (!flower || flower === _activeVintageFlower) return;
-        _activeVintageFlower = flower;
-        document.querySelectorAll('.vintage-flower-option').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if (!flower) return;
+        
+        if (_activeVintageFlower.includes(flower)) {
+          if (_activeVintageFlower.length > 1) {
+            _activeVintageFlower = _activeVintageFlower.filter(f => f !== flower);
+            btn.classList.remove('active');
+          } else {
+            showToast('Minimal pilih 1 bunga');
+            return;
+          }
+        } else {
+          _activeVintageFlower.push(flower);
+          btn.classList.add('active');
+        }
         Autosave.trigger();
         const names = {
           'flower1': 'Tipe 1',
           'flower2': 'Tipe 2',
           'flower3': 'Tipe 3'
         };
-        showToast(`Bunga '${names[flower] || flower}' dipilih`);
+        showToast(`Bunga '${names[flower] || flower}' ${btn.classList.contains('active') ? 'dipilih' : 'dihapus'}`);
       });
     });
   }
@@ -857,7 +867,7 @@ const Studio = (() => {
   function getActiveTexture() { return _activeTexture; }
   function getActiveAirmailTheme() { return _activeAirmailTheme; }
   function getActiveRibbonTheme() { return _activeRibbonTheme; }
-  function getActiveVintageFlower() { return _activeVintageFlower; }
+  function getActiveVintageFlower() { return _activeVintageFlower.join(','); }
 
   function updateSidebarBonusStatus() {
     const config = Auth.getInitialConfig() || {};
@@ -878,7 +888,7 @@ const Studio = (() => {
     }
   }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveRibbonTheme, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveRibbonTheme, getActiveVintageFlower, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {

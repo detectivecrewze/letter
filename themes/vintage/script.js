@@ -36,10 +36,18 @@ const VINTAGE_FLOWER_ASSETS = {
   ]
 };
 
-// Fallback to flower1 if none specified
+// Get all selected flowers
 function getFlowerSrcs(config) {
-  const flowerType = config.vintageFlower || 'flower1';
-  return VINTAGE_FLOWER_ASSETS[flowerType] || VINTAGE_FLOWER_ASSETS['flower1'];
+  const flowerStr = config.vintageFlower || 'flower1';
+  const flowerTypes = flowerStr.split(',');
+  let srcs = [];
+  flowerTypes.forEach(t => {
+    if (VINTAGE_FLOWER_ASSETS[t]) {
+      srcs.push(...VINTAGE_FLOWER_ASSETS[t]);
+    }
+  });
+  if (srcs.length === 0) srcs = VINTAGE_FLOWER_ASSETS['flower1'];
+  return srcs;
 }
 
 const TW_CHAR_DELAY = 38;
