@@ -249,7 +249,7 @@ const Publisher = (() => {
         topAccent.innerHTML = '';
       }
       if (title) {
-        title.innerHTML = '✿ <span style="margin: 0 4px;">Vintage</span> ✿';
+        title.innerHTML = '✿ <span style="margin: 0 4px;">Letter</span> ✿';
         title.style.fontFamily = "'Playfair Display', serif";
         title.style.fontStyle = 'italic';
         title.style.fontWeight = 'bold';
