@@ -358,6 +358,7 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
       wrapper.style.cssText = `
         position:absolute;
         width:${p.size}px;
+        height:${p.size}px;
         left:${cx - half}px;
         top:${cy - half}px;
         opacity:0;
@@ -366,13 +367,11 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
       `;
 
       const img = document.createElement('img');
-      const srcs = getFlowerSrcs(config);
       img.src = srcs[p.i % srcs.length];
       img.draggable = false;
       img.decoding  = 'async';
       img.style.cssText = `
-        width:100%;
-        height:auto;
+        width:100%;height:100%;
         display:block;
         animation:${p.rotateDir > 0 ? '_floral-spin' : '_floral-spin-rev'} ${p.rotateSpeed}s linear ${p.delay}s infinite;
         will-change:transform;
