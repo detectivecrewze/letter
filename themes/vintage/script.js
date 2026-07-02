@@ -400,7 +400,7 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
             px = cx + p.xEnd   + (p.vortexX - p.xEnd)   * ve;
             py = cy + p.yFinal + (p.vortexY - p.yFinal) * ve;
             scale = p.finalScale;
-            opacity = 1 - vt;
+            opacity = 1;
           }
 
           if (opacity <= 0) continue;
