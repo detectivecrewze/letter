@@ -807,16 +807,17 @@ var index_default = {
             break;
         }
 
-        const systemInstruction = `Kamu adalah penulis pesan/surat personal digital untuk "Letter Edition by For You, Always."
-Tugasmu: Tulis isi surat yang sangat personal, mengalir, dan terasa ditulis oleh MANUSIA ASLI (bukan AI).
+        const systemInstruction = `Kamu adalah asisten penulis surat digital personal untuk "Letter Edition by For You, Always."
+Tugasmu: Tulis isi surat ucapan/pesan yang hangat, wajar, dan relevan sesuai dengan konteks yang diberikan pengguna.
 Gaya Bahasa: [${toneInstruction}]
 
 ATURAN WAJIB (JIKA DILANGGAR HASIL BATAL):
-1. Panjang isi surat: 70–110 kata, dibagi menjadi 2 PARAGRAF pendek (dipisahkan 1 baris kosong).
-2. DILARANG KERAS memakai tanda pisah em-dash (—, –, atau --). Gunakan tanda koma atau titik biasa.
-3. DILARANG KERAS menggunakan kata-kata puitis kaku/klise (contoh yang dilarang: "relung hati", "samudra", "meniti waktu", "untaian kata", "lembaran baru", "cahaya hidupku"). Gunakan ungkapan sehari-hari yang relate dan jujur.
-4. Tanpa format markdown (tanpa **, *, #). Tanpa sapaan pembuka (seperti "Dear...", "Halo...", "Untuk..."), karena sapaan sudah ada di template.
-5. Langsung mulai dari isi kalimat pertama secara natural.`;
+1. DILARANG MENGARANG CERITA ATAU KENANGAN PALSU: Gunakan HANYA detail fakta yang diberikan pengguna. JANGAN PERNAH membuat cerita atau kenangan spesifik buatan yang tidak disebutkan di prompt (seperti mengarang cerita makan roti bakar, nonton laptop, topping es krim, jalan di taman, dsb). Jika instruksi pengguna singkat, fokuslah pada ucapan ulang tahun/pesan yang manis, ungkapan syukur, dan harapan baik secara tulus dan wajar tanpa cerita karangan.
+2. Panjang isi surat: 70–110 kata, dibagi menjadi 2 PARAGRAF pendek (dipisahkan 1 baris kosong).
+3. DILARANG KERAS memakai tanda pisah em-dash (—, –, atau --). Gunakan tanda koma atau titik biasa.
+4. DILARANG KERAS menggunakan kata-kata puitis kaku/klise (misal: "relung hati", "samudra", "meniti waktu", "untaian kata", "lembaran baru", "cahaya hidupku"). Tulis seperti ungkapan tulus dan manis sehari-hari.
+5. Tanpa format markdown (tanpa **, *, #). Tanpa sapaan pembuka (seperti "Dear...", "Halo...", "Untuk..."), karena sapaan sudah ada di template.
+6. Langsung mulai dari isi kalimat pertama secara natural.`;
 
         const qwenPayload = {
           model: 'qwen-plus',
@@ -824,8 +825,8 @@ ATURAN WAJIB (JIKA DILANGGAR HASIL BATAL):
             { role: 'system', content: systemInstruction },
             { role: 'user', content: `[PESAN/KONTEKS DARI PENGIRIM:]\n${userPrompt.trim()}` },
           ],
-          temperature: 0.85,
-          top_p: 0.95,
+          temperature: 0.7,
+          top_p: 0.9,
         };
 
         const controller = new AbortController();
