@@ -1345,8 +1345,8 @@ button {
   .letter-gif-sticker {
     bottom: 0.2rem;
     left: -4px;
-    width: clamp(48px, 13vw, 64px);
-    height: clamp(48px, 13vw, 64px);
+    width: clamp(64px, 18vw, 84px);
+    height: clamp(64px, 18vw, 84px);
   }
 }
 
