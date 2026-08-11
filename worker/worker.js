@@ -782,85 +782,166 @@ var index_default = {
 
         const body = await request.json();
         const userPrompt = body.prompt;
-        const requestedTone = body.tone || 'tulus';
+        let tonesArray = Array.isArray(body.tones) && body.tones.length > 0
+          ? body.tones
+          : [body.tone || 'tulus'];
 
-        if (!userPrompt || typeof userPrompt !== 'string' || userPrompt.trim().length === 0) {
-          return new Response(JSON.stringify({ error: 'Prompt tidak boleh kosong.' }), {
-            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+        let toneDescriptions = [];
+        if (tonesArray.includes('romantis')) {
+          toneDescriptions.push('ROMANTIS, manis, dan hangat untuk pasangan (gunakan panggilan "aku" dan "kamu", santai tanpa kata kiasan puitis klise)');
+        }
+        if (tonesArray.includes('santai')) {
+          toneDescriptions.push('SANTAI PERCAKAPAN SEHARI-HARI (bahasa kasual manusia modern, wajar dan mengalir seolah ngobrol langsung)');
+        }
+        if (tonesArray.includes('lucu')) {
+          toneDescriptions.push('LUCU, BERCANDA, DAN HUMORIS (ringan, bercanda manis, ada celetukan gemas/ringan)');
+        }
+        if (tonesArray.includes('tulus')) {
+          toneDescriptions.push('HANGAT, TULUS, DAN MENYENTUH HATI (bahasa natural dan sopan tanpa kalimat baku/kaku)');
+        }
+        if (toneDescriptions.length === 0) {
+          toneDescriptions.push('HANGAT, TULUS, DAN MENYENTUH HATI');
         }
 
-        let toneInstruction = '';
-        switch (requestedTone) {
-          case 'romantis':
-            toneInstruction = 'Bergaya ROMANTIS, manis, dan hangat untuk pasangan. Gunakan panggilan "aku" dan "kamu". Mengalir santai dan tulus, jangan baku atau puitis klise (hindari kata kiasan puitis tua seperti "relung hati", "samudra", "meniti").';
-            break;
-          case 'lucu':
-            toneInstruction = 'Bergaya SANTAI, BERCANDA, DAN HUMORIS. Seperti ngobrol santai dengan pacar/sahabat dekat. Penuh keceriaan, ada celetukan manis atau kebiasaan gemas. Gunakan "aku" dan "kamu". Ringan, relate, dan menyenangkan tanpa kaku sama sekali.';
-            break;
-          case 'santai':
-            toneInstruction = 'Bergaya SANTAI PERCAKAPAN SEHARI-HARI. Bahasa kasual manusia modern, wajar dan mengalir seolah sedang ngobrol langsung. Gunakan "aku" dan "kamu". Hindari kata-kata baku atau kalimat puitis yang kaku.';
-            break;
-          case 'tulus':
-          default:
-            toneInstruction = 'Bergaya HANGAT, TULUS, DAN MENYENTUH HATI. Bahasa natural dan sopan tanpa bahasa surat dinas/baku dan tanpa sastra kaku yang dibuat-buat. Menyentuh namun tetap terasa jujur dari hati.';
-            break;
-        }
+        const toneInstruction = toneDescriptions.join(' DIPADUKAN DENGAN ');
 
         const systemInstruction = `Kamu adalah asisten penulis surat digital personal untuk "Letter Edition by For You, Always."
-Tugasmu: Tulis isi surat ucapan/pesan yang hangat, wajar, dan relevan sesuai dengan konteks yang diberikan pengguna.
+Tugasmu: Tulis isi surat ucapan/pesan yang hangat, mengalir, dan memiliki STRUKTUR ALUR SURAT UTUH (Pembuka, Isi, dan Penutup/Closure yang jelas).
 Gaya Bahasa: [${toneInstruction}]
 
-ATURAN WAJIB (JIKA DILANGGAR HASIL BATAL):
-1. DILARANG MENGARANG CERITA ATAU KENANGAN PALSU: Gunakan HANYA detail fakta yang diberikan pengguna. JANGAN PERNAH membuat cerita atau kenangan spesifik buatan yang tidak disebutkan di prompt (seperti mengarang cerita makan roti bakar, nonton laptop, topping es krim, jalan di taman, dsb). Jika instruksi pengguna singkat, fokuslah pada ucapan ulang tahun/pesan yang manis, ungkapan syukur, dan harapan baik secara tulus dan wajar tanpa cerita karangan.
-2. Panjang isi surat: 70–110 kata, dibagi menjadi 2 PARAGRAF pendek (dipisahkan 1 baris kosong).
+ATURAN STRUKTUR & ALUR SURAT WAJIB:
+- PARAGRAF 1 (PEMBUKA & MEMORI): Menyapa hangat sesuai hubungan yang diberikan. Sebutkan momen/acara dan kenangan/kebiasaan unik secara alami dan akrab.
+- PARAGRAF 2 (DOA & CLOSING/PENUTUP): Sampaikan doa/harapan khusus, lalu WAKTU TERAKHIR DIISIKAN KALIMAT PENUTUP HARMONIS & LENGKAP (Closure yang tulus & berkesan, contoh: "Sekali lagi selamat ya, aku akan selalu ada di sini untuk mendukungmu."). JANGAN PERNAH membiarkan surat berakhir menggantung tanpa salam penutup!
+
+ATURAN LAINNYA:
+1. DILARANG MENGARANG CERITA PALSU: Gunakan HANYA fakta yang diberikan pengguna. JANGAN PERNAH mengarang kenangan palsu yang tidak disebutkan di prompt.
+2. Panjang total: 80–120 kata (terbagi menjadi 2 PARAGRAF pendek dipisahkan 1 baris kosong).
 3. DILARANG KERAS memakai tanda pisah em-dash (—, –, atau --). Gunakan tanda koma atau titik biasa.
-4. DILARANG KERAS menggunakan kata-kata puitis kaku/klise (misal: "relung hati", "samudra", "meniti waktu", "untaian kata", "lembaran baru", "cahaya hidupku"). Tulis seperti ungkapan tulus dan manis sehari-hari.
-5. Tanpa format markdown (tanpa **, *, #). Tanpa sapaan pembuka (seperti "Dear...", "Halo...", "Untuk..."), karena sapaan sudah ada di template.
+4. DILARANG KERAS menggunakan kata-kata puitis kaku/klise (misal: "relung hati", "samudra", "meniti waktu", "untaian kata").
+5. Tanpa format markdown (tanpa **, *, #). Tanpa header sapaan luar (seperti "Dear...").
 6. Langsung mulai dari isi kalimat pertama secara natural.`;
 
-        const qwenPayload = {
-          model: 'qwen-plus',
-          messages: [
-            { role: 'system', content: systemInstruction },
-            { role: 'user', content: `[PESAN/KONTEKS DARI PENGIRIM:]\n${userPrompt.trim()}` },
-          ],
-          temperature: 0.7,
-          top_p: 0.9,
-        };
+        const selectedModel = body.model === 'qwen' ? 'qwen' : 'gemini';
+        let generatedText = '';
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-        const qwenResponse = await fetch(
-          'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-            body: JSON.stringify(qwenPayload),
-            signal: controller.signal,
+        if (selectedModel === 'gemini') {
+          const apiKey = env.GEMINI_API_KEY;
+          if (!apiKey) {
+            return new Response(JSON.stringify({ error: 'GEMINI_API_KEY belum dikonfigurasi.' }), {
+              status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
           }
-        );
-        clearTimeout(timeoutId);
 
-        if (!qwenResponse.ok) {
-          const errText = await qwenResponse.text();
-          return new Response(JSON.stringify({ error: `Qwen AI error (${qwenResponse.status}): ${errText.substring(0, 150)}` }), {
-            status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
+          // Native Google REST API with verified gemini-3.5-flash-lite model
+          const modelNames = [
+            'gemini-3.5-flash-lite',
+            'gemini-3.5-flash',
+            'gemini-3.6-flash',
+            'gemini-3.1-flash-lite'
+          ];
+          let lastErrText = '';
+          for (const mName of modelNames) {
+            const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${mName}:generateContent?key=${apiKey}`;
+            const res = await fetch(geminiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: `${systemInstruction}\n\n[PESAN/KONTEKS DARI PENGIRIM:]\n${userPrompt.trim()}` }] }],
+                generationConfig: { temperature: 0.7, topP: 0.9, maxOutputTokens: 500 }
+              }),
+              signal: controller.signal
+            });
+            if (res.ok) {
+              const geminiData = await res.json();
+              generatedText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+              lastErrText = '';
+              break;
+            } else {
+              lastErrText = await res.text();
+            }
+          }
+
+          if (!generatedText && lastErrText) {
+            return new Response(JSON.stringify({ error: `Gemini AI error: ${lastErrText.substring(0, 150)}` }), {
+              status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+
+        } else {
+          const apiKey = env.QWEN_API_KEY;
+          if (!apiKey) {
+            return new Response(JSON.stringify({ error: 'QWEN_API_KEY belum dikonfigurasi.' }), {
+              status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+
+          const qwenPayload = {
+            model: 'qwen-plus',
+            messages: [
+              { role: 'system', content: systemInstruction },
+              { role: 'user', content: `[PESAN/KONTEKS DARI PENGIRIM:]\n${userPrompt.trim()}` },
+            ],
+            temperature: 0.7,
+            top_p: 0.9,
+          };
+
+          const qwenResponse = await fetch(
+            'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+              body: JSON.stringify(qwenPayload),
+              signal: controller.signal,
+            }
+          );
+
+          if (!qwenResponse.ok) {
+            const errText = await qwenResponse.text();
+            return new Response(JSON.stringify({ error: `Qwen AI error (${qwenResponse.status}): ${errText.substring(0, 150)}` }), {
+              status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+
+          const qwenData = await qwenResponse.json();
+          generatedText = qwenData?.choices?.[0]?.message?.content || '';
         }
-
-        const qwenData = await qwenResponse.json();
-        let generatedText = qwenData?.choices?.[0]?.message?.content || '';
+        clearTimeout(timeoutId);
 
         // Clean up em-dashes and formatting artifacts
         generatedText = generatedText
-          .replace(/[\u2014\u2013]|--/g, ', ')
+          .replace(/[\u2014\u2013]|--/g, ', ') // remove em-dashes
+          .replace(/[ \t]+/g, ' ')             // collapse ONLY horizontal spaces, KEEP newlines!
           .replace(/,\s*,/g, ',')
-          .replace(/\s+/g, ' ')
-          .replace(/\n\s+/g, '\n')
+          .replace(/\n[ \t]+/g, '\n')
           .replace(/\n{3,}/g, '\n\n')
           .trim();
+
+        // Ensure proper 2-paragraph separation
+        if (!generatedText.includes('\n\n')) {
+          if (generatedText.includes('\n')) {
+            generatedText = generatedText.replace(/\n+/g, '\n\n');
+          } else {
+            // Find a sentence ending (. ) near the middle of text to split into 2 paragraphs
+            const mid = Math.floor(generatedText.length / 2);
+            let splitPos = -1;
+            for (let offset = 0; offset < 100; offset++) {
+              if (mid + offset < generatedText.length && generatedText.substr(mid + offset, 2) === '. ') {
+                splitPos = mid + offset + 1;
+                break;
+              }
+              if (mid - offset > 0 && generatedText.substr(mid - offset, 2) === '. ') {
+                splitPos = mid - offset + 1;
+                break;
+              }
+            }
+            if (splitPos > 0) {
+              generatedText = generatedText.slice(0, splitPos) + '\n\n' + generatedText.slice(splitPos).trim();
+            }
+          }
+        }
 
         return new Response(JSON.stringify({ success: true, text: generatedText }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

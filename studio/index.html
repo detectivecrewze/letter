@@ -1285,58 +1285,125 @@
     <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
     <div
-      class="ai-modal-card relative w-full sm:max-w-md bg-[#fcfaf7] rounded-t-3xl sm:rounded-2xl shadow-2xl transition-all duration-250 scale-95 opacity-0 overflow-hidden">
+      class="ai-modal-card relative w-full sm:max-w-lg bg-[#fcfaf7] rounded-t-3xl sm:rounded-2xl shadow-2xl transition-all duration-250 scale-95 opacity-0 overflow-hidden">
       <!-- Header -->
-      <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+      <div class="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-100">
         <div>
           <h3 class="text-sm font-bold text-gray-800 flex items-center gap-1.5"><span class="material-symbols-outlined text-sm text-[#d4a373]">auto_awesome</span> Tulis dengan AI</h3>
-          <p class="text-[9px] uppercase tracking-widest text-gray-400 mt-0.5">Untuk Surat</p>
+          <p class="text-[9px] uppercase tracking-widest text-gray-400 mt-0.5">Asisten Penulis Surat</p>
         </div>
         <button id="btn-ai-close"
           class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-gray-500 text-sm font-bold">✕</button>
       </div>
 
-      <!-- View: Input -->
-      <div id="ai-view-input" class="px-6 py-6">
-        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-3">Instruksi untuk
-          AI</label>
-        <textarea id="ai-prompt-input"
-          placeholder="Contoh: Buatkan surat untuk Ivana, bilangin kalau aku sangat bersyukur mengenalnya dan senang bisa ada untuknya..."
-          rows="4" maxlength="500"
-          class="w-full resize-none border border-gray-200 rounded-xl p-4 text-[13px] leading-relaxed focus:outline-none focus:border-[#d4a373] transition-all bg-white text-gray-800 placeholder:text-gray-300"></textarea>
-        <p class="text-[9px] text-gray-300 mt-2 italic">Semakin detail instruksimu, semakin personal hasilnya.</p>
+      <!-- Model AI Engine Selector -->
+      <div class="px-6 pt-3.5 pb-2.5 border-b border-gray-100 flex items-center justify-between">
+        <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Engine AI</label>
+        <div class="flex gap-1.5" id="ai-model-selector">
+          <button data-model="gemini"
+            class="ai-model-btn px-3 py-1 text-[9px] rounded-full border border-[#d4a373] bg-[#d4a373] text-white font-bold transition-all flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span> Gemini Flash
+          </button>
+          <button data-model="qwen"
+            class="ai-model-btn px-3 py-1 text-[9px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373] flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Qwen AI
+          </button>
+        </div>
+      </div>
 
-        <!-- Tone Selection -->
-        <div class="mt-4">
-          <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-3">Pilih Gaya
-            Bahasa</label>
+      <!-- Mode Switcher Tabs -->
+      <div class="px-6 pt-3 pb-2 border-b border-gray-100 flex gap-2">
+        <button id="tab-ai-mode-quick"
+          class="flex-1 py-2 px-3 text-[10px] uppercase tracking-wider font-bold rounded-lg transition-all border border-[#d4a373] bg-[#d4a373] text-white flex items-center justify-center gap-1.5 shadow-sm">
+          <span class="material-symbols-outlined text-[13px]">edit_note</span> Mode Cepat
+        </button>
+        <button id="tab-ai-mode-interactive"
+          class="flex-1 py-2 px-3 text-[10px] uppercase tracking-wider font-bold rounded-lg transition-all border border-gray-200 bg-white text-gray-500 hover:border-[#d4a373] hover:text-[#d4a373] flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[13px]">quiz</span> Mode Interaktif
+        </button>
+      </div>
+
+      <!-- View: Input -->
+      <div id="ai-view-input" class="px-6 py-5 max-h-[72vh] overflow-y-auto">
+        
+        <!-- Mode Interaktif Container -->
+        <div id="ai-container-interactive" class="space-y-3.5">
+          <div>
+            <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1.5">Penerima &amp; Momen</label>
+            <div class="grid grid-cols-2 gap-2">
+              <input id="ai-input-recipient" type="text" placeholder="Nama (cth: Natasya)"
+                class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-[12px] focus:outline-none focus:border-[#d4a373] bg-white text-gray-800 placeholder:text-gray-300 transition-all">
+              <input id="ai-input-occasion" type="text" placeholder="Momen (cth: Ultah ke-19)"
+                class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-[12px] focus:outline-none focus:border-[#d4a373] bg-white text-gray-800 placeholder:text-gray-300 transition-all">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1.5">Hubungan</label>
+            <div class="flex flex-wrap gap-1.5" id="ai-relation-selector">
+              <button data-relation="Pacar / Pasangan"
+                class="ai-relation-btn px-3 py-1.5 text-[10px] rounded-full border border-[#d4a373] bg-[#d4a373] text-white font-bold transition-all">Pacar / Pasangan</button>
+              <button data-relation="Sahabat / Teman"
+                class="ai-relation-btn px-3 py-1.5 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373]">Sahabat / Teman</button>
+              <button data-relation="Keluarga"
+                class="ai-relation-btn px-3 py-1.5 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373]">Keluarga</button>
+              <button data-relation="Rekan Kerja"
+                class="ai-relation-btn px-3 py-1.5 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373]">Rekan Kerja</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1.5">Kenangan / Kebiasaan Unik <span class="text-gray-300 font-normal lowercase">(opsional)</span></label>
+            <input id="ai-input-memories" type="text" placeholder="Cth: Suka makan ramen bareng, sering ketiduran pas vcall"
+              class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-[12px] focus:outline-none focus:border-[#d4a373] bg-white text-gray-800 placeholder:text-gray-300 transition-all">
+          </div>
+
+          <div>
+            <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-1.5">Doa &amp; Harapan Khusus <span class="text-gray-300 font-normal lowercase">(opsional)</span></label>
+            <input id="ai-input-wishes" type="text" placeholder="Cth: Semoga lulus sidang skripsi tahun ini, sehat selalu"
+              class="w-full border border-gray-200 rounded-xl px-3.5 py-2.5 text-[12px] focus:outline-none focus:border-[#d4a373] bg-white text-gray-800 placeholder:text-gray-300 transition-all">
+          </div>
+        </div>
+
+        <!-- Mode Cepat Container -->
+        <div id="ai-container-quick" class="hidden space-y-2">
+          <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block">Instruksi Bebas</label>
+          <textarea id="ai-prompt-input"
+            placeholder="Contoh: Buatkan surat ucapan ulang tahun untuk pacar saya Natasya yang ke-19..."
+            rows="4" maxlength="500"
+            class="w-full resize-none border border-gray-200 rounded-xl p-3.5 text-[12px] leading-relaxed focus:outline-none focus:border-[#d4a373] transition-all bg-white text-gray-800 placeholder:text-gray-300"></textarea>
+        </div>
+
+        <!-- Tone Selection (Multi-select) -->
+        <div class="mt-4 pt-3.5 border-t border-gray-100">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold">Gaya Bahasa</label>
+            <span class="text-[9px] text-gray-400 italic">Bisa pilih lebih dari 1</span>
+          </div>
           <div class="flex flex-wrap gap-2" id="ai-tone-selector">
             <button data-tone="romantis"
-              class="px-4 py-2 text-[10px] rounded-full border border-[#d4a373] bg-[#d4a373] text-white font-bold transition-all">Romantis</button>
-            <button data-tone="lucu"
-              class="px-4 py-2 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373]">Lucu
-              / Canda</button>
+              class="ai-tone-btn px-3.5 py-1.5 text-[10px] rounded-full border border-[#d4a373] bg-[#d4a373] text-white font-bold transition-all">Romantis</button>
             <button data-tone="santai"
-              class="px-4 py-2 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373]">Santai
-              (Aku/Kamu)</button>
+              class="ai-tone-btn px-3.5 py-1.5 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373]">Santai (Aku/Kamu)</button>
+            <button data-tone="lucu"
+              class="ai-tone-btn px-3.5 py-1.5 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373]">Lucu / Canda</button>
             <button data-tone="tulus"
-              class="px-4 py-2 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373]">Formal
-              &amp; Tulus</button>
+              class="ai-tone-btn px-3.5 py-1.5 text-[10px] rounded-full border border-gray-200 bg-white text-gray-500 font-bold transition-all hover:border-[#d4a373] hover:text-[#d4a373]">Formal &amp; Tulus</button>
           </div>
         </div>
 
         <p id="ai-error-msg" class="text-[9px] text-rose-500 mt-3 font-bold"></p>
         <button id="btn-ai-generate"
-          class="mt-5 w-full py-3.5 text-[10px] uppercase tracking-widest font-bold bg-gray-900 text-white rounded-full hover:bg-black transition-all shadow-sm flex items-center justify-center gap-2">
+          class="mt-4 w-full py-3.5 text-[10px] uppercase tracking-widest font-bold bg-gray-900 text-white rounded-full hover:bg-black transition-all shadow-sm flex items-center justify-center gap-2">
           <span class="material-symbols-outlined text-[12px] leading-none">auto_awesome</span> Generate Surat
         </button>
       </div>
 
       <!-- View: Loading -->
       <div id="ai-view-loading" class="hidden px-6 py-12 flex flex-col items-center justify-center text-center">
-        <div class="w-8 h-8 border-2 border-gray-100 border-t-[#d4a373] rounded-full animate-spin mb-5"></div>
-        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">AI sedang menulis...</p>
-        <p class="text-[9px] text-gray-300 mt-1 italic">Sebentar ya, lagi merangkai kata-kata</p>
+        <div class="w-8 h-8 border-2 border-gray-100 border-t-[#d4a373] rounded-full animate-spin mb-4"></div>
+        <p class="text-[10px] uppercase tracking-widest text-gray-400 font-bold">AI sedang merangkai pesan...</p>
+        <p class="text-[9px] text-gray-300 mt-1 italic">Memproses detail &amp; gaya bahasa pilihanmu</p>
       </div>
 
       <!-- View: Result -->
@@ -1344,7 +1411,7 @@
         <label class="text-[9px] uppercase tracking-widest text-gray-400 font-bold block mb-3">Hasil dari AI :</label>
         <div class="relative">
           <div id="ai-result-text"
-            class="w-full p-4 bg-white border border-[#d4a373]/20 rounded-xl text-[14px] leading-relaxed text-gray-800 min-h-[100px] max-h-[280px] overflow-y-auto"
+            class="w-full p-4.5 bg-white border border-[#d4a373]/25 rounded-xl text-[17px] leading-[1.85] text-gray-800 min-h-[120px] max-h-[300px] overflow-y-auto shadow-inner"
             style="font-family: 'Caveat', cursive; white-space: pre-wrap;"></div>
         </div>
         <div class="flex gap-3 mt-5">
@@ -1354,7 +1421,7 @@
           </button>
           <button id="btn-ai-apply"
             class="flex-1 py-3 text-[9px] uppercase tracking-widest font-bold bg-[#d4a373] text-white rounded-full hover:bg-[#c4956a] transition-all shadow-sm">
-            ✓ Gunakan Surat
+            Gunakan Surat
           </button>
         </div>
       </div>
