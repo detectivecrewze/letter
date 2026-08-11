@@ -312,41 +312,18 @@ const Studio = (() => {
     if (!grid) return;
     grid.innerHTML = '<div class="col-span-4 text-center py-4 text-gray-400 text-[9px] uppercase tracking-widest font-bold">Mencari sticker...</div>';
 
-    const apiKey = 'DV4osjz8JzjCyyFZttAUqXPcxgPh1H4W';
     try {
-      let gifs = null;
+      const workerUrl = Auth.getWorkerUrl();
+      const res = await fetch(`${workerUrl}/giphy-search?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
 
-      // Try worker proxy first
-      try {
-        const workerUrl = Auth.getWorkerUrl();
-        const res = await fetch(`${workerUrl}/giphy-search?q=${encodeURIComponent(query)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.gifs) gifs = data.gifs;
-        }
-      } catch (e) {
-        console.warn('[Giphy Worker Proxy fail, falling back to direct API]', e);
-      }
-
-      // Fallback to direct Giphy API call if worker proxy is not deployed
-      if (!gifs) {
-        const directRes = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&rating=g`);
-        const directJson = await directRes.json();
-        gifs = (directJson.data || []).map(g => ({
-          id: g.id,
-          title: g.title,
-          url: g.images?.downsized_medium?.url || g.images?.original?.url || g.images?.fixed_height?.url,
-          preview: g.images?.fixed_height_small?.url || g.images?.downsized_small?.url || g.images?.downsized?.url
-        }));
-      }
-
-      if (!gifs || !gifs.length) {
+      if (!data.success || !data.gifs || !data.gifs.length) {
         grid.innerHTML = '<div class="col-span-4 text-center py-4 text-gray-400 text-[9px]">Tidak ada sticker ditemukan.</div>';
         return;
       }
 
       grid.innerHTML = '';
-      gifs.forEach(gif => {
+      data.gifs.forEach(gif => {
         const div = document.createElement('div');
         div.className = 'cursor-pointer rounded-xl overflow-hidden border border-gray-200 hover:border-[#d4a373] transition-all bg-white hover:scale-105 shadow-sm';
         div.innerHTML = `<img src="${gif.preview || gif.url}" alt="${gif.title || ''}" class="w-full h-14 object-cover">`;

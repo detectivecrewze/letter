@@ -160,7 +160,12 @@ var index_default = {
     if (request.method === 'GET' && url.pathname === '/giphy-search') {
       try {
         const query = url.searchParams.get('q') || 'love cute';
-        const apiKey = env.GIPHY_API_KEY || 'DV4osjz8JzjCyyFZttAUqXPcxgPh1H4W';
+        const apiKey = env.GIPHY_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'GIPHY_API_KEY belum dikonfigurasi di server.' }), {
+            status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
         const giphyRes = await fetch(
           `https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&rating=g`
         );
