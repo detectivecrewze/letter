@@ -561,16 +561,22 @@ async function _typewriteLetter(config) {
     p.appendChild(cursor);
 
     for (const ch of paragraphs[pi]) {
-      const textNode = document.createTextNode(ch);
-      p.insertBefore(textNode, cursor);
+      if (ch === '\n') {
+        const br = document.createElement('br');
+        p.insertBefore(br, cursor);
+        await _delay(TW_CHAR_DELAY * 3.5);
+      } else {
+        const textNode = document.createTextNode(ch);
+        p.insertBefore(textNode, cursor);
 
-      const scrollEl = document.querySelector('.letter-scroll');
-      if (scrollEl) scrollEl.scrollTop = scrollEl.scrollHeight;
+        const scrollEl = document.querySelector('.letter-scroll');
+        if (scrollEl) scrollEl.scrollTop = scrollEl.scrollHeight;
 
-      const delay = (ch === '.' || ch === ',' || ch === '!' || ch === '?')
-        ? TW_CHAR_DELAY * 3.5
-        : TW_CHAR_DELAY + (Math.random() * 10 - 5);
-      await _delay(delay);
+        const delay = (ch === '.' || ch === ',' || ch === '!' || ch === '?')
+          ? TW_CHAR_DELAY * 3.5
+          : TW_CHAR_DELAY + (Math.random() * 10 - 5);
+        await _delay(delay);
+      }
     }
 
     cursor.remove();
@@ -609,7 +615,7 @@ async function _typewriteSimple(elId, text, speed) {
 function _formatContent(text) {
   return text.split(/\n\n+/)
     .filter(p => p.trim())
-    .map(p => `<p>${p.replace(/\n/g, ' ')}</p>`)
+    .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
     .join('');
 }
 

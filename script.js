@@ -596,20 +596,26 @@ async function _typewriteLetter(config) {
       p.style.opacity = '1';
 
       for (const ch of para) {
-        const textNode = document.createTextNode(ch);
-        p.insertBefore(textNode, cursor);
+        if (ch === '\n') {
+          const br = document.createElement('br');
+          p.insertBefore(br, cursor);
+          await _delay(TW_CHAR_DELAY * 4);
+        } else {
+          const textNode = document.createTextNode(ch);
+          p.insertBefore(textNode, cursor);
 
-        // Smart autoscroll: only if user is already near the bottom
-        const isAtBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 120);
-        if (isAtBottom) {
-          cursor.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+          // Smart autoscroll: only if user is already near the bottom
+          const isAtBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 120);
+          if (isAtBottom) {
+            cursor.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+          }
+
+          const delay = ch === '.' || ch === ',' || ch === '!' || ch === '?'
+            ? TW_CHAR_DELAY * 4
+            : TW_CHAR_DELAY + (Math.random() * 12 - 6);
+
+          await _delay(delay);
         }
-
-        const delay = ch === '.' || ch === ',' || ch === '!' || ch === '?'
-          ? TW_CHAR_DELAY * 4
-          : TW_CHAR_DELAY + (Math.random() * 12 - 6);
-
-        await _delay(delay);
       }
       cursor.remove();
       await _delay(TW_PARA_PAUSE);
