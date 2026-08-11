@@ -793,34 +793,36 @@ var index_default = {
         let toneInstruction = '';
         switch (requestedTone) {
           case 'romantis':
-            toneInstruction = 'Bergaya ROMANTIS dan manis, cocok untuk pasangan. Gunakan "aku" dan "kamu". Hangat, tulus, dan sedikit puitis.';
+            toneInstruction = 'Bergaya ROMANTIS, manis, dan hangat untuk pasangan. Gunakan panggilan "aku" dan "kamu". Mengalir santai dan tulus, jangan baku atau puitis klise (hindari kata kiasan puitis tua seperti "relung hati", "samudra", "meniti").';
             break;
-          case 'semangat':
-            toneInstruction = 'Bergaya MOTIVASI dan menyemangati. Positif, energetik, dan penuh harapan. Cocok untuk wisuda, ujian, atau momen perjuangan.';
+          case 'lucu':
+            toneInstruction = 'Bergaya SANTAI, BERCANDA, DAN HUMORIS. Seperti ngobrol santai dengan pacar/sahabat dekat. Penuh keceriaan, ada celetukan manis atau kebiasaan gemas. Gunakan "aku" dan "kamu". Ringan, relate, dan menyenangkan tanpa kaku sama sekali.';
             break;
-          case 'bersahabat':
-            toneInstruction = 'Bergaya KASUAL dan bersahabat seperti sahabat lama. Santai, hangat, dan penuh ketulusan.';
+          case 'santai':
+            toneInstruction = 'Bergaya SANTAI PERCAKAPAN SEHARI-HARI. Bahasa kasual manusia modern, wajar dan mengalir seolah sedang ngobrol langsung. Gunakan "aku" dan "kamu". Hindari kata-kata baku atau kalimat puitis yang kaku.';
             break;
           case 'tulus':
           default:
-            toneInstruction = 'Bergaya FORMAL TAPI TULUS. Kata-kata dipilih dengan hati-hati, sopan namun menyentuh. Cocok untuk semua konteks.';
+            toneInstruction = 'Bergaya HANGAT, TULUS, DAN MENYENTUH HATI. Bahasa natural dan sopan tanpa bahasa surat dinas/baku dan tanpa sastra kaku yang dibuat-buat. Menyentuh namun tetap terasa jujur dari hati.';
             break;
         }
 
-        const systemInstruction = `Kamu adalah penulis surat digital premium untuk "Letter Edition by For You, Always."
-Tugasmu: Tulis isi surat yang personal dan menyentuh dengan gaya: [${toneInstruction}]
-ATURAN WAJIB:
-1. Panjang isi surat: 80–120 kata (2 paragraf).
-2. Tulis dalam 2 PARAGRAF dipisahkan baris kosong.
-3. Jangan potong di tengah kalimat. Akhiri dengan tanda titik.
-4. Tanpa format markdown. Tanpa sapaan pembuka (sudah ada di template).
-5. Langsung tulis isi pesan.`;
+        const systemInstruction = `Kamu adalah penulis pesan/surat personal digital untuk "Letter Edition by For You, Always."
+Tugasmu: Tulis isi surat yang sangat personal, mengalir, dan terasa ditulis oleh MANUSIA ASLI (bukan AI).
+Gaya Bahasa: [${toneInstruction}]
+
+ATURAN WAJIB (JIKA DILANGGAR HASIL BATAL):
+1. Panjang isi surat: 70–110 kata, dibagi menjadi 2 PARAGRAF pendek (dipisahkan 1 baris kosong).
+2. DILARANG KERAS memakai tanda pisah em-dash (—, –, atau --). Gunakan tanda koma atau titik biasa.
+3. DILARANG KERAS menggunakan kata-kata puitis kaku/klise (contoh yang dilarang: "relung hati", "samudra", "meniti waktu", "untaian kata", "lembaran baru", "cahaya hidupku"). Gunakan ungkapan sehari-hari yang relate dan jujur.
+4. Tanpa format markdown (tanpa **, *, #). Tanpa sapaan pembuka (seperti "Dear...", "Halo...", "Untuk..."), karena sapaan sudah ada di template.
+5. Langsung mulai dari isi kalimat pertama secara natural.`;
 
         const qwenPayload = {
           model: 'qwen-plus',
           messages: [
             { role: 'system', content: systemInstruction },
-            { role: 'user', content: `[KONTEKS/TEMA DARI PENGIRIM:]\\n${userPrompt.trim()}` },
+            { role: 'user', content: `[PESAN/KONTEKS DARI PENGIRIM:]\n${userPrompt.trim()}` },
           ],
           temperature: 0.85,
           top_p: 0.95,
@@ -848,9 +850,18 @@ ATURAN WAJIB:
         }
 
         const qwenData = await qwenResponse.json();
-        const generatedText = qwenData?.choices?.[0]?.message?.content || '';
+        let generatedText = qwenData?.choices?.[0]?.message?.content || '';
 
-        return new Response(JSON.stringify({ success: true, text: generatedText.trim() }), {
+        // Clean up em-dashes and formatting artifacts
+        generatedText = generatedText
+          .replace(/[\u2014\u2013]|--/g, ', ')
+          .replace(/,\s*,/g, ',')
+          .replace(/\s+/g, ' ')
+          .replace(/\n\s+/g, '\n')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+
+        return new Response(JSON.stringify({ success: true, text: generatedText }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
 
