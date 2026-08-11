@@ -157,6 +157,10 @@ const Studio = (() => {
     document.querySelectorAll('.vintage-flower-option').forEach(btn => {
       btn.classList.toggle('active', _activeVintageFlower.includes(btn.dataset.vintageFlower));
     });
+
+    // GIF Sticker Initial State
+    _setVal('input-gif-sticker-url', config.gifStickerUrl || '');
+    _updateGifStickerPreview(config.gifStickerUrl || '');
   }
 
   function _setVal(id, val) {
@@ -257,6 +261,122 @@ const Studio = (() => {
         showToast(`Tekstur '${_activeTexture}' dipilih`);
       });
     });
+
+    // GIF Sticker Binding
+    document.getElementById('input-gif-sticker-url')?.addEventListener('input', (e) => {
+      _updateGifStickerPreview(e.target.value.trim());
+      Autosave.trigger();
+    });
+
+    document.getElementById('btn-gif-sticker-clear')?.addEventListener('click', () => {
+      const inp = document.getElementById('input-gif-sticker-url');
+      if (inp) inp.value = '';
+      _updateGifStickerPreview('');
+      Autosave.trigger();
+    });
+
+    // Toggle Giphy Picker Drawer
+    const btnSearchGiphy = document.getElementById('btn-search-giphy');
+    const giphyContainer = document.getElementById('giphy-picker-container');
+    const btnDoSearch = document.getElementById('btn-do-giphy-search');
+    const inputGiphyQuery = document.getElementById('input-giphy-query');
+
+    if (btnSearchGiphy && giphyContainer) {
+      btnSearchGiphy.addEventListener('click', () => {
+        const isHidden = giphyContainer.classList.contains('hidden');
+        giphyContainer.classList.toggle('hidden', !isHidden);
+        const grid = document.getElementById('giphy-results-grid');
+        if (isHidden && (!grid || !grid.children.length)) {
+          _fetchGiphy('cute love');
+        }
+      });
+    }
+
+    if (btnDoSearch && inputGiphyQuery) {
+      const runSearch = () => {
+        const q = inputGiphyQuery.value.trim() || 'cute love';
+        _fetchGiphy(q);
+      };
+      btnDoSearch.addEventListener('click', runSearch);
+      inputGiphyQuery.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          runSearch();
+        }
+      });
+    }
+  }
+
+  async function _fetchGiphy(query) {
+    const grid = document.getElementById('giphy-results-grid');
+    if (!grid) return;
+    grid.innerHTML = '<div class="col-span-4 text-center py-4 text-gray-400 text-[9px] uppercase tracking-widest font-bold">Mencari sticker...</div>';
+
+    const apiKey = 'DV4osjz8JzjCyyFZttAUqXPcxgPh1H4W';
+    try {
+      let gifs = null;
+
+      // Try worker proxy first
+      try {
+        const workerUrl = Auth.getWorkerUrl();
+        const res = await fetch(`${workerUrl}/giphy-search?q=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.gifs) gifs = data.gifs;
+        }
+      } catch (e) {
+        console.warn('[Giphy Worker Proxy fail, falling back to direct API]', e);
+      }
+
+      // Fallback to direct Giphy API call if worker proxy is not deployed
+      if (!gifs) {
+        const directRes = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${apiKey}&q=${encodeURIComponent(query)}&limit=20&rating=g`);
+        const directJson = await directRes.json();
+        gifs = (directJson.data || []).map(g => ({
+          id: g.id,
+          title: g.title,
+          url: g.images?.downsized_medium?.url || g.images?.original?.url || g.images?.fixed_height?.url,
+          preview: g.images?.fixed_height_small?.url || g.images?.downsized_small?.url || g.images?.downsized?.url
+        }));
+      }
+
+      if (!gifs || !gifs.length) {
+        grid.innerHTML = '<div class="col-span-4 text-center py-4 text-gray-400 text-[9px]">Tidak ada sticker ditemukan.</div>';
+        return;
+      }
+
+      grid.innerHTML = '';
+      gifs.forEach(gif => {
+        const div = document.createElement('div');
+        div.className = 'cursor-pointer rounded-xl overflow-hidden border border-gray-200 hover:border-[#d4a373] transition-all bg-white hover:scale-105 shadow-sm';
+        div.innerHTML = `<img src="${gif.preview || gif.url}" alt="${gif.title || ''}" class="w-full h-14 object-cover">`;
+        div.addEventListener('click', () => {
+          const inp = document.getElementById('input-gif-sticker-url');
+          if (inp) inp.value = gif.url;
+          _updateGifStickerPreview(gif.url);
+          document.getElementById('giphy-picker-container')?.classList.add('hidden');
+          Autosave.trigger();
+          showToast('GIF Sticker dipilih! ✓');
+        });
+        grid.appendChild(div);
+      });
+    } catch (err) {
+      console.warn('[Giphy Search Error]', err);
+      grid.innerHTML = '<div class="col-span-4 text-center py-4 text-red-400 text-[9px]">Gagal memuat sticker Giphy. Silakan paste URL langsung.</div>';
+    }
+  }
+
+  function _updateGifStickerPreview(url) {
+    const wrap = document.getElementById('gif-sticker-preview-wrap');
+    const img  = document.getElementById('gif-sticker-preview-img');
+    if (!wrap || !img) return;
+    if (url) {
+      img.src = url;
+      wrap.classList.remove('hidden');
+    } else {
+      wrap.classList.add('hidden');
+      img.src = '';
+    }
   }
 
   /* ─────────────────────────────────────────────────────────
@@ -453,6 +573,22 @@ const Studio = (() => {
     _toggle(vintageFlowerDisp, !isVintage);  // show flower selector only for vintage
     _toggle(textureSectionWrap, isAirmail || isRibbon || isVintage);  // no paper texture for airmail, ribbon, or vintage
     _toggle(ribbonSenderWrap, !isRibbon);    // show "Dari" field ONLY for Ribbon & Seal
+
+    // GIF Sticker input block — strictly visible ONLY when vintage template is active
+    const gifStickerWrap = document.getElementById('gif-sticker-input-wrap');
+    if (gifStickerWrap) {
+      if (isVintage) {
+        gifStickerWrap.classList.remove('hidden', 'field-hidden');
+        gifStickerWrap.style.display = 'block';
+      } else {
+        gifStickerWrap.classList.add('hidden', 'field-hidden');
+        gifStickerWrap.style.display = 'none';
+        // Clear input value & preview when switching away from vintage
+        const inp = document.getElementById('input-gif-sticker-url');
+        if (inp) inp.value = '';
+        _updateGifStickerPreview('');
+      }
+    }
 
     // Adjust spacing for Recipient Info — remove top border only for airmail (everything hidden above)
     const recipientInfoWrap = document.getElementById('recipient-info-wrap');
@@ -666,6 +802,18 @@ const Studio = (() => {
         if (typoSection) typoSection.style.opacity = '1';
         const lockBadge = typoSection?.querySelector('.typo-lock-badge');
         if (lockBadge) lockBadge.remove();
+      }
+    }
+
+    // ── 6. GIF Sticker Locking ────────────────────────────────────
+    const gifInputWrap = document.getElementById('gif-sticker-input-wrap');
+    if (gifInputWrap) {
+      if (isPrem) {
+        gifInputWrap.style.pointerEvents = '';
+        gifInputWrap.style.opacity = '';
+      } else {
+        gifInputWrap.style.pointerEvents = 'none';
+        gifInputWrap.style.opacity = '0.45';
       }
     }
   }

@@ -634,6 +634,7 @@ function _showSaveContainer(config) {
   setTimeout(() => { container.style.opacity = '1'; }, 50);
 
   _initSecretMemory(config);
+  _revealGifSticker(config);
 
   const scrollEl = document.querySelector('.letter-scroll');
   if (scrollEl) {
@@ -647,6 +648,27 @@ function _showSaveContainer(config) {
     }, 150);
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   GIF STICKER
+   ════════════════════════════════════════════════════════════ */
+function _revealGifSticker(config) {
+  if (config.templateType && config.templateType !== 'vintage') return;
+  const url = (config.gifStickerUrl || '').trim();
+  if (!url) return;
+
+  const wrap = document.getElementById('letter-gif-sticker-wrap');
+  const img  = document.getElementById('letter-gif-sticker-img');
+  if (!wrap || !img) return;
+
+  img.src = url;
+
+  // Spring-reveal after a short delay so it feels like a postscript surprise
+  setTimeout(() => {
+    wrap.classList.add('is-visible');
+  }, 900);
+}
+
 
 function _initDownloadButton(config) {
   const btn = document.getElementById('btn-save-letter');

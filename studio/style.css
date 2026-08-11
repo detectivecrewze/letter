@@ -1278,7 +1278,9 @@ textarea,
 #theme-selector-wrap,
 #airmail-color-display,
 #ribbon-color-display,
+#vintage-color-display,
 #vintage-flower-display,
+#gif-sticker-input-wrap,
 #texture-section-wrap {
   transition: opacity 0.25s ease, max-height 0.35s cubic-bezier(0.4,0,0.2,1);
 }
@@ -1290,13 +1292,15 @@ textarea,
 #ribbon-color-display.field-hidden,
 #vintage-color-display.field-hidden,
 #vintage-flower-display.field-hidden,
+#gif-sticker-input-wrap.field-hidden,
 #texture-section-wrap.field-hidden {
-  opacity: 0;
+  opacity: 0 !important;
   max-height: 0 !important;
-  pointer-events: none;
+  pointer-events: none !important;
   margin: 0 !important;
   padding: 0 !important;
-  overflow: hidden;
+  border: none !important;
+  overflow: hidden !important;
 }
 
 /* ── Template Section Premium Lock ── */

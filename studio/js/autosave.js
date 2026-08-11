@@ -95,6 +95,9 @@ const Autosave = (() => {
       ribbonTheme:  Studio.getActiveRibbonTheme(),
       vintageFlower: Studio.getActiveVintageFlower(),
       vintageColor:  Studio.getActiveVintageColor(),
+      gifStickerUrl: Studio.getActiveTemplate() === 'vintage'
+        ? (document.getElementById('input-gif-sticker-url')?.value.trim() || '')
+        : '',
 
       // Section 4 — Memori Rahasia (multi-photo carousel)
       // Only include if admin has whitelisted this letter for secret memory
@@ -125,6 +128,8 @@ const Autosave = (() => {
       if (!Studio.isMemoryEnabled()) {
         state.secretMediaList = [];
       }
+      // Strip GIF sticker (premium-only)
+      state.gifStickerUrl = '';
     } else {
       // Premium users ALWAYS send their media list
       state.secretMediaList = Studio.getMediaList();

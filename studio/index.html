@@ -685,6 +685,48 @@
             <input id="input-letter-from" type="text" placeholder="Pengirim (e.g. Your Biggest Fans, Rey)"
               class="input-minimal mt-4 text-right" />
 
+            <!-- GIF Sticker Input Block (Inside Section 2 - Surat, Optional, Vintage Only) -->
+            <div id="gif-sticker-input-wrap" class="mt-6 pt-5 border-t border-gray-100/80 hidden field-hidden" style="display: none;">
+              <div class="flex items-center justify-between mb-3">
+                <label class="text-[9px] uppercase tracking-[0.2em] font-bold text-gray-600 flex items-center gap-1.5">
+                  GIF Sticker <span class="text-[8px] text-[#d4a373] bg-[#fdf9f4] border border-[#d4a373]/30 px-2 py-0.5 rounded-full font-semibold">Opsional</span>
+                </label>
+                <button id="btn-search-giphy" type="button" class="text-[8px] text-[#b58756] hover:text-[#d4a373] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[12px]">search</span> Cari via Giphy
+                </button>
+              </div>
+
+              <!-- Live Preview -->
+              <div id="gif-sticker-preview-wrap" class="hidden mb-3 flex items-center gap-3 bg-[#fdf9f4] p-3 rounded-2xl border border-[#d4a373]/20">
+                <img id="gif-sticker-preview-img" src="" alt="GIF Preview" class="w-14 h-14 object-cover rounded-xl border border-[#d4a373]/40 flex-shrink-0">
+                <div class="flex-1 min-w-0">
+                  <p class="text-[8px] font-bold text-gray-700 uppercase tracking-wider">GIF Terpilih</p>
+                  <p class="text-[7px] text-gray-400 truncate">Akan muncul di akhir surat</p>
+                </div>
+                <button id="btn-gif-sticker-clear" type="button" class="text-[9px] text-red-400 hover:text-red-600 font-bold px-2 py-1">Hapus</button>
+              </div>
+
+              <!-- Input URL -->
+              <div class="flex gap-2 items-center">
+                <input id="input-gif-sticker-url" type="url" placeholder="Paste URL GIF (https://media.giphy.com/...)" class="input-minimal flex-1 text-xs" />
+              </div>
+
+              <!-- Hint Text -->
+              <p class="text-[8px] text-[#b58756] mt-2 leading-relaxed font-medium">
+                💡 <strong>Petunjuk:</strong> Jika mengambil dari web/Tenor/Giphy, <strong>klik kanan pada gambar GIF &rarr; pilih "Copy Image Address"</strong> (bukan Copy Link web-nya). Atau klik "Cari via Giphy" di atas.
+              </p>
+
+              <!-- Giphy Picker Container (Hidden by default) -->
+              <div id="giphy-picker-container" class="hidden mt-3 p-4 bg-[#fdf9f4] rounded-2xl border border-[#d4a373]/20 space-y-3">
+                <div class="flex gap-2 items-center">
+                  <input id="input-giphy-query" type="text" placeholder="Cari sticker Giphy (cth: cute cat, love)..." class="w-full text-xs px-3 py-2 rounded-xl border border-gray-200 outline-none focus:border-[#d4a373] bg-white text-gray-800" />
+                  <button id="btn-do-giphy-search" type="button" class="bg-[#d4a373] text-white text-[9px] font-bold uppercase tracking-wider px-3 py-2 rounded-xl hover:bg-[#b58756] transition-all flex-shrink-0">Cari</button>
+                </div>
+                <div id="giphy-results-grid" class="grid grid-cols-4 gap-2 max-h-48 overflow-y-auto pr-1"></div>
+              </div>
+            </div>
+
+
             <div
               class="section-hint mt-8 flex items-start gap-3 bg-[#fdf9f4]/50 p-4 rounded-2xl border border-[#d4a373]/10">
               <svg class="w-4 h-4 text-[#d4a373] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor"
@@ -877,6 +919,8 @@
           </div>
         </div>
       </section>
+
+
 
 
       <!-- ══════════════════════════════════════
