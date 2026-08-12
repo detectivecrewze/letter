@@ -654,19 +654,28 @@ function _showSaveContainer(config) {
    ════════════════════════════════════════════════════════════ */
 function _revealGifSticker(config) {
   if (config.templateType && config.templateType !== 'vintage') return;
+
+  // 1. Footer GIF Sticker (Bottom-left of signature)
   const url = (config.gifStickerUrl || '').trim();
-  if (!url) return;
+  if (url) {
+    const wrap = document.getElementById('letter-gif-sticker-wrap');
+    const img  = document.getElementById('letter-gif-sticker-img');
+    if (wrap && img) {
+      img.src = url;
+      setTimeout(() => wrap.classList.add('is-visible'), 900);
+    }
+  }
 
-  const wrap = document.getElementById('letter-gif-sticker-wrap');
-  const img  = document.getElementById('letter-gif-sticker-img');
-  if (!wrap || !img) return;
-
-  img.src = url;
-
-  // Spring-reveal after a short delay so it feels like a postscript surprise
-  setTimeout(() => {
-    wrap.classList.add('is-visible');
-  }, 900);
+  // 2. Header GIF Sticker (Top-right of recipient salutation)
+  const headerUrl = (config.headerGifStickerUrl || '').trim();
+  if (headerUrl) {
+    const hWrap = document.getElementById('letter-header-gif-sticker-wrap');
+    const hImg  = document.getElementById('letter-header-gif-sticker-img');
+    if (hWrap && hImg) {
+      hImg.src = headerUrl;
+      setTimeout(() => hWrap.classList.add('is-visible'), 900);
+    }
+  }
 }
 
 

@@ -161,6 +161,8 @@ const Studio = (() => {
     // GIF Sticker Initial State
     _setVal('input-gif-sticker-url', config.gifStickerUrl || '');
     _updateGifStickerPreview(config.gifStickerUrl || '');
+    _setVal('input-header-gif-sticker-url', config.headerGifStickerUrl || '');
+    _updateHeaderGifStickerPreview(config.headerGifStickerUrl || '');
   }
 
   function _setVal(id, val) {
@@ -262,11 +264,19 @@ const Studio = (() => {
       });
     });
 
-    // GIF Sticker Binding
-    document.getElementById('input-gif-sticker-url')?.addEventListener('input', (e) => {
-      _updateGifStickerPreview(e.target.value.trim());
-      Autosave.trigger();
-    });
+    _bindGifStickerSection();
+  }
+
+  let _giphyTarget = 'footer';
+
+  function _bindGifStickerSection() {
+    const inpFooter = document.getElementById('input-gif-sticker-url');
+    if (inpFooter) {
+      inpFooter.addEventListener('input', () => {
+        _updateGifStickerPreview(inpFooter.value.trim());
+        Autosave.trigger();
+      });
+    }
 
     document.getElementById('btn-gif-sticker-clear')?.addEventListener('click', () => {
       const inp = document.getElementById('input-gif-sticker-url');
@@ -275,21 +285,45 @@ const Studio = (() => {
       Autosave.trigger();
     });
 
+    const inpHeader = document.getElementById('input-header-gif-sticker-url');
+    if (inpHeader) {
+      inpHeader.addEventListener('input', () => {
+        _updateHeaderGifStickerPreview(inpHeader.value.trim());
+        Autosave.trigger();
+      });
+    }
+
+    document.getElementById('btn-clear-header-gif-sticker')?.addEventListener('click', () => {
+      const inp = document.getElementById('input-header-gif-sticker-url');
+      if (inp) inp.value = '';
+      _updateHeaderGifStickerPreview('');
+      Autosave.trigger();
+    });
+
     // Toggle Giphy Picker Drawer
     const btnSearchGiphy = document.getElementById('btn-search-giphy');
+    const btnSearchGiphyHeader = document.getElementById('btn-search-giphy-header');
     const giphyContainer = document.getElementById('giphy-picker-container');
     const btnDoSearch = document.getElementById('btn-do-giphy-search');
     const inputGiphyQuery = document.getElementById('input-giphy-query');
 
-    if (btnSearchGiphy && giphyContainer) {
-      btnSearchGiphy.addEventListener('click', () => {
+    const openGiphy = (target) => {
+      _giphyTarget = target;
+      if (giphyContainer) {
         const isHidden = giphyContainer.classList.contains('hidden');
-        giphyContainer.classList.toggle('hidden', !isHidden);
+        giphyContainer.classList.toggle('hidden', false);
         const grid = document.getElementById('giphy-results-grid');
-        if (isHidden && (!grid || !grid.children.length)) {
+        if (!grid || !grid.children.length) {
           _fetchGiphy('cute love');
         }
-      });
+      }
+    };
+
+    if (btnSearchGiphy) {
+      btnSearchGiphy.addEventListener('click', () => openGiphy('footer'));
+    }
+    if (btnSearchGiphyHeader) {
+      btnSearchGiphyHeader.addEventListener('click', () => openGiphy('header'));
     }
 
     if (btnDoSearch && inputGiphyQuery) {
@@ -328,9 +362,15 @@ const Studio = (() => {
         div.className = 'cursor-pointer rounded-xl overflow-hidden border border-gray-200 hover:border-[#d4a373] transition-all bg-white hover:scale-105 shadow-sm';
         div.innerHTML = `<img src="${gif.preview || gif.url}" alt="${gif.title || ''}" class="w-full h-14 object-cover">`;
         div.addEventListener('click', () => {
-          const inp = document.getElementById('input-gif-sticker-url');
-          if (inp) inp.value = gif.url;
-          _updateGifStickerPreview(gif.url);
+          if (_giphyTarget === 'header') {
+            const inp = document.getElementById('input-header-gif-sticker-url');
+            if (inp) inp.value = gif.url;
+            _updateHeaderGifStickerPreview(gif.url);
+          } else {
+            const inp = document.getElementById('input-gif-sticker-url');
+            if (inp) inp.value = gif.url;
+            _updateGifStickerPreview(gif.url);
+          }
           document.getElementById('giphy-picker-container')?.classList.add('hidden');
           Autosave.trigger();
           showToast('GIF Sticker dipilih! ✓');
@@ -346,6 +386,19 @@ const Studio = (() => {
   function _updateGifStickerPreview(url) {
     const wrap = document.getElementById('gif-sticker-preview-wrap');
     const img  = document.getElementById('gif-sticker-preview-img');
+    if (!wrap || !img) return;
+    if (url) {
+      img.src = url;
+      wrap.classList.remove('hidden');
+    } else {
+      wrap.classList.add('hidden');
+      img.src = '';
+    }
+  }
+
+  function _updateHeaderGifStickerPreview(url) {
+    const wrap = document.getElementById('header-gif-sticker-preview-wrap');
+    const img  = document.getElementById('header-gif-sticker-preview-img');
     if (!wrap || !img) return;
     if (url) {
       img.src = url;
@@ -564,6 +617,20 @@ const Studio = (() => {
         const inp = document.getElementById('input-gif-sticker-url');
         if (inp) inp.value = '';
         _updateGifStickerPreview('');
+      }
+    }
+
+    const headerGifWrap = document.getElementById('header-gif-sticker-input-wrap');
+    if (headerGifWrap) {
+      if (isVintage) {
+        headerGifWrap.classList.remove('hidden', 'field-hidden');
+        headerGifWrap.style.display = 'block';
+      } else {
+        headerGifWrap.classList.add('hidden', 'field-hidden');
+        headerGifWrap.style.display = 'none';
+        const inp = document.getElementById('input-header-gif-sticker-url');
+        if (inp) inp.value = '';
+        _updateHeaderGifStickerPreview('');
       }
     }
 

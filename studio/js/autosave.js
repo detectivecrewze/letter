@@ -98,6 +98,9 @@ const Autosave = (() => {
       gifStickerUrl: Studio.getActiveTemplate() === 'vintage'
         ? (document.getElementById('input-gif-sticker-url')?.value.trim() || '')
         : '',
+      headerGifStickerUrl: Studio.getActiveTemplate() === 'vintage'
+        ? (document.getElementById('input-header-gif-sticker-url')?.value.trim() || '')
+        : '',
 
       // Section 4 — Memori Rahasia (multi-photo carousel)
       // Only include if admin has whitelisted this letter for secret memory

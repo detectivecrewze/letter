@@ -867,6 +867,7 @@ button {
 /* ── Letter Salutation ────────────────────────────────── */
 .letter-salutation {
   margin-bottom: 1.2rem;
+  position: relative;
 }
 
 .meta-to-name {
@@ -1356,6 +1357,50 @@ button {
 }
 
 .letter-gif-sticker img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: transparent !important;
+}
+
+/* ────────────────────────────────────────
+   HEADER GIF STICKER — appears top-right of letter recipient
+   ──────────────────────────────────────── */
+.letter-header-gif-sticker {
+  position: absolute;
+  right: 0;
+  top: -10px;
+  width: clamp(64px, 16vw, 88px);
+  height: clamp(64px, 16vw, 88px);
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible;
+  opacity: 0;
+  transform: scale(0.6) rotate(0deg);
+  transition: opacity 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: 20;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 540px) {
+  .letter-header-gif-sticker {
+    top: -6px;
+    right: 0;
+    width: clamp(52px, 14vw, 72px);
+    height: clamp(52px, 14vw, 72px);
+  }
+}
+
+.letter-header-gif-sticker.is-visible {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+.letter-header-gif-sticker img {
   width: 100%;
   height: 100%;
   object-fit: contain;
