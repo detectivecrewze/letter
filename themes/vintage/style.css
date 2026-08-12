@@ -1457,4 +1457,46 @@ button {
     height: clamp(64px, 17vw, 86px);
     bottom: -2px;
   }
+}
+
+/* ────────────────────────────────────────
+   ENVELOPE GIF STICKER — floats above top-right of closed vintage envelope
+   ──────────────────────────────────────── */
+.vintage-envelope-gif-sticker {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.6) translateY(10px);
+  width: clamp(80px, 18vw, 110px);
+  height: auto;
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 0.55s ease,
+              transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  z-index: 10;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+}
+
+@media (max-width: 540px) {
+  .vintage-envelope-gif-sticker {
+    top: -60px;
+    width: clamp(64px, 16vw, 88px);
+  }
+}
+
+.vintage-envelope-gif-sticker.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) scale(1) translateY(0);
+}
+
+.vintage-envelope-gif-sticker img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  background: transparent !important;
 }

@@ -101,6 +101,9 @@ const Autosave = (() => {
       headerGifStickerUrl: Studio.getActiveTemplate() === 'vintage'
         ? (document.getElementById('input-header-gif-sticker-url')?.value.trim() || '')
         : '',
+      envelopeGifStickerUrl: Studio.getActiveTemplate() === 'vintage'
+        ? (document.getElementById('input-envelope-gif-sticker-url')?.value.trim() || '')
+        : '',
 
       // Section 4 — Memori Rahasia (multi-photo carousel)
       // Only include if admin has whitelisted this letter for secret memory

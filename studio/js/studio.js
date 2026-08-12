@@ -163,6 +163,8 @@ const Studio = (() => {
     _updateGifStickerPreview(config.gifStickerUrl || '');
     _setVal('input-header-gif-sticker-url', config.headerGifStickerUrl || '');
     _updateHeaderGifStickerPreview(config.headerGifStickerUrl || '');
+    _setVal('input-envelope-gif-sticker-url', config.envelopeGifStickerUrl || '');
+    _updateEnvelopeGifStickerPreview(config.envelopeGifStickerUrl || '');
   }
 
   function _setVal(id, val) {
@@ -300,9 +302,25 @@ const Studio = (() => {
       Autosave.trigger();
     });
 
+    const inpEnvelope = document.getElementById('input-envelope-gif-sticker-url');
+    if (inpEnvelope) {
+      inpEnvelope.addEventListener('input', () => {
+        _updateEnvelopeGifStickerPreview(inpEnvelope.value.trim());
+        Autosave.trigger();
+      });
+    }
+
+    document.getElementById('btn-clear-envelope-gif-sticker')?.addEventListener('click', () => {
+      const inp = document.getElementById('input-envelope-gif-sticker-url');
+      if (inp) inp.value = '';
+      _updateEnvelopeGifStickerPreview('');
+      Autosave.trigger();
+    });
+
     // Toggle Giphy Picker Drawer
     const btnSearchGiphy = document.getElementById('btn-search-giphy');
     const btnSearchGiphyHeader = document.getElementById('btn-search-giphy-header');
+    const btnSearchGiphyEnvelope = document.getElementById('btn-search-giphy-envelope');
     const giphyContainer = document.getElementById('giphy-picker-container');
     const btnDoSearch = document.getElementById('btn-do-giphy-search');
     const inputGiphyQuery = document.getElementById('input-giphy-query');
@@ -324,6 +342,9 @@ const Studio = (() => {
     }
     if (btnSearchGiphyHeader) {
       btnSearchGiphyHeader.addEventListener('click', () => openGiphy('header'));
+    }
+    if (btnSearchGiphyEnvelope) {
+      btnSearchGiphyEnvelope.addEventListener('click', () => openGiphy('envelope'));
     }
 
     if (btnDoSearch && inputGiphyQuery) {
@@ -362,7 +383,11 @@ const Studio = (() => {
         div.className = 'cursor-pointer rounded-xl overflow-hidden border border-gray-200 hover:border-[#d4a373] transition-all bg-white hover:scale-105 shadow-sm';
         div.innerHTML = `<img src="${gif.preview || gif.url}" alt="${gif.title || ''}" class="w-full h-14 object-cover">`;
         div.addEventListener('click', () => {
-          if (_giphyTarget === 'header') {
+          if (_giphyTarget === 'envelope') {
+            const inp = document.getElementById('input-envelope-gif-sticker-url');
+            if (inp) inp.value = gif.url;
+            _updateEnvelopeGifStickerPreview(gif.url);
+          } else if (_giphyTarget === 'header') {
             const inp = document.getElementById('input-header-gif-sticker-url');
             if (inp) inp.value = gif.url;
             _updateHeaderGifStickerPreview(gif.url);
@@ -399,6 +424,19 @@ const Studio = (() => {
   function _updateHeaderGifStickerPreview(url) {
     const wrap = document.getElementById('header-gif-sticker-preview-wrap');
     const img  = document.getElementById('header-gif-sticker-preview-img');
+    if (!wrap || !img) return;
+    if (url) {
+      img.src = url;
+      wrap.classList.remove('hidden');
+    } else {
+      wrap.classList.add('hidden');
+      img.src = '';
+    }
+  }
+
+  function _updateEnvelopeGifStickerPreview(url) {
+    const wrap = document.getElementById('envelope-gif-sticker-preview-wrap');
+    const img  = document.getElementById('envelope-gif-sticker-preview-img');
     if (!wrap || !img) return;
     if (url) {
       img.src = url;
@@ -631,6 +669,20 @@ const Studio = (() => {
         const inp = document.getElementById('input-header-gif-sticker-url');
         if (inp) inp.value = '';
         _updateHeaderGifStickerPreview('');
+      }
+    }
+
+    const envelopeGifWrap = document.getElementById('envelope-gif-sticker-input-wrap');
+    if (envelopeGifWrap) {
+      if (isVintage) {
+        envelopeGifWrap.classList.remove('hidden', 'field-hidden');
+        envelopeGifWrap.style.display = 'block';
+      } else {
+        envelopeGifWrap.classList.add('hidden', 'field-hidden');
+        envelopeGifWrap.style.display = 'none';
+        const inp = document.getElementById('input-envelope-gif-sticker-url');
+        if (inp) inp.value = '';
+        _updateEnvelopeGifStickerPreview('');
       }
     }
 

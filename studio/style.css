@@ -1282,6 +1282,7 @@ textarea,
 #vintage-flower-display,
 #gif-sticker-input-wrap,
 #header-gif-sticker-input-wrap,
+#envelope-gif-sticker-input-wrap,
 #texture-section-wrap {
   transition: opacity 0.25s ease, max-height 0.35s cubic-bezier(0.4,0,0.2,1);
 }
@@ -1295,6 +1296,7 @@ textarea,
 #vintage-flower-display.field-hidden,
 #gif-sticker-input-wrap.field-hidden,
 #header-gif-sticker-input-wrap.field-hidden,
+#envelope-gif-sticker-input-wrap.field-hidden,
 #texture-section-wrap.field-hidden {
   opacity: 0 !important;
   max-height: 0 !important;
