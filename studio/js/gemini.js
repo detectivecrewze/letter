@@ -44,9 +44,9 @@ const GeminiAI = (() => {
     });
     setTimeout(() => {
       if (activeMode === 'interactive') {
-        document.getElementById('ai-input-recipient')?.focus();
+        document.getElementById('ai-input-recipient')?.focus({ preventScroll: true });
       } else {
-        document.getElementById('ai-prompt-input')?.focus();
+        document.getElementById('ai-prompt-input')?.focus({ preventScroll: true });
       }
     }, 300);
   }
@@ -66,22 +66,22 @@ const GeminiAI = (() => {
     const tabQuick       = document.getElementById('tab-ai-mode-quick');
     const containerInteractive = document.getElementById('ai-container-interactive');
     const containerQuick       = document.getElementById('ai-container-quick');
+    const viewInput            = document.getElementById('ai-view-input');
+
+    if (viewInput) viewInput.scrollTop = 0;
+
+    const activeClasses = 'flex-1 py-2 px-3 text-[10px] uppercase tracking-wider font-bold rounded-lg transition-all border border-[#d4a373] bg-[#d4a373] text-white flex items-center justify-center gap-1.5 shadow-sm';
+    const inactiveClasses = 'flex-1 py-2 px-3 text-[10px] uppercase tracking-wider font-bold rounded-lg transition-all border border-gray-200 bg-white text-gray-500 hover:border-[#d4a373] hover:text-[#d4a373] flex items-center justify-center gap-1.5';
 
     if (mode === 'interactive') {
-      tabInteractive?.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
-      tabInteractive?.classList.add('bg-[#d4a373]', 'text-white', 'border-[#d4a373]', 'shadow-sm');
-
-      tabQuick?.classList.remove('bg-[#d4a373]', 'text-white', 'border-[#d4a373]', 'shadow-sm');
-      tabQuick?.classList.add('bg-white', 'text-gray-500', 'border-gray-200');
+      if (tabInteractive) tabInteractive.className = activeClasses;
+      if (tabQuick)       tabQuick.className       = inactiveClasses;
 
       containerInteractive?.classList.remove('hidden');
       containerQuick?.classList.add('hidden');
     } else {
-      tabQuick?.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
-      tabQuick?.classList.add('bg-[#d4a373]', 'text-white', 'border-[#d4a373]', 'shadow-sm');
-
-      tabInteractive?.classList.remove('bg-[#d4a373]', 'text-white', 'border-[#d4a373]', 'shadow-sm');
-      tabInteractive?.classList.add('bg-white', 'text-gray-500', 'border-gray-200');
+      if (tabQuick)       tabQuick.className       = activeClasses;
+      if (tabInteractive) tabInteractive.className = inactiveClasses;
 
       containerQuick?.classList.remove('hidden');
       containerInteractive?.classList.add('hidden');
