@@ -1483,8 +1483,8 @@ button {
 
 @media (max-width: 540px) {
   .vintage-envelope-gif-sticker {
-    top: -60px;
-    width: clamp(64px, 16vw, 88px);
+    top: -72px;
+    width: clamp(88px, 22vw, 112px);
   }
 }
 
