@@ -325,15 +325,37 @@ const Studio = (() => {
     const btnDoSearch = document.getElementById('btn-do-giphy-search');
     const inputGiphyQuery = document.getElementById('input-giphy-query');
 
+    // Map each giphy target to the wrap element it should appear inside
+    const _giphyTargetWrap = {
+      footer:   document.getElementById('gif-sticker-input-wrap'),
+      header:   document.getElementById('header-gif-sticker-input-wrap'),
+      envelope: document.getElementById('envelope-gif-sticker-input-wrap'),
+    };
+
     const openGiphy = (target) => {
+      if (!giphyContainer) return;
+
+      const isCurrentlyOpen = !giphyContainer.classList.contains('hidden');
+      const isSameTarget = _giphyTarget === target;
+
+      // Same button clicked while open → close it
+      if (isCurrentlyOpen && isSameTarget) {
+        giphyContainer.classList.add('hidden');
+        return;
+      }
+
+      // Move picker DOM node to inside the triggering section
+      const targetWrap = _giphyTargetWrap[target];
+      if (targetWrap && giphyContainer.parentElement !== targetWrap) {
+        targetWrap.appendChild(giphyContainer);
+      }
+
+      // Different button or currently closed → open and switch target
       _giphyTarget = target;
-      if (giphyContainer) {
-        const isHidden = giphyContainer.classList.contains('hidden');
-        giphyContainer.classList.toggle('hidden', false);
-        const grid = document.getElementById('giphy-results-grid');
-        if (!grid || !grid.children.length) {
-          _fetchGiphy('cute love');
-        }
+      giphyContainer.classList.remove('hidden');
+      const grid = document.getElementById('giphy-results-grid');
+      if (!grid || !grid.children.length) {
+        _fetchGiphy('cute love');
       }
     };
 
