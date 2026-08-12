@@ -637,14 +637,8 @@ const Studio = (() => {
     _toggle(ribbonColorDisp, !isRibbon);     // show chips only for ribbon
     const vintageColorDisp  = document.getElementById('vintage-color-display');
     const vintageFlowerDisp  = document.getElementById('vintage-flower-display');
-    const gifStickerWrap = document.getElementById('gif-sticker-input-wrap');
-    const headerGifStickerWrap = document.getElementById('header-gif-sticker-input-wrap');
-    const envelopeGifStickerWrap = document.getElementById('envelope-gif-sticker-input-wrap');
     _toggle(vintageColorDisp,  !isVintage);  // show color picker only for vintage
     _toggle(vintageFlowerDisp, !isVintage);  // show flower selector only for vintage
-    _toggle(gifStickerWrap, !isVintage);
-    _toggle(headerGifStickerWrap, !isVintage);
-    _toggle(envelopeGifStickerWrap, !isVintage);
     _toggle(textureSectionWrap, isAirmail || isRibbon || isVintage);  // no paper texture for airmail, ribbon, or vintage
     _toggle(ribbonSenderWrap, !isRibbon);    // show "Dari" field ONLY for Ribbon & Seal
 
@@ -675,6 +669,20 @@ const Studio = (() => {
         const inp = document.getElementById('input-header-gif-sticker-url');
         if (inp) inp.value = '';
         _updateHeaderGifStickerPreview('');
+      }
+    }
+
+    const envelopeGifWrap = document.getElementById('envelope-gif-sticker-input-wrap');
+    if (envelopeGifWrap) {
+      if (isVintage) {
+        envelopeGifWrap.classList.remove('hidden', 'field-hidden');
+        envelopeGifWrap.style.display = 'block';
+      } else {
+        envelopeGifWrap.classList.add('hidden', 'field-hidden');
+        envelopeGifWrap.style.display = 'none';
+        const inp = document.getElementById('input-envelope-gif-sticker-url');
+        if (inp) inp.value = '';
+        _updateEnvelopeGifStickerPreview('');
       }
     }
 
