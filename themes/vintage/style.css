@@ -868,6 +868,10 @@ button {
 .letter-salutation {
   margin-bottom: 1.2rem;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .meta-to-name {
@@ -875,10 +879,18 @@ button {
   font-size: clamp(2.6rem, 7vw, 3.2rem);
   color: var(--ink-primary);
   font-weight: 400;
-  line-height: 0.8;
+  line-height: 0.9;
   position: relative;
   display: inline-block;
   margin-bottom: 1.2rem;
+  max-width: calc(100% - 92px);
+  word-break: break-word;
+}
+
+@media (max-width: 540px) {
+  .meta-to-name {
+    max-width: calc(100% - 74px);
+  }
 }
 
 .meta-to-name::after,
@@ -978,6 +990,14 @@ button {
   position: relative;
   display: inline-block;
   margin-bottom: 0.5rem;
+  max-width: calc(100% - 96px);
+  word-break: break-word;
+}
+
+@media (max-width: 540px) {
+  .letter-from {
+    max-width: calc(100% - 76px);
+  }
 }
 
 .letter-from::after,
@@ -1370,7 +1390,7 @@ button {
 .letter-header-gif-sticker {
   position: absolute;
   right: 0;
-  top: -10px;
+  top: -32px;
   width: clamp(64px, 16vw, 88px);
   height: clamp(64px, 16vw, 88px);
   background: transparent !important;
@@ -1388,7 +1408,7 @@ button {
 
 @media (max-width: 540px) {
   .letter-header-gif-sticker {
-    top: -6px;
+    top: -28px;
     right: 0;
     width: clamp(52px, 14vw, 72px);
     height: clamp(52px, 14vw, 72px);
@@ -1406,4 +1426,34 @@ button {
   object-fit: contain;
   display: block;
   background: transparent !important;
+}
+
+/* Multi-line Header GIF Sticker — when recipient name wraps to 2+ lines */
+.letter-salutation.is-multiline .letter-header-gif-sticker {
+  width: clamp(82px, 20vw, 112px);
+  height: clamp(82px, 20vw, 112px);
+  top: -48px;
+}
+
+@media (max-width: 540px) {
+  .letter-salutation.is-multiline .letter-header-gif-sticker {
+    width: clamp(68px, 18vw, 92px);
+    height: clamp(68px, 18vw, 92px);
+    top: -26px;
+  }
+}
+
+/* Multi-line Footer GIF Sticker — when sender signature wraps to 2+ lines */
+.letter-from-wrap.is-multiline .letter-gif-sticker {
+  width: clamp(88px, 22vw, 120px);
+  height: clamp(88px, 22vw, 120px);
+  bottom: -4px;
+}
+
+@media (max-width: 540px) {
+  .letter-from-wrap.is-multiline .letter-gif-sticker {
+    width: clamp(72px, 19vw, 98px);
+    height: clamp(72px, 19vw, 98px);
+    bottom: -2px;
+  }
 }

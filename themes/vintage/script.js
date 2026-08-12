@@ -507,6 +507,7 @@ async function _typewriteLetter(config) {
     const salutation = (config.salutation || config.letterTo || config.recipientName || config.to || '').trim() || 'Kamu';
     const toEl = document.getElementById('letter-to');
     if (toEl) { toEl.textContent = salutation; toEl.classList.add('has-content'); }
+    _revealHeaderGifSticker(config);
 
     body.innerHTML = _formatContent(config.letterContent || config.letter_body || '');
 
@@ -514,6 +515,7 @@ async function _typewriteLetter(config) {
     const fromEl  = document.getElementById('letter-from');
     if (fromEl && fromStr) { fromEl.textContent = fromStr; fromEl.classList.add('has-content'); }
 
+    _checkMultilineNames();
     _showSaveContainer(config);
     return;
   }
@@ -544,6 +546,8 @@ async function _typewriteLetter(config) {
     toEl.textContent = '';
     await _typewriteSimple('letter-to', salutation, 60);
     toEl.classList.add('has-content');
+    _checkMultilineNames();
+    _revealHeaderGifSticker(config);
     await _delay(500);
   }
 
@@ -650,33 +654,59 @@ function _showSaveContainer(config) {
 }
 
 /* ════════════════════════════════════════════════════════════
-   GIF STICKER
+   GIF STICKER REVEALS
    ════════════════════════════════════════════════════════════ */
-function _revealGifSticker(config) {
+function _revealHeaderGifSticker(config) {
   if (config.templateType && config.templateType !== 'vintage') return;
-
-  // 1. Footer GIF Sticker (Bottom-left of signature)
-  const url = (config.gifStickerUrl || '').trim();
-  if (url) {
-    const wrap = document.getElementById('letter-gif-sticker-wrap');
-    const img  = document.getElementById('letter-gif-sticker-img');
-    if (wrap && img) {
-      img.src = url;
-      setTimeout(() => wrap.classList.add('is-visible'), 900);
-    }
-  }
-
-  // 2. Header GIF Sticker (Top-right of recipient salutation)
   const headerUrl = (config.headerGifStickerUrl || '').trim();
-  if (headerUrl) {
-    const hWrap = document.getElementById('letter-header-gif-sticker-wrap');
-    const hImg  = document.getElementById('letter-header-gif-sticker-img');
-    if (hWrap && hImg) {
-      hImg.src = headerUrl;
-      setTimeout(() => hWrap.classList.add('is-visible'), 900);
-    }
+  if (!headerUrl) return;
+
+  const hWrap = document.getElementById('letter-header-gif-sticker-wrap');
+  const hImg  = document.getElementById('letter-header-gif-sticker-img');
+  if (hWrap && hImg) {
+    hImg.src = headerUrl;
+    _checkMultilineNames();
+    setTimeout(() => hWrap.classList.add('is-visible'), 250);
   }
 }
+
+function _revealFooterGifSticker(config) {
+  if (config.templateType && config.templateType !== 'vintage') return;
+  const url = (config.gifStickerUrl || '').trim();
+  if (!url) return;
+
+  const wrap = document.getElementById('letter-gif-sticker-wrap');
+  const img  = document.getElementById('letter-gif-sticker-img');
+  if (wrap && img) {
+    img.src = url;
+    _checkMultilineNames();
+    setTimeout(() => wrap.classList.add('is-visible'), 400);
+  }
+}
+
+function _revealGifSticker(config) {
+  _revealFooterGifSticker(config);
+}
+
+function _checkMultilineNames() {
+  const toEl = document.getElementById('letter-to');
+  if (toEl) {
+    const parent = toEl.closest('.letter-salutation');
+    const txt = toEl.textContent.trim();
+    const isMulti = toEl.offsetHeight > 42 || txt.length >= 14;
+    if (parent) parent.classList.toggle('is-multiline', isMulti);
+  }
+
+  const fromEl = document.getElementById('letter-from');
+  if (fromEl) {
+    const parent = fromEl.closest('.letter-from-wrap');
+    const txt = fromEl.textContent.trim();
+    const isMulti = fromEl.offsetHeight > 48 || txt.length >= 18;
+    if (parent) parent.classList.toggle('is-multiline', isMulti);
+  }
+}
+
+window.addEventListener('resize', _checkMultilineNames);
 
 
 function _initDownloadButton(config) {
