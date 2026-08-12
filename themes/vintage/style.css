@@ -1464,14 +1464,14 @@ button {
    ──────────────────────────────────────── */
 .vintage-envelope-gif-sticker {
   position: absolute;
-  top: 14%;
-  right: 12%;
-  width: clamp(54px, 14vw, 84px);
-  height: clamp(54px, 14vw, 84px);
+  bottom: 28%;
+  right: 10%;
+  width: clamp(52px, 12vw, 72px);
+  height: clamp(52px, 12vw, 72px);
   background: transparent !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  overflow: visible;
+  overflow: hidden;
   opacity: 0;
   transform: scale(0.6) rotate(0deg);
   transition: opacity 0.55s ease,
@@ -1479,6 +1479,15 @@ button {
   pointer-events: none;
   z-index: 5;
   mix-blend-mode: multiply;
+}
+
+@media (max-width: 540px) {
+  .vintage-envelope-gif-sticker {
+    bottom: 26%;
+    right: 8%;
+    width: clamp(44px, 11vw, 60px);
+    height: clamp(44px, 11vw, 60px);
+  }
 }
 
 .vintage-envelope-gif-sticker.is-visible {
