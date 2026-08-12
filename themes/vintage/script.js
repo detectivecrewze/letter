@@ -229,6 +229,7 @@ async function init() {
   // ── Show Envelope ──
   await _delay(200);
   showState('envelope');
+  _revealEnvelopeGifSticker(config);
   await _waitForEnvelopeOpen(config);
 
   // ── Get envelope position for flower burst origin ──
@@ -681,6 +682,19 @@ function _revealFooterGifSticker(config) {
     img.src = url;
     _checkMultilineNames();
     setTimeout(() => wrap.classList.add('is-visible'), 400);
+  }
+}
+
+function _revealEnvelopeGifSticker(config) {
+  if (config.templateType && config.templateType !== 'vintage') return;
+  const envUrl = (config.envelopeGifStickerUrl || '').trim();
+  if (!envUrl) return;
+
+  const envWrap = document.getElementById('vintage-envelope-gif-sticker-wrap');
+  const envImg  = document.getElementById('vintage-envelope-gif-sticker-img');
+  if (envWrap && envImg) {
+    envImg.src = envUrl;
+    setTimeout(() => envWrap.classList.add('is-visible'), 300);
   }
 }
 
