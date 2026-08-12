@@ -1347,8 +1347,8 @@ button {
   position: absolute;
   left: 0;
   bottom: 0.1rem;
-  width: clamp(68px, 16vw, 92px);
-  height: clamp(68px, 16vw, 92px);
+  width: clamp(56px, 13vw, 76px);
+  height: clamp(56px, 13vw, 76px);
   background: transparent !important;
   border-radius: 0 !important;
   box-shadow: none !important;
@@ -1366,8 +1366,8 @@ button {
   .letter-gif-sticker {
     bottom: 0.2rem;
     left: -4px;
-    width: clamp(64px, 18vw, 84px);
-    height: clamp(64px, 18vw, 84px);
+    width: clamp(52px, 15vw, 70px);
+    height: clamp(52px, 15vw, 70px);
   }
 }
 
@@ -1445,15 +1445,15 @@ button {
 
 /* Multi-line Footer GIF Sticker — when sender signature wraps to 2+ lines */
 .letter-from-wrap.is-multiline .letter-gif-sticker {
-  width: clamp(88px, 22vw, 120px);
-  height: clamp(88px, 22vw, 120px);
+  width: clamp(74px, 18vw, 98px);
+  height: clamp(74px, 18vw, 98px);
   bottom: -4px;
 }
 
 @media (max-width: 540px) {
   .letter-from-wrap.is-multiline .letter-gif-sticker {
-    width: clamp(72px, 19vw, 98px);
-    height: clamp(72px, 19vw, 98px);
+    width: clamp(64px, 17vw, 86px);
+    height: clamp(64px, 17vw, 86px);
     bottom: -2px;
   }
 }
