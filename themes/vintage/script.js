@@ -174,6 +174,11 @@ async function init() {
     const envOpen   = document.querySelector('.env-open');
     if (envClosed) envClosed.src = _SCRIPT_BASE + 'envelope-closed-midnight.png';
     if (envOpen)   envOpen.src   = _SCRIPT_BASE + 'envelope-open-midnight.png';
+  } else if (vintageColor === 'dusty-rose' || vintageColor === 'dusty_rose') {
+    const envClosed = document.querySelector('.env-closed');
+    const envOpen   = document.querySelector('.env-open');
+    if (envClosed) envClosed.src = _SCRIPT_BASE + 'dusty-rose-closed.webp';
+    if (envOpen)   envOpen.src   = _SCRIPT_BASE + 'dusty-rose-opened.webp';
   }
 
   // Render static letter skeleton (clears any previous text)

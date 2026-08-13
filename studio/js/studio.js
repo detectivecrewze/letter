@@ -622,7 +622,7 @@ const Studio = (() => {
         });
 
         Autosave.trigger();
-        const names = { 'parchment': 'Parchment', 'midnight': 'Blue Midnight' };
+        const names = { 'parchment': 'Parchment', 'midnight': 'Blue Midnight', 'dusty-rose': 'Dusty Rose' };
         showToast(`Warna Amplop '${names[color] || color}' dipilih, bunga di-reset ke standar`);
       });
     });

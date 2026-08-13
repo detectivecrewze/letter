@@ -126,6 +126,96 @@
 
 
 /* ════════════════════════════════════════════════════════════
+   DUSTY ROSE COLOR SCHEME
+   Applied when config.vintageColor === 'dusty-rose'
+   ════════════════════════════════════════════════════════════ */
+[data-vintage-color="dusty-rose"],
+[data-vintage-color="dusty_rose"] {
+  /* ── Background: soft warm cream with subtle rose tint ──── */
+  --bg-top:    #f7ebeb;
+  --bg-bottom: #e8d7d8;
+
+  /* ── Paper: warm soft cream paper ───────────────────────── */
+  --paper-bg:     #fcf8f6;
+  --paper-bg2:    #f5ece8;
+  --paper-border: rgba(212, 139, 155, 0.3);
+
+  /* ── Inks: warm romantic dark rose/espresso ─────────────── */
+  --ink-primary:   #3d252b;
+  --ink-secondary: #5c3841;
+  --ink-faded:     rgba(61, 37, 43, 0.45);
+
+  /* ── Accent: rose gold & deep rose ──────────────────────── */
+  --seal-red:       #a04a5c;
+  --seal-red-light: #c57182;
+  --warm-brown:     #9c6b77;
+}
+
+[data-vintage-color="dusty-rose"] .static-bg,
+[data-vintage-color="dusty_rose"] .static-bg {
+  background: linear-gradient(160deg, #f8eeee 0%, #e9d9da 100%);
+}
+
+[data-vintage-color="dusty-rose"] .corner-vine,
+[data-vintage-color="dusty_rose"] .corner-vine {
+  filter: hue-rotate(310deg) saturate(0.5) brightness(0.9);
+  opacity: 0.55;
+}
+
+[data-vintage-color="dusty-rose"] .loading-title,
+[data-vintage-color="dusty-rose"] .loading-sub,
+[data-vintage-color="dusty_rose"] .loading-title,
+[data-vintage-color="dusty_rose"] .loading-sub {
+  color: #7d4d59;
+}
+
+[data-vintage-color="dusty-rose"] .vintage-tap-hint,
+[data-vintage-color="dusty_rose"] .vintage-tap-hint {
+  color: #8c5864;
+}
+
+[data-vintage-color="dusty-rose"] .vintage-tag-for,
+[data-vintage-color="dusty_rose"] .vintage-tag-for {
+  color: #7d4d59;
+}
+
+[data-vintage-color="dusty-rose"] .vintage-tag-name,
+[data-vintage-color="dusty_rose"] .vintage-tag-name {
+  color: #381f26;
+}
+
+/* Custom Envelope Sizing strictly for Dusty Rose theme ONLY (both Desktop & Mobile) */
+[data-vintage-color="dusty-rose"] .vintage-envelope-wrap,
+[data-vintage-color="dusty_rose"] .vintage-envelope-wrap {
+  width: clamp(250px, 46vw, 450px);
+}
+
+@media (max-width: 640px) {
+  [data-vintage-color="dusty-rose"] .vintage-envelope-wrap,
+  [data-vintage-color="dusty_rose"] .vintage-envelope-wrap {
+    width: min(78vw, 300px);
+  }
+}
+
+/* Custom GIF Sticker sizing & positioning for Dusty Rose & Midnight themes */
+[data-vintage-color="dusty-rose"] .vintage-envelope-gif-sticker,
+[data-vintage-color="dusty_rose"] .vintage-envelope-gif-sticker,
+[data-vintage-color="midnight"] .vintage-envelope-gif-sticker {
+  top: -88px;
+  width: clamp(65px, 14vw, 86px);
+}
+
+@media (max-width: 540px) {
+  [data-vintage-color="dusty-rose"] .vintage-envelope-gif-sticker,
+  [data-vintage-color="dusty_rose"] .vintage-envelope-gif-sticker,
+  [data-vintage-color="midnight"] .vintage-envelope-gif-sticker {
+    top: -76px;
+    width: clamp(58px, 16vw, 76px);
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════
    RESET & BASE
    ════════════════════════════════════════════════════════════ */
 *,
