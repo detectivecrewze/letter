@@ -164,7 +164,6 @@
 
 [data-vintage-color="dusty-rose"] .loading-title,
 [data-vintage-color="dusty-rose"] .loading-sub,
-[data-vintage-color="dusty_rose"] .loading-title,
 [data-vintage-color="dusty_rose"] .loading-sub {
   color: #7d4d59;
 }
@@ -201,16 +200,16 @@
 [data-vintage-color="dusty-rose"] .vintage-envelope-gif-sticker,
 [data-vintage-color="dusty_rose"] .vintage-envelope-gif-sticker,
 [data-vintage-color="midnight"] .vintage-envelope-gif-sticker {
-  top: -88px;
-  width: clamp(65px, 14vw, 86px);
+  top: -92px;
+  width: clamp(70px, 15vw, 94px);
 }
 
 @media (max-width: 540px) {
   [data-vintage-color="dusty-rose"] .vintage-envelope-gif-sticker,
   [data-vintage-color="dusty_rose"] .vintage-envelope-gif-sticker,
   [data-vintage-color="midnight"] .vintage-envelope-gif-sticker {
-    top: -76px;
-    width: clamp(58px, 16vw, 76px);
+    top: -80px;
+    width: clamp(64px, 18vw, 84px);
   }
 }
 
