@@ -728,6 +728,22 @@ function _checkMultilineNames() {
 window.addEventListener('resize', _checkMultilineNames);
 
 
+async function _imgUrlToDataUrl(src) {
+  if (!src || src.startsWith('data:')) return src;
+  try {
+    const res = await fetch(src, { mode: 'cors' });
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = () => resolve(src);
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    return src;
+  }
+}
+
 function _initDownloadButton(config) {
   const btn = document.getElementById('btn-save-letter');
   if (!btn) return;
@@ -746,9 +762,28 @@ function _initDownloadButton(config) {
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
       if (btnContainer)  btnContainer.style.display   = 'none';
 
+      // Pre-convert GIF sticker URLs to Base64 Data URLs so html2canvas renders them 100% without CORS taints
+      const stickerImgs = [
+        document.getElementById('letter-header-gif-sticker-img'),
+        document.getElementById('letter-gif-sticker-img')
+      ].filter(Boolean);
+
+      for (const imgEl of stickerImgs) {
+        if (imgEl.src && !imgEl.src.startsWith('data:')) {
+          try {
+            const dataUrl = await _imgUrlToDataUrl(imgEl.src);
+            if (dataUrl && dataUrl.startsWith('data:')) {
+              imgEl.setAttribute('data-original-src', imgEl.src);
+              imgEl.src = dataUrl;
+            }
+          } catch(e) {}
+        }
+      }
+
       const letterCanvas = await html2canvas(targetEl, {
         scale: window.devicePixelRatio > 1 ? 1.5 : 2,
         useCORS: true,
+        allowTaint: true,
         backgroundColor: null,
         onclone: (clonedDoc) => {
           const paper = clonedDoc.getElementById('letter-paper');
@@ -758,12 +793,31 @@ function _initDownloadButton(config) {
             paper.style.transform  = 'none';
             paper.style.opacity    = '1';
           }
+
+          // Force GIF stickers to be fully visible and rendered in the canvas capture
+          clonedDoc.querySelectorAll('.letter-header-gif-sticker, .letter-gif-sticker, #letter-header-gif-sticker-wrap, #letter-gif-sticker-wrap').forEach(wrap => {
+            wrap.style.opacity = '1';
+            wrap.style.visibility = 'visible';
+            wrap.style.transform = 'none';
+            wrap.style.animation = 'none';
+            wrap.style.transition = 'none';
+            wrap.classList.add('is-visible');
+          });
+
           clonedDoc.querySelectorAll('*').forEach(el => {
             el.style.animation  = 'none';
             el.style.transition = 'none';
           });
         }
       });
+
+      // Restore original image URLs
+      for (const imgEl of stickerImgs) {
+        if (imgEl.hasAttribute('data-original-src')) {
+          imgEl.src = imgEl.getAttribute('data-original-src');
+          imgEl.removeAttribute('data-original-src');
+        }
+      }
 
       if (btnContainer)  btnContainer.style.display  = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
