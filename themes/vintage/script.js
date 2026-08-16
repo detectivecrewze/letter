@@ -781,7 +781,7 @@ function _initDownloadButton(config) {
       }
 
       const letterCanvas = await html2canvas(targetEl, {
-        scale: window.devicePixelRatio > 1 ? 1.5 : 2,
+        scale: 3, // High-DPI 300 DPI capture scale for razor-sharp text and graphics
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
@@ -822,12 +822,14 @@ function _initDownloadButton(config) {
       if (btnContainer)  btnContainer.style.display  = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
 
-      // Compose 9:16 story canvas
-      const storyW = 1080, storyH = 1920;
+      // Compose 9:16 story canvas (Ultra HD 4K / 300 DPI crisp output: 2160x3840)
+      const storyW = 2160, storyH = 3840;
       const story  = document.createElement('canvas');
       story.width  = storyW;
       story.height = storyH;
       const ctx = story.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
 
       const computedStyle = getComputedStyle(document.body);
       const bgTop    = computedStyle.getPropertyValue('--bg-top').trim()    || '#f5f0e8';
@@ -849,8 +851,8 @@ function _initDownloadButton(config) {
 
       ctx.save();
       ctx.shadowColor   = 'rgba(60,40,20,0.3)';
-      ctx.shadowBlur    = 50;
-      ctx.shadowOffsetY = 16;
+      ctx.shadowBlur    = 100;
+      ctx.shadowOffsetY = 32;
       ctx.drawImage(letterCanvas, dx, dy, dw, dh);
       ctx.restore();
 

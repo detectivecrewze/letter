@@ -31,6 +31,7 @@ const Publisher = (() => {
     // Success modal
     document.getElementById('btn-copy-link')?.addEventListener('click', _handleCopyLink);
     document.getElementById('btn-close-success')?.addEventListener('click', () => _toggleModal('modal-success', false));
+    document.getElementById('btn-close-success-x')?.addEventListener('click', () => _toggleModal('modal-success', false));
 
     // Bonus claim modal
     const showClaimModal = () => {
@@ -125,6 +126,18 @@ const Publisher = (() => {
     if (waBtn) {
       const msg = encodeURIComponent(`Ada surat untukmu...\n\n${url}`);
       waBtn.href = `https://wa.me/?text=${msg}`;
+    }
+
+    const unboxWaBtn = document.getElementById('btn-unbox-whatsapp');
+    if (unboxWaBtn) {
+      const token = (typeof Auth !== 'undefined' && Auth.getToken) ? Auth.getToken() : '';
+      const msg = encodeURIComponent(
+        `Halo admin For You, Always! ✨\n\n` +
+        `Saya sudah selesai mengedit kado Letter Edition saya (ID: ${token}).\n` +
+        `Link Kado: ${url}\n\n` +
+        `Mohon kado fisik / hampers Gift Box saya segera dirakit dan dikirimkan yaa. Terima kasih! 🙏`
+      );
+      unboxWaBtn.href = `https://wa.me/6281381543981?text=${msg}`;
     }
 
     // ── QR export card design styling based on template ──
