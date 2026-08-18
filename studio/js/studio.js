@@ -9,7 +9,7 @@ const Studio = (() => {
   let _activeTemplate = 'classic';
   let _activeAirmailTheme = 'airmail-parchment';
   let _activeRibbonTheme = 'ribbon-crimson'; // default airmail colour
-  let _activeVintageFlower = ['flower1', 'flower2', 'flower3', 'flower4', 'flower5', 'midnight1', 'midnight2', 'midnight3'];
+  let _activeVintageFlower = ['flower1', 'flower2', 'flower3', 'flower4', 'flower5', 'midnight1', 'midnight2', 'midnight3', 'lily-white', 'lily-pink'];
   let _activeVintageColor  = 'parchment'; // 'parchment' | 'midnight'
 
   function initPostAuth() {
@@ -152,7 +152,7 @@ const Studio = (() => {
     // Vintage Flower Initial State
     const defaultFlower = _activeVintageColor === 'midnight'
       ? 'midnight1,midnight2,midnight3'
-      : 'flower1,flower2,flower3,flower4,flower5';
+      : 'flower1,flower2,flower3,flower4,flower5,lily-white,lily-pink';
     _activeVintageFlower = (config.vintageFlower || defaultFlower).split(',');
     document.querySelectorAll('.vintage-flower-option').forEach(btn => {
       btn.classList.toggle('active', _activeVintageFlower.includes(btn.dataset.vintageFlower));
@@ -509,29 +509,48 @@ const Studio = (() => {
       });
     });
 
-    // Airmail, Ribbon & Vintage Colour Binding
+    _bindThemeSelector();
+    _bindTextureSelector();
     _bindAirmailThemeSelector();
     _bindRibbonThemeSelector();
-    _bindVintageFlowerSelector();
     _bindVintageColorSelector();
+    _bindVintageFlowerSelector();
   }
 
-  function _bindRibbonThemeSelector() {
-    document.querySelectorAll('.ribbon-theme-option').forEach(btn => {
+  function _bindThemeSelector() {
+    document.querySelectorAll('.theme-option').forEach(btn => {
       btn.addEventListener('click', () => {
-        const theme = btn.dataset.ribbonTheme;
-        if (!theme || theme === _activeRibbonTheme) return;
-        _activeRibbonTheme = theme;
-        document.querySelectorAll('.ribbon-theme-option').forEach(b => b.classList.remove('active'));
+        const theme = btn.dataset.theme;
+        if (!theme || theme === _activeTheme) return;
+        _activeTheme = theme;
+        document.querySelectorAll('.theme-option').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         Autosave.trigger();
         const names = {
-          'ribbon-crimson': 'Parchment',
-          'ribbon-forest': 'Forest Green',
-          'ribbon-midnight': 'Midnight',
-          'ribbon-rose': 'Soft Rose'
+          'blush-cream': 'Blush Cream',
+          'vintage-sepia': 'Vintage Sepia',
+          'matcha-mint': 'Matcha Mint',
+          'twilight-lavender': 'Twilight Lavender',
+          'midnight-rose': 'Midnight Rose',
+          'ocean-breeze': 'Ocean Breeze',
+          'golden-hour': 'Golden Hour',
+          'emerald-forest': 'Emerald Forest'
         };
-        showToast(`Warna Ribbon '${names[theme] || theme}' dipilih`);
+        showToast(`Tema '${names[theme] || theme}' dipilih`);
+      });
+    });
+  }
+
+  function _bindTextureSelector() {
+    document.querySelectorAll('.texture-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tex = btn.dataset.texture;
+        if (!tex || tex === _activeTexture) return;
+        _activeTexture = tex;
+        document.querySelectorAll('.texture-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Autosave.trigger();
+        showToast(`Tekstur '${tex === 'handmade' ? 'Handmade Paper' : 'Kertas Biasa'}' dipilih`);
       });
     });
   }
@@ -553,7 +572,30 @@ const Studio = (() => {
           'airmail-midnight': 'Midnight',
           'airmail-bordeaux': 'Bordeaux'
         };
-        showToast(`Warna '${names[theme] || theme}' dipilih`);
+        showToast(`Warna Airmail '${names[theme] || theme}' dipilih`);
+      });
+    });
+  }
+
+  function _bindRibbonThemeSelector() {
+    document.querySelectorAll('.ribbon-theme-option').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.dataset.ribbonTheme;
+        if (!theme || theme === _activeRibbonTheme) return;
+        _activeRibbonTheme = theme;
+        document.querySelectorAll('.ribbon-theme-option').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Autosave.trigger();
+        const names = {
+          'ribbon-crimson': 'Parchment',
+          'ribbon-forest': 'Forest Green',
+          'ribbon-midnight': 'Midnight Blue',
+          'ribbon-rose': 'Soft Rose',
+          'ribbon-bordeaux': 'Bordeaux',
+          'ribbon-violet': 'Soft Violet',
+          'ribbon-sunflower': 'Sunflower'
+        };
+        showToast(`Warna Ribbon '${names[theme] || theme}' dipilih`);
       });
     });
   }
@@ -585,14 +627,16 @@ const Studio = (() => {
           'flower5': 'Tipe 5',
           'midnight1': 'Tipe 6',
           'midnight2': 'Tipe 7',
-          'midnight3': 'Tipe 8'
+          'midnight3': 'Tipe 8',
+          'lily-white': 'Tipe 9 (Lily White)',
+          'lily-pink': 'Tipe 10 (Lily Pink)'
         };
         showToast(`Bunga '${names[flower] || flower}' ${btn.classList.contains('active') ? 'dipilih' : 'dihapus'}`);
       });
     });
   }
 
-  /** All 8 flower types are always visible — no grouping needed */
+  /** All flower types are always visible — no grouping needed */
   function _syncVintageFlowerGroup(_color) {
     // No-op: flowers are no longer grouped by color
   }
@@ -615,7 +659,7 @@ const Studio = (() => {
         if (color === 'midnight') {
           _activeVintageFlower = ['midnight1', 'midnight2', 'midnight3'];
         } else {
-          _activeVintageFlower = ['flower1', 'flower2', 'flower3', 'flower4', 'flower5'];
+          _activeVintageFlower = ['flower1', 'flower2', 'flower3', 'flower4', 'flower5', 'lily-white', 'lily-pink'];
         }
         document.querySelectorAll('.vintage-flower-option').forEach(b => {
           b.classList.toggle('active', _activeVintageFlower.includes(b.dataset.vintageFlower));

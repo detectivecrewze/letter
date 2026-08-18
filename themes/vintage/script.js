@@ -55,6 +55,15 @@ const VINTAGE_FLOWER_ASSETS = {
   'midnight3': [
     _SCRIPT_BASE + 'assets/test3-midnight.png',
     _SCRIPT_BASE + 'assets/test3-midnight.png'
+  ],
+  // ── Lily Flowers ──
+  'lily-white': [
+    _SCRIPT_BASE + 'assets/lily-white.webp',
+    _SCRIPT_BASE + 'assets/lily-white.webp'
+  ],
+  'lily-pink': [
+    _SCRIPT_BASE + 'assets/lily-pink.webp',
+    _SCRIPT_BASE + 'assets/lily-pink.webp'
   ]
 };
 
@@ -63,7 +72,7 @@ function getFlowerSrcs(config) {
   const vintageColor  = config.vintageColor || 'parchment';
   const defaultFlower = vintageColor === 'midnight'
     ? 'midnight1,midnight2,midnight3'
-    : 'flower1,flower2,flower3,flower4,flower5';
+    : 'flower1,flower2,flower3,flower4,flower5,lily-white,lily-pink';
   const flowerStr   = config.vintageFlower || defaultFlower;
   const flowerTypes = flowerStr.split(',');
   let srcs = [];
@@ -446,7 +455,9 @@ function _playFlowerTransition(envRect, config, onSwitchState) {
           if (opacity <= 0) continue;
 
           const rot      = (elapsed / 1000 / p.rotateSpeed) * Math.PI * 2 * p.rotateDir;
-          const drawSize = p.size * scale;
+          const isLily   = p.img.src && (p.img.src.includes('lily-white') || p.img.src.includes('lily-pink') || p.img.src.includes('lily'));
+          const baseMultiplier = isLily ? 0.48 : 1.0;
+          const drawSize = p.size * scale * baseMultiplier;
           const iw       = p.img.naturalWidth  || 1;
           const ih       = p.img.naturalHeight || 1;
           const ar       = iw / ih;
