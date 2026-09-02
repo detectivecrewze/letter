@@ -154,7 +154,10 @@
     const isEn = get() === 'en';
     Object.entries(htmlPhrases).forEach(([id, phrase]) => {
       const el = document.getElementById(id);
-      if (el) el.innerHTML = isEn ? phrase.en : phrase.id;
+      if (el) {
+        const target = isEn ? phrase.en : phrase.id;
+        if (el.innerHTML !== target) el.innerHTML = target;
+      }
     });
 
     const skipSelector = '#memory-desc-hint, #memory-upload-specs, #envelope-name-hint, #gif-footer-hint, #typewriter-hint-desc, #studio-security-desc, #vip-link-desc, #multi-device-desc, #ai-result-text';
@@ -171,13 +174,12 @@
     document.querySelectorAll('[placeholder], [title], [aria-label]').forEach((element) => {
       ['placeholder', 'title', 'aria-label'].forEach((attribute) => {
         const source = element.getAttribute(attribute);
-        if (source) element.setAttribute(attribute, t(source));
+        if (source) {
+          const translated = t(source);
+          if (translated !== source) element.setAttribute(attribute, translated);
+        }
       });
     });
-
-    if (typeof Studio !== 'undefined' && typeof Studio.renderGallery === 'function') {
-      Studio.renderGallery();
-    }
   }
 
   function set(value, fallback) {
@@ -304,15 +306,14 @@
         onChange(event.target.value);
         wrap.querySelector('span').textContent = get() === 'id' ? 'Bahasa' : 'Language';
         applyStudioCopy();
+        if (typeof Studio !== 'undefined' && typeof Studio.renderGallery === 'function') {
+          Studio.renderGallery();
+        }
       });
     }
     wrap.querySelector('select').value = get();
     wrap.querySelector('span').textContent = get() === 'id' ? 'Bahasa' : 'Language';
     applyStudioCopy();
-    if (!document.__letterStudioLocaleObserver) {
-      document.__letterStudioLocaleObserver = new MutationObserver(applyStudioCopy);
-      document.__letterStudioLocaleObserver.observe(document.body, { childList: true, subtree: true });
-    }
   }
 
   global.LetterI18n = { normalize, set, get, t, initGift, initStudio, applyStudioCopy };

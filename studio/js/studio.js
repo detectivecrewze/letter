@@ -1046,6 +1046,15 @@ const Studio = (() => {
     const countEl = document.getElementById('memory-count-label');
     if (!listEl) return;
 
+    const isEn = typeof LetterI18n !== 'undefined' && LetterI18n.get() === 'en';
+    const captionPlaceholder = isEn ? 'Caption (optional)…' : 'Caption (opsional)…';
+    const moveUpTitle = isEn ? 'Move up' : 'Geser ke atas';
+    const moveDownTitle = isEn ? 'Move down' : 'Geser ke bawah';
+    const deleteTitle = isEn ? 'Delete' : 'Hapus';
+    const deleteConfirm = isEn ? 'Are you sure you want to delete this photo?' : 'Yakin ingin menghapus foto ini?';
+    const photoDeletedMsg = isEn ? 'Photo deleted' : 'Foto dihapus';
+    const photoUnit = isEn ? 'photos' : 'foto';
+
     listEl.innerHTML = '';
 
     _mediaList.forEach((item, idx) => {
