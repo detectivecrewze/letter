@@ -1367,4 +1367,45 @@ textarea,
     flex-shrink: 0;
     scroll-snap-align: start;
   }
+}
+
+/* ── Studio Floating Language Switcher ── */
+#letter-studio-language {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 9999;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  font: 600 12px system-ui, -apple-system, sans-serif;
+  color: #4b352d;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+#letter-studio-language select {
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+@media (max-width: 480px) {
+  #letter-studio-language {
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    gap: 0;
+  }
+  #letter-studio-language > span {
+    display: none !important;
+  }
 }

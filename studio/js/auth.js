@@ -16,7 +16,7 @@ const Auth = (() => {
     _token = _getTokenFromURL();
 
     if (!_token) {
-      _showError('Token tidak ditemukan di URL. Minta link Studio baru dari admin.');
+      _showError(LetterI18n.t('Token tidak ditemukan di URL. Minta link Studio baru dari admin.'));
       return false;
     }
 
@@ -31,7 +31,7 @@ const Auth = (() => {
       });
 
       if (res.status === 404) {
-        _showError('Project tidak ditemukan. Silakan minta link baru dari admin.');
+        _showError(LetterI18n.t('Project tidak ditemukan. Silakan minta link baru dari admin.'));
         return false;
       }
       if (!res.ok) throw new Error(`Server error (${res.status})`);
@@ -63,7 +63,7 @@ const Auth = (() => {
       return true;
 
     } catch (err) {
-      _showError('Gagal terhubung ke server. Coba muat ulang halaman.');
+      _showError(LetterI18n.t('Gagal terhubung ke server. Coba muat ulang halaman.'));
       return false;
     }
   }

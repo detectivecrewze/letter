@@ -111,6 +111,8 @@ async function init() {
     config = _demoConfig();
   }
 
+  LetterI18n.initGift(config);
+
   // ── Maintenance Mode ──
   if (config.is_active === false) {
     showState('maintenance');

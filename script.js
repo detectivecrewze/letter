@@ -102,6 +102,8 @@ async function init() {
     config = _demoConfig();
   }
 
+  LetterI18n.initGift(config);
+
   // ── Maintenance Mode Check ──────────────────────────────
   // If is_active is explicitly false, show maintenance screen
   if (config.is_active === false) {
@@ -252,6 +254,7 @@ function _getTokenFromPath() {
    ════════════════════════════════════════════════════════════ */
 function _normalizeConfig(raw) {
   return {
+    locale: raw.locale === 'id' || raw.locale === 'en' ? raw.locale : 'en',
     recipientName: raw.recipientName || raw.to || raw.recipient || '',
     to: raw.to || raw.recipient || 'Dear,',
     title: raw.title || '',

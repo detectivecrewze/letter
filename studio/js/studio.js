@@ -14,6 +14,10 @@ const Studio = (() => {
 
   function initPostAuth() {
     const config = Auth.getInitialConfig() || {};
+    LetterI18n.initStudio(config, (nextLocale) => {
+      config.locale = LetterI18n.set(nextLocale, 'en');
+      Autosave.trigger();
+    });
     _populate(config);
     Music.init(config);
     Autosave.init();
@@ -1014,7 +1018,7 @@ const Studio = (() => {
   function showToast(msg, duration = 3000) {
     const toast = document.getElementById('toast');
     if (!toast) return;
-    toast.textContent = msg;
+    toast.textContent = LetterI18n.t(msg);
     toast.classList.remove('hidden');
     clearTimeout(toast._timer);
     toast._timer = setTimeout(() => toast.classList.add('hidden'), duration);
@@ -1024,7 +1028,7 @@ const Studio = (() => {
     const el = document.getElementById(inputId);
     const errEl = document.getElementById(inputId + '-error');
     if (el) el.style.borderBottomColor = '#e57373';
-    if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
+    if (errEl) { errEl.textContent = LetterI18n.t(msg); errEl.classList.remove('hidden'); }
   }
 
   function clearErrors() {
@@ -1057,19 +1061,19 @@ const Studio = (() => {
         }
         </div>
         <!-- Caption Input -->
-        <input type="text" maxlength="40" placeholder="Caption (opsional)…"
+        <input type="text" maxlength="40" placeholder="${captionPlaceholder}"
           value="${item.caption || ''}"
           class="input-minimal flex-1"
           style="font-family: 'Caveat', cursive; font-size: 1.15rem; color: #4a3f35;"
           data-idx="${idx}" />
         <!-- Reorder and Remove -->
         <div class="flex flex-col items-center gap-1 flex-shrink-0 mr-1">
-          ${idx > 0 ? `<button data-move-up="${idx}" class="text-gray-400 hover:text-gray-600 transition text-[12px] leading-none p-1" style="touch-action: manipulation;">▲</button>` : `<span style="height:20px;width:20px;"></span>`}
+          ${idx > 0 ? `<button data-move-up="${idx}" title="${moveUpTitle}" class="text-gray-400 hover:text-gray-600 transition text-[12px] leading-none p-1" style="touch-action: manipulation;">▲</button>` : `<span style="height:20px;width:20px;"></span>`}
           <span class="text-gray-300 text-[9px] font-bold">${idx + 1}</span>
-          ${idx < _mediaList.length - 1 ? `<button data-move-down="${idx}" class="text-gray-400 hover:text-gray-600 transition text-[12px] leading-none p-1" style="touch-action: manipulation;">▼</button>` : `<span style="height:20px;width:20px;"></span>`}
+          ${idx < _mediaList.length - 1 ? `<button data-move-down="${idx}" title="${moveDownTitle}" class="text-gray-400 hover:text-gray-600 transition text-[12px] leading-none p-1" style="touch-action: manipulation;">▼</button>` : `<span style="height:20px;width:20px;"></span>`}
         </div>
         <div class="flex flex-col items-center justify-center pl-2 border-l border-[#d4a373]/20 flex-shrink-0">
-          <button data-remove="${idx}"
+          <button data-remove="${idx}" title="${deleteTitle}"
             class="text-red-300 hover:text-red-500 transition text-[12px] font-bold leading-none p-2" style="touch-action: manipulation;">✕</button>
         </div>
       `;
@@ -1105,11 +1109,11 @@ const Studio = (() => {
 
       // Remove listener
       div.querySelector(`[data-remove="${idx}"]`)?.addEventListener('click', () => {
-        if (confirm('Yakin ingin menghapus foto ini?')) {
+        if (confirm(deleteConfirm)) {
           _mediaList.splice(idx, 1);
           _renderGallery();
           Autosave.trigger();
-          showToast('Foto dihapus');
+          showToast(photoDeletedMsg);
         }
       });
 
@@ -1120,7 +1124,7 @@ const Studio = (() => {
     const count = _mediaList.length;
     if (countEl) {
       if (count > 0) {
-        countEl.textContent = `${count} / ${MAX_PHOTOS} foto`;
+        countEl.textContent = `${count} / ${MAX_PHOTOS} ${photoUnit}`;
         countEl.classList.remove('hidden');
       } else {
         countEl.classList.add('hidden');
@@ -1142,7 +1146,10 @@ const Studio = (() => {
 
       const slots = MAX_PHOTOS - _mediaList.length;
       const toUpload = files.slice(0, slots);
-      if (files.length > slots) showToast(`Hanya ${slots} foto lagi yang bisa ditambahkan`);
+      if (files.length > slots) {
+        const isEnLimit = typeof LetterI18n !== 'undefined' && LetterI18n.get() === 'en';
+        showToast(isEnLimit ? `Only ${slots} more photo${slots > 1 ? 's' : ''} can be added` : `Hanya ${slots} foto lagi yang bisa ditambahkan`);
+      }
 
       for (const file of toUpload) {
         const url = await _uploadOneToR2(file);
@@ -1253,7 +1260,7 @@ const Studio = (() => {
     }
   }
 
-  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveRibbonTheme, getActiveVintageFlower, getActiveVintageColor, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus };
+  return { initPostAuth, showToast, showError, clearErrors, getStudioPassword, getActiveTheme, getActiveTexture, getActiveAirmailTheme, getActiveRibbonTheme, getActiveVintageFlower, getActiveVintageColor, getActiveTemplate: () => _activeTemplate, getMediaList, isMemoryEnabled, isPremium, updateSidebarBonusStatus, renderGallery: _renderGallery };
 })();
 
 document.addEventListener('DOMContentLoaded', async () => {

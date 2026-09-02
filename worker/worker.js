@@ -245,6 +245,13 @@ var index_default = {
         const existingConfig = existingRaw ? JSON.parse(existingRaw) : {};
         const isPremium = existingConfig.isPremium === true;
 
+        if (body.locale !== undefined && body.locale !== 'id' && body.locale !== 'en') {
+          return new Response(JSON.stringify({ error: 'Invalid locale' }), {
+            status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        body.locale = body.locale || existingConfig.locale || 'en';
+
         // Preserve server-controlled flags (client must never overwrite them)
         body.isPremium           = existingConfig.isPremium           ?? false;
         body.secretMemoryEnabled = existingConfig.secretMemoryEnabled ?? false;
@@ -340,6 +347,7 @@ var index_default = {
           id: customId,
           studioPassword: null,
           isPremium: false,
+          locale: 'id',
           recipientName: "",
           letterTo: "",
           message: "",
@@ -450,6 +458,7 @@ var index_default = {
           id: customId,
           studioPassword: studioPassword,
           isPremium: isPremium,
+          locale: 'id',
           recipientName: "",
           letterTo: "",
           message: "",
@@ -1136,6 +1145,7 @@ ATURAN LAINNYA:
           id: customId,
           studioPassword: studioPassword,
           isPremium: isPremium,
+          locale: 'id',
           recipientName: "",
           letterTo: "",
           message: "",

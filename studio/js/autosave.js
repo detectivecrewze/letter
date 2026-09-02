@@ -9,7 +9,7 @@ const Autosave = (() => {
 
   function trigger() {
     if (_debounceTimer) clearTimeout(_debounceTimer);
-    _setSaveStatus('Menyimpan...');
+    _setSaveStatus(LetterI18n.t('Menyimpan...'));
     _debounceTimer = setTimeout(_saveConfiguration, DEBOUNCE_MS);
   }
 
@@ -20,7 +20,7 @@ const Autosave = (() => {
 
   async function saveNow() {
     if (_debounceTimer) clearTimeout(_debounceTimer);
-    _setSaveStatus('Menyimpan...');
+    _setSaveStatus(LetterI18n.t('Menyimpan...'));
     await _saveConfiguration();
   }
 
@@ -39,13 +39,13 @@ const Autosave = (() => {
       const data = await res.json();
 
       if (data.success) {
-        _setSaveStatus('Tersimpan Otomatis');
+        _setSaveStatus(LetterI18n.t('Tersimpan Otomatis'));
         setTimeout(() => _setSaveStatus('', true), 2500);
       } else throw new Error(data.error || 'Unknown error');
 
     } catch (e) {
       console.warn('[Autosave]', e);
-      _setSaveStatus('Gagal Menyimpan');
+      _setSaveStatus(LetterI18n.t('Gagal Menyimpan'));
       setTimeout(() => _setSaveStatus('', true), 4000);
     }
   }
@@ -65,6 +65,7 @@ const Autosave = (() => {
       studioToken:    token,
       giftId:         token,
       studioPassword: document.getElementById('input-studio-editor-password')?.value.trim() || '',
+      locale: LetterI18n.get(),
 
       // Section 1 — Penerima
       recipientName: document.getElementById('input-recipient-name')?.value.trim() || '',

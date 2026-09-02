@@ -605,7 +605,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
+                <p id="envelope-name-hint" class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
                   <strong>Nama Amplop</strong> adalah teks yang muncul secara eksklusif pada tampilan depan fisik amplop
                   surat digital Anda.
                 </p>
@@ -792,7 +792,7 @@
               </div>
 
               <!-- Hint Text -->
-              <p class="text-[8px] text-[#b58756] mt-2 leading-relaxed font-medium">
+              <p id="gif-footer-hint" class="text-[8px] text-[#b58756] mt-2 leading-relaxed font-medium">
                 💡 <strong>Petunjuk:</strong> Jika mengambil dari web/Tenor/Giphy, <strong>klik kanan pada gambar GIF &rarr; pilih "Copy Image Address"</strong> (bukan Copy Link web-nya). Atau klik "Cari via Giphy" di atas.
               </p>
 
@@ -814,7 +814,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
+              <p id="typewriter-hint-desc" class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
                 Efek mengetik muncul di <strong>Preview Akhir</strong> &amp; <strong>Surat Terkirim</strong>.
               </p>
             </div>
@@ -947,7 +947,7 @@
                   </svg>
                 </div>
                 <p class="text-[9px] font-bold text-gray-600 mb-0.5">Tambah Foto / Video</p>
-                <p class="text-[7px] text-gray-400 uppercase tracking-wider leading-relaxed">
+                <p id="memory-upload-specs" class="text-[7px] text-gray-400 uppercase tracking-wider leading-relaxed">
                   Maks. 10 File · Video Maks 15 MB (Ideal 1-10 Detik)<br>JPG · PNG · WEBP · MP4
                 </p>
 
@@ -973,7 +973,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
+                <p id="memory-desc-hint" class="text-[9px] text-[#b58756] leading-relaxed uppercase tracking-wider font-medium">
                   <strong>Optional:</strong> Kosongkan jika tidak ingin menambahkan foto/video. Jika diisi, Polaroid
                   akan muncul otomatis di akhir surat — penerima bisa swipe antar foto dengan tombol panah.
                 </p>
@@ -1027,7 +1027,7 @@
                 <span class="material-symbols-outlined text-[14px] text-[#d4a373]">lock</span>
                 <h3 class="text-[9px] uppercase tracking-[0.2em] font-bold text-gray-700">Studio Password (Optional)</h3>
               </div>
-              <p class="text-[8px] text-gray-500 leading-relaxed mb-6 font-medium">
+              <p id="studio-security-desc" class="text-[8px] text-gray-500 leading-relaxed mb-6 font-medium">
                 Password ini digunakan untuk <strong>mengunci akses ke Studio Editor ini</strong>, sehingga orang lain yang memiliki link Anda tidak dapat mengubah isi surat tanpa password.
               </p>
 
@@ -1150,7 +1150,7 @@
             </button>
           </div>
           
-          <p class="text-[9px] text-[#b58756] mt-5 leading-relaxed max-w-[280px] mx-auto opacity-80 italic font-medium text-center">
+          <p id="vip-link-desc" class="text-[9px] text-[#b58756] mt-5 leading-relaxed max-w-[280px] mx-auto opacity-80 italic font-medium text-center">
             Dapatkan link kado dengan domain sendiri (contoh: <em>nama-kamu.vercel.app</em>) dan buat pengalaman yang terasa lebih personal.<br><br>
             Selain link eksklusif, kamu juga otomatis bisa membuat surat baru dari studio editor ini.
           </p>
@@ -1189,7 +1189,7 @@
           </svg>
         </div>
         <h3 class="font-bold text-gray-400 text-[8px] mb-2 uppercase tracking-[0.2em]">Dukungan Multi-Perangkat</h3>
-        <p class="text-[9.5px] text-gray-500 leading-relaxed italic">Surat ini sudah dioptimalkan sepenuhnya untuk
+        <p id="multi-device-desc" class="text-[9.5px] text-gray-500 leading-relaxed italic">Surat ini sudah dioptimalkan sepenuhnya untuk
           pengalaman <strong>Desktop & Mobile terbaik</strong>.</p>
       </div>
 
@@ -1729,6 +1729,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- Studio JS Modules (urutan penting!) -->
+  <script src="../i18n.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/music.js"></script>
   <script src="js/gemini.js"></script>

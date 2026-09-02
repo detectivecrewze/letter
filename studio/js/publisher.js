@@ -412,8 +412,13 @@ const Publisher = (() => {
     if (!url) return;
     navigator.clipboard.writeText(url).then(() => {
       const btn = document.getElementById('btn-copy-link');
-      if (btn) { btn.textContent = 'TERSALIN ✓'; setTimeout(() => btn.textContent = 'Salin Link', 2000); }
-    }).catch(() => Studio.showToast('Gagal salin. Coba manual.'));
+      if (btn) {
+        const isEn = typeof LetterI18n !== 'undefined' && LetterI18n.get() === 'en';
+        const orig = isEn ? 'Copy' : 'Salin';
+        btn.textContent = isEn ? 'COPIED ✓' : 'TERSALIN ✓';
+        setTimeout(() => btn.textContent = orig, 2000);
+      }
+    }).catch(() => Studio.showToast((typeof LetterI18n !== 'undefined' && LetterI18n.get() === 'en') ? 'Failed to copy. Try manually.' : 'Gagal salin. Coba manual.'));
   }
 
   // ── VIP Flow ───────────────────────────────────────────────
