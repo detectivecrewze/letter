@@ -3,6 +3,7 @@
  */
 const Autosave = (() => {
   let _debounceTimer = null;
+  let _saveQueue = Promise.resolve();
   const DEBOUNCE_MS  = 2500;
 
   function init() { /* nothing to init */ }
@@ -20,34 +21,46 @@ const Autosave = (() => {
 
   async function saveNow() {
     if (_debounceTimer) clearTimeout(_debounceTimer);
+    _debounceTimer = null;
     _setSaveStatus(LetterI18n.t('Menyimpan...'));
-    await _saveConfiguration();
+    return _saveConfiguration();
   }
 
-  async function _saveConfiguration() {
-    if (Music.isUploading()) { trigger(); return; }
+  function _saveConfiguration() {
+    if (Music.isUploading()) { trigger(); return Promise.resolve(false); }
 
     const token = Auth.getToken();
-    if (!token) return;
+    if (!token) return Promise.resolve(false);
 
-    try {
-      const res  = await fetch(`${Auth.getWorkerUrl()}/save-config?id=${encodeURIComponent(token)}`, {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(buildState()),
-      });
-      const data = await res.json();
+    const runSave = async () => {
+      try {
+        const res = await fetch(`${Auth.getWorkerUrl()}/save-config?id=${encodeURIComponent(token)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // Build when this queued save starts, so it always sends the latest form state.
+          body: JSON.stringify(buildState()),
+        });
+        const data = await res.json();
 
-      if (data.success) {
-        _setSaveStatus(LetterI18n.t('Tersimpan Otomatis'));
-        setTimeout(() => _setSaveStatus('', true), 2500);
-      } else throw new Error(data.error || 'Unknown error');
+        if (data.success) {
+          _setSaveStatus(LetterI18n.t('Tersimpan Otomatis'));
+          setTimeout(() => _setSaveStatus('', true), 2500);
+          return true;
+        }
+        throw new Error(data.error || 'Unknown error');
+      } catch (e) {
+        console.warn('[Autosave]', e);
+        _setSaveStatus(LetterI18n.t('Gagal Menyimpan'));
+        setTimeout(() => _setSaveStatus('', true), 4000);
+        return false;
+      }
+    };
 
-    } catch (e) {
-      console.warn('[Autosave]', e);
-      _setSaveStatus(LetterI18n.t('Gagal Menyimpan'));
-      setTimeout(() => _setSaveStatus('', true), 4000);
-    }
+    // Serialize background, manual, and preview saves. This prevents an older,
+    // slower request from overwriting a newer preview-triggered save.
+    const queuedSave = _saveQueue.then(runSave, runSave);
+    _saveQueue = queuedSave.then(() => undefined, () => undefined);
+    return queuedSave;
   }
 
   function _setSaveStatus(text, hide = false) {

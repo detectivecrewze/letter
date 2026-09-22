@@ -220,8 +220,8 @@ const Studio = (() => {
     // Manual Save Button
     document.getElementById('btn-save-draft')?.addEventListener('click', async () => {
       showToast('Menyimpan draft...');
-      await Autosave.saveNow();
-      showToast('Draft berhasil disimpan! ✓');
+      const saved = await Autosave.saveNow();
+      showToast(saved ? 'Draft berhasil disimpan! ✓' : 'Gagal menyimpan draft. Coba lagi.');
     });
 
     // Password toggle (show/hide) for login

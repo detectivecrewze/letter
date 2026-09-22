@@ -16,6 +16,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="preview.css">
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&family=Sacramento&family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,wght@0,400;0,500;1,400&family=Dancing+Script:wght@400;700&family=Shadows+Into+Light&family=Indie+Flower&display=swap">
   <link rel="stylesheet"
@@ -1718,6 +1719,41 @@
     </div>
   </div>
 </div>
+
+  <!-- ══════════════════════════════════════
+       MOBILE-FIRST CONTEXTUAL PREVIEW MODAL
+       Final Live Preview intentionally remains a new browser tab.
+  ══════════════════════════════════════ -->
+  <div id="letter-preview-modal" class="letter-preview-modal hidden" role="dialog" aria-modal="true"
+    aria-hidden="true" aria-labelledby="letter-preview-title" aria-describedby="letter-preview-subtitle">
+    <button id="letter-preview-backdrop" class="letter-preview-backdrop" type="button"
+      aria-label="Tutup preview"></button>
+
+    <section class="letter-preview-card" tabindex="-1">
+      <header class="letter-preview-header">
+        <div class="letter-preview-heading">
+          <p class="letter-preview-kicker">LIVE PREVIEW</p>
+          <h2 id="letter-preview-title">Preview Surat</h2>
+          <p id="letter-preview-subtitle">Perubahan terbaru disimpan sebelum preview dimuat.</p>
+        </div>
+        <button id="letter-preview-close" class="letter-preview-close" type="button" aria-label="Tutup preview">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </header>
+
+      <div id="letter-preview-status" class="letter-preview-status" data-state="loading" role="status" aria-live="polite">
+        <span class="letter-preview-spinner" aria-hidden="true"></span>
+        <span id="letter-preview-status-text">Menyiapkan preview...</span>
+        <button id="letter-preview-retry" type="button" hidden>Coba Lagi</button>
+      </div>
+
+      <div id="letter-preview-stage" class="letter-preview-stage" data-preview-viewport="mobile">
+        <div id="letter-preview-device" class="letter-preview-device" aria-live="off"></div>
+      </div>
+    </section>
+  </div>
 
   <!-- TOAST -->
   <div id="toast"
