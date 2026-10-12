@@ -1204,6 +1204,26 @@ function _initDownloadButton(config) {
 
       await window.LetterDownloadFlow?.waitForAssets(targetEl);
 
+      if (window.LetterDownloadFlow?.isMobileDevice()) {
+        const computedStyle = getComputedStyle(document.body);
+        const bgTop = computedStyle.getPropertyValue('--bg-top').trim() || '#eeeadd';
+        const bgBottom = computedStyle.getPropertyValue('--bg-bottom').trim() || '#ded9cb';
+        const activeTheme = document.documentElement.getAttribute('data-ribbon-theme') || 'ribbon-crimson';
+        const isDarkTheme = ['ribbon-midnight', 'ribbon-bordeaux'].includes(activeTheme);
+        resultBlob = await window.LetterDownloadFlow.createMobilePng(targetEl, {
+          backgroundTop: bgTop,
+          backgroundBottom: bgBottom,
+          paperTop: isDarkTheme ? '#20243a' : '#fffaf0',
+          paperBottom: isDarkTheme ? '#151827' : '#eee7d8',
+          borderColor: isDarkTheme ? 'rgba(229,221,197,.34)' : 'rgba(142,111,72,.32)',
+          lineColor: isDarkTheme ? 'rgba(255,255,255,.05)' : 'rgba(142,111,72,.065)',
+          accentColor: isDarkTheme ? 'rgba(229,221,197,.40)' : 'rgba(142,111,72,.35)'
+        });
+        if (btnContainer) btnContainer.style.display = 'block';
+        if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
+        return resultBlob;
+      }
+
       const letterCanvas = await html2canvas(targetEl, {
         scale: window.devicePixelRatio > 1 ? 1.5 : 2,
         useCORS: true,

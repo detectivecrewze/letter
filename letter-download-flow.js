@@ -41,6 +41,218 @@
       (window.matchMedia && window.matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 1024);
   }
 
+  function isIOSDevice() {
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function elementText(element) {
+    if (!element) return '';
+    const paragraphs = Array.from(element.querySelectorAll('p'))
+      .map(paragraph => paragraph.textContent.trim())
+      .filter(Boolean);
+    return paragraphs.length ? paragraphs.join('\n\n') : element.textContent.trim();
+  }
+
+  function fontFromElement(element, size, fallbackFamily, fallbackWeight = '400', fallbackStyle = 'normal') {
+    const style = element ? getComputedStyle(element) : null;
+    return {
+      family: style?.fontFamily || fallbackFamily,
+      weight: style?.fontWeight || fallbackWeight,
+      style: style?.fontStyle || fallbackStyle,
+      color: style?.color || '#4f4036',
+      size
+    };
+  }
+
+  function applyCanvasFont(ctx, font) {
+    ctx.font = `${font.style} ${font.weight} ${font.size}px ${font.family}`;
+  }
+
+  function wrapCanvasText(ctx, text, maxWidth) {
+    const paragraphs = String(text || '').split(/\n\n+/);
+    const lines = [];
+    paragraphs.forEach((paragraph, paragraphIndex) => {
+      const words = paragraph.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+      let line = '';
+      words.forEach((word) => {
+        const candidate = line ? `${line} ${word}` : word;
+        if (line && ctx.measureText(candidate).width > maxWidth) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = candidate;
+        }
+      });
+      if (line) lines.push(line);
+      if (paragraphIndex < paragraphs.length - 1) lines.push('');
+    });
+    return lines;
+  }
+
+  function createSafeLetterCanvas(target, options = {}) {
+    if (!target) throw new Error('LETTER_TARGET_MISSING');
+    const width = 720;
+    const padding = 72;
+    const contentWidth = width - (padding * 2);
+    const titleEl = target.querySelector('#letter-title');
+    const dateEl = target.querySelector('#letter-date');
+    const toEl = target.querySelector('#letter-to');
+    const bodyEl = target.querySelector('#letter-body');
+    const fromEl = target.querySelector('#letter-from');
+    const title = titleEl?.textContent?.trim() || '';
+    const date = dateEl?.textContent?.trim() || '';
+    const to = toEl?.textContent?.trim() || '';
+    const body = elementText(bodyEl);
+    const from = fromEl?.textContent?.trim() || '';
+
+    const measure = document.createElement('canvas').getContext('2d');
+    if (!measure) throw new Error('SAFE_CANVAS_CONTEXT_UNAVAILABLE');
+    const titleSize = clamp((parseFloat(getComputedStyle(titleEl || target).fontSize) || 32) * 1.2, 38, 52);
+    const bodyStyleSize = parseFloat(getComputedStyle(bodyEl || target).fontSize) || 22;
+    let bodySize = clamp(bodyStyleSize * 1.35, 27, 35);
+    const titleFont = fontFromElement(titleEl, titleSize, 'Georgia, serif', '600');
+    const dateFont = fontFromElement(dateEl, 21, 'Georgia, serif', '500', 'italic');
+    const toFont = fontFromElement(toEl, 35, '"Caveat", cursive', '500');
+    const fromFont = fontFromElement(fromEl, 33, '"Caveat", cursive', '500');
+
+    applyCanvasFont(measure, titleFont);
+    const titleLines = wrapCanvasText(measure, title, contentWidth - 32);
+    let bodyFont = fontFromElement(bodyEl, bodySize, '"Caveat", cursive', '400');
+    applyCanvasFont(measure, bodyFont);
+    let bodyLines = wrapCanvasText(measure, body, contentWidth);
+    let bodyLineHeight = Math.round(bodySize * 1.45);
+    let estimatedHeight = padding * 2 + Math.max(1, titleLines.length) * 58 + Math.max(1, bodyLines.length) * bodyLineHeight + 280;
+    while (estimatedHeight > 2800 && bodySize > 22) {
+      bodySize -= 2;
+      bodyFont = fontFromElement(bodyEl, bodySize, '"Caveat", cursive', '400');
+      applyCanvasFont(measure, bodyFont);
+      bodyLines = wrapCanvasText(measure, body, contentWidth);
+      bodyLineHeight = Math.round(bodySize * 1.45);
+      estimatedHeight = padding * 2 + Math.max(1, titleLines.length) * 58 + Math.max(1, bodyLines.length) * bodyLineHeight + 280;
+    }
+
+    const height = Math.max(980, estimatedHeight);
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('SAFE_CANVAS_CONTEXT_UNAVAILABLE');
+
+    const paperTop = options.paperTop || '#fffaf2';
+    const paperBottom = options.paperBottom || '#f3e8d6';
+    const borderColor = options.borderColor || 'rgba(111,83,58,.32)';
+    const lineColor = options.lineColor || 'rgba(111,83,58,.07)';
+    const accentColor = options.accentColor || borderColor;
+    const paper = ctx.createLinearGradient(0, 0, width, height);
+    paper.addColorStop(0, paperTop);
+    paper.addColorStop(1, paperBottom);
+    ctx.fillStyle = paper;
+    ctx.fillRect(0, 0, width, height);
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(10, 10, width - 20, height - 20);
+
+    if (options.ruled !== false) {
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 1;
+      for (let y = 52; y < height - 40; y += 44) {
+        ctx.beginPath();
+        ctx.moveTo(36, y);
+        ctx.lineTo(width - 36, y);
+        ctx.stroke();
+      }
+    }
+
+    let y = padding + 10;
+    ctx.textBaseline = 'top';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = titleFont.color;
+    applyCanvasFont(ctx, titleFont);
+    titleLines.forEach((line) => { ctx.fillText(line, width / 2, y); y += 58; });
+    y += 8;
+    ctx.fillStyle = dateFont.color;
+    applyCanvasFont(ctx, dateFont);
+    ctx.fillText(date, width / 2, y);
+    y += 54;
+    ctx.strokeStyle = accentColor;
+    ctx.beginPath();
+    ctx.moveTo(padding + 36, y);
+    ctx.lineTo(width - padding - 36, y);
+    ctx.stroke();
+    y += 38;
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = toFont.color;
+    applyCanvasFont(ctx, toFont);
+    ctx.fillText(to, padding, y);
+    y += 60;
+    ctx.fillStyle = bodyFont.color;
+    applyCanvasFont(ctx, bodyFont);
+    bodyLines.forEach((line) => {
+      if (!line) { y += Math.round(bodyLineHeight * .55); return; }
+      ctx.fillText(line, padding, y);
+      y += bodyLineHeight;
+    });
+    y += 28;
+    ctx.strokeStyle = accentColor;
+    ctx.beginPath();
+    ctx.moveTo(padding, y);
+    ctx.lineTo(width - padding, y);
+    ctx.stroke();
+    y += 30;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = fromFont.color;
+    applyCanvasFont(ctx, fromFont);
+    ctx.fillText(from, width - padding, y);
+    return canvas;
+  }
+
+  async function createMobilePng(target, options = {}) {
+    const letterCanvas = createSafeLetterCanvas(target, options);
+    const story = document.createElement('canvas');
+    story.width = 900;
+    story.height = 1600;
+    try {
+      const ctx = story.getContext('2d');
+      if (!ctx) throw new Error('PNG_CONTEXT_UNAVAILABLE');
+      const background = ctx.createLinearGradient(0, 0, 0, story.height);
+      background.addColorStop(0, options.backgroundTop || options.paperTop || '#f3eadf');
+      background.addColorStop(1, options.backgroundBottom || options.paperBottom || '#e5d8ca');
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, story.width, story.height);
+      const maxWidth = story.width * .84;
+      const maxHeight = story.height * .82;
+      const drawScale = Math.min(maxWidth / letterCanvas.width, maxHeight / letterCanvas.height);
+      const drawWidth = letterCanvas.width * drawScale;
+      const drawHeight = letterCanvas.height * drawScale;
+      const drawX = (story.width - drawWidth) / 2;
+      const drawY = (story.height - drawHeight) / 2;
+      ctx.save();
+      ctx.shadowColor = options.shadowColor || 'rgba(45,31,23,.28)';
+      ctx.shadowBlur = 48;
+      ctx.shadowOffsetY = 18;
+      ctx.drawImage(letterCanvas, drawX, drawY, drawWidth, drawHeight);
+      ctx.restore();
+      return await new Promise((resolve, reject) => {
+        try {
+          story.toBlob(blob => blob ? resolve(blob) : reject(new Error('PNG_ENCODE_FAILED')), 'image/png');
+        } catch (error) {
+          reject(error);
+        }
+      });
+    } finally {
+      letterCanvas.width = 0;
+      letterCanvas.height = 0;
+      story.width = 0;
+      story.height = 0;
+    }
+  }
+
   function isLandscape() { return window.innerWidth > window.innerHeight; }
   function safeFilename(name) { return String(name || 'surat.png').replace(/[\\/:*?"<>|]+/g, '_'); }
 
@@ -218,5 +430,13 @@
     }
   }
 
-  window.LetterDownloadFlow = { run, close: closeDialog, waitForAssets };
+  window.LetterDownloadFlow = {
+    run,
+    close: closeDialog,
+    waitForAssets,
+    isMobileDevice,
+    isIOSDevice,
+    createSafeLetterCanvas,
+    createMobilePng
+  };
 })();

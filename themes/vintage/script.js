@@ -801,6 +801,23 @@ function _canvasLines(ctx, text, maxWidth) {
 }
 
 function _renderVintageFallback(targetEl) {
+  if (window.LetterDownloadFlow?.createSafeLetterCanvas) {
+    const computedStyle = getComputedStyle(document.body);
+    const bgTop = computedStyle.getPropertyValue('--bg-top').trim() || '#f5f0e8';
+    const bgBottom = computedStyle.getPropertyValue('--bg-bottom').trim() || '#e8e0d0';
+    const activeColor = document.documentElement.getAttribute('data-vintage-color') ||
+      document.body.getAttribute('data-vintage-color') || 'parchment';
+    const isDarkTheme = activeColor === 'midnight';
+    return window.LetterDownloadFlow.createSafeLetterCanvas(targetEl, {
+      backgroundTop: bgTop,
+      backgroundBottom: bgBottom,
+      paperTop: isDarkTheme ? '#20243a' : '#f8f1e2',
+      paperBottom: isDarkTheme ? '#141827' : '#eee0c8',
+      borderColor: isDarkTheme ? 'rgba(222,228,244,.35)' : 'rgba(139,107,74,.42)',
+      lineColor: isDarkTheme ? 'rgba(255,255,255,.05)' : 'rgba(135,105,65,.075)',
+      accentColor: isDarkTheme ? 'rgba(222,228,244,.40)' : 'rgba(139,107,74,.38)'
+    });
+  }
   const canvas = document.createElement('canvas');
   const width = 720;
   const padding = 72;

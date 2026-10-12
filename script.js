@@ -162,7 +162,7 @@ async function init() {
 
   // Jika ?theme= override aktif → ini adalah free-user premium preview
   // Sembunyikan tombol "Simpan Surat Ini" agar user tidak bisa screenshot tema premium
-  if (themeOverride) {
+  if (isPreviewOnly && themeOverride) {
     const saveContainer = document.getElementById('save-letter-container');
     const saveBtn = document.getElementById('btn-save-letter');
     if (saveBtn) saveBtn.style.display = 'none';
@@ -887,6 +887,24 @@ function _initDownloadButton(config) {
       if (btnContainer) btnContainer.style.display = 'none';
 
       await window.LetterDownloadFlow?.waitForAssets(targetEl);
+
+      if (window.LetterDownloadFlow?.isMobileDevice()) {
+        const themeKey = (config.theme || 'default').replace('midnight-blue', 'midnight');
+        const [bgTop, bgBottom] = _THEME_BG[themeKey] || _THEME_BG.default;
+        const isDarkTheme = ['midnight', 'crimson', 'obsidian'].includes(themeKey);
+        resultBlob = await window.LetterDownloadFlow.createMobilePng(targetEl, {
+          backgroundTop: bgTop,
+          backgroundBottom: bgBottom,
+          paperTop: isDarkTheme ? bgTop : '#fffaf2',
+          paperBottom: isDarkTheme ? bgBottom : '#f2e5d4',
+          borderColor: isDarkTheme ? 'rgba(235,206,165,.36)' : 'rgba(122,88,55,.30)',
+          lineColor: isDarkTheme ? 'rgba(255,255,255,.055)' : 'rgba(122,88,55,.065)',
+          accentColor: isDarkTheme ? 'rgba(235,206,165,.42)' : 'rgba(122,88,55,.32)'
+        });
+        if (btnContainer) btnContainer.style.display = 'block';
+        if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
+        return resultBlob;
+      }
 
       // ── Step 1: capture the letter at 2× scale ───────────────
       const letterCanvas = await html2canvas(targetEl, {
