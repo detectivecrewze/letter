@@ -30,7 +30,7 @@
       @keyframes letterPhoneRotate{0%,16%{transform:rotate(0deg)}45%,72%{transform:rotate(90deg)}100%{transform:rotate(0deg)}}
       @keyframes letterRotateArrows{0%,100%{opacity:.3;transform:translateY(-4px) scale(.94)}24%,72%{opacity:1;transform:translateY(-4px) scale(1)}85%{opacity:.45;transform:translateY(-4px) scale(.96)}}
       @keyframes letterDownloadProgress{0%{transform:translateX(-110%)}100%{transform:translateX(250%)}}
-      @media (orientation:landscape) and (max-height:520px){.letter-download-panel{width:min(620px,calc(100% - 24px));padding:20px 24px}.letter-download-icon{width:48px;height:48px;margin:0 auto 8px}.letter-download-title{font-size:1.25rem}.letter-download-copy{margin-bottom:12px}.letter-download-state{margin-bottom:12px}.letter-download-actions{grid-template-columns:1fr 1fr}.letter-download-preview{width:54px;position:absolute;left:24px;bottom:20px;margin:0}}
+      @media (orientation:landscape) and (max-height:520px){.letter-download-panel{width:min(620px,calc(100% - 24px));padding:20px 24px}.letter-download-icon{width:48px;height:48px;margin:0 auto 8px}.letter-download-title{font-size:1.25rem}.letter-download-copy{margin-bottom:12px}.letter-download-state{margin-bottom:12px}.letter-download-actions{grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr))}.letter-download-preview{display:none!important}}
     `;
     document.head.appendChild(style);
   }

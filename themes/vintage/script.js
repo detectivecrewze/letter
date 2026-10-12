@@ -745,16 +745,148 @@ async function _imgUrlToDataUrl(src) {
   if (!src || src.startsWith('data:')) return src;
   try {
     const res = await fetch(src, { mode: 'cors' });
+    if (!res.ok) throw new Error(`IMAGE_FETCH_${res.status}`);
     const blob = await res.blob();
     return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result);
-      reader.onerror = () => resolve(src);
+      reader.onerror = () => resolve(null);
       reader.readAsDataURL(blob);
     });
   } catch (e) {
-    return src;
+    return null;
   }
+}
+
+function _isIOSBrowser() {
+  return /iPad|iPhone|iPod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function _isMobileCaptureContext() {
+  return _isIOSBrowser() || /Android/i.test(navigator.userAgent) ||
+    Math.max(window.innerWidth, window.innerHeight) <= 900 ||
+    (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+}
+
+function _withTimeout(promise, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('DOM_CAPTURE_TIMEOUT')), timeoutMs);
+    promise.then(
+      value => { clearTimeout(timer); resolve(value); },
+      error => { clearTimeout(timer); reject(error); }
+    );
+  });
+}
+
+function _canvasLines(ctx, text, maxWidth) {
+  const paragraphs = String(text || '').split(/\n\n+/);
+  const lines = [];
+  paragraphs.forEach((paragraph, paragraphIndex) => {
+    const words = paragraph.replace(/\s+/g, ' ').trim().split(' ').filter(Boolean);
+    let line = '';
+    words.forEach((word) => {
+      const candidate = line ? `${line} ${word}` : word;
+      if (line && ctx.measureText(candidate).width > maxWidth) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = candidate;
+      }
+    });
+    if (line) lines.push(line);
+    if (paragraphIndex < paragraphs.length - 1) lines.push('');
+  });
+  return lines;
+}
+
+function _renderVintageFallback(targetEl) {
+  const canvas = document.createElement('canvas');
+  const width = 720;
+  const padding = 72;
+  const contentWidth = width - (padding * 2);
+  const title = targetEl.querySelector('#letter-title')?.textContent?.trim() || '';
+  const date = targetEl.querySelector('#letter-date')?.textContent?.trim() || '';
+  const to = targetEl.querySelector('#letter-to')?.textContent?.trim() || '';
+  const body = targetEl.querySelector('#letter-body')?.innerText?.trim() || '';
+  const from = targetEl.querySelector('#letter-from')?.textContent?.trim() || '';
+
+  const measure = document.createElement('canvas').getContext('2d');
+  if (!measure) throw new Error('FALLBACK_CONTEXT_UNAVAILABLE');
+  measure.font = '500 42px "Cormorant Garamond", Georgia, serif';
+  const titleLines = _canvasLines(measure, title, contentWidth - 40);
+  measure.font = '400 27px "Lora", Georgia, serif';
+  const bodyLines = _canvasLines(measure, body, contentWidth);
+  const titleHeight = Math.max(1, titleLines.length) * 50;
+  const bodyHeight = Math.max(1, bodyLines.length) * 42;
+  const height = Math.max(980, Math.min(2600, padding * 2 + titleHeight + bodyHeight + 300));
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('FALLBACK_CONTEXT_UNAVAILABLE');
+  const paper = ctx.createLinearGradient(0, 0, width, height);
+  paper.addColorStop(0, '#f8f1e2');
+  paper.addColorStop(0.55, '#f3ead8');
+  paper.addColorStop(1, '#eee0c8');
+  ctx.fillStyle = paper;
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = 'rgba(139,107,74,.42)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(10, 10, width - 20, height - 20);
+
+  ctx.strokeStyle = 'rgba(135,105,65,.075)';
+  ctx.lineWidth = 1;
+  for (let y = 52; y < height - 40; y += 42) {
+    ctx.beginPath();
+    ctx.moveTo(36, y);
+    ctx.lineTo(width - 36, y);
+    ctx.stroke();
+  }
+
+  let y = padding + 12;
+  ctx.fillStyle = '#594538';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.font = '500 42px "Cormorant Garamond", Georgia, serif';
+  titleLines.forEach((line) => { ctx.fillText(line, width / 2, y); y += 50; });
+  y += 12;
+  ctx.font = 'italic 20px "Lora", Georgia, serif';
+  ctx.fillStyle = '#897363';
+  ctx.fillText(date, width / 2, y);
+  y += 52;
+
+  ctx.strokeStyle = 'rgba(139,107,74,.45)';
+  ctx.beginPath();
+  ctx.moveTo(padding + 36, y);
+  ctx.lineTo(width - padding - 36, y);
+  ctx.stroke();
+  y += 38;
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#594538';
+  ctx.font = 'italic 32px "Cormorant Garamond", Georgia, serif';
+  ctx.fillText(to, padding, y);
+  y += 58;
+  ctx.font = '400 27px "Lora", Georgia, serif';
+  ctx.fillStyle = '#51443b';
+  bodyLines.forEach((line) => {
+    if (!line) { y += 22; return; }
+    ctx.fillText(line, padding, y);
+    y += 42;
+  });
+  y += 28;
+  ctx.strokeStyle = 'rgba(139,107,74,.35)';
+  ctx.beginPath();
+  ctx.moveTo(padding, y);
+  ctx.lineTo(width - padding, y);
+  ctx.stroke();
+  y += 30;
+  ctx.textAlign = 'right';
+  ctx.font = 'italic 31px "Cormorant Garamond", Georgia, serif';
+  ctx.fillStyle = '#594538';
+  ctx.fillText(from, width - padding, y);
+  return canvas;
 }
 
 function _initDownloadButton(config) {
@@ -763,6 +895,11 @@ function _initDownloadButton(config) {
 
   const _doCapture = async () => {
     let resultBlob = null;
+    let letterCanvas = null;
+    let story = null;
+    let stickerImgs = [];
+    let btnContainer = null;
+    let scrollWrapper = null;
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Saving... ⏳';
     btn.style.opacity = '0.7';
@@ -770,14 +907,14 @@ function _initDownloadButton(config) {
 
     try {
       const targetEl     = document.getElementById('letter-paper');
-      const btnContainer = document.getElementById('save-letter-container');
-      const scrollWrapper = document.querySelector('.letter-scroll');
+      btnContainer = document.getElementById('save-letter-container');
+      scrollWrapper = document.querySelector('.letter-scroll');
 
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
       if (btnContainer)  btnContainer.style.display   = 'none';
 
       // Pre-convert GIF sticker URLs to Base64 Data URLs so html2canvas renders them 100% without CORS taints
-      const stickerImgs = [
+      stickerImgs = [
         document.getElementById('letter-header-gif-sticker-img'),
         document.getElementById('letter-gif-sticker-img')
       ].filter(Boolean);
@@ -789,61 +926,91 @@ function _initDownloadButton(config) {
             if (dataUrl && dataUrl.startsWith('data:')) {
               imgEl.setAttribute('data-original-src', imgEl.src);
               imgEl.src = dataUrl;
+            } else {
+              // A remote image without CORS taints Safari's canvas and makes toBlob fail.
+              // Keep the letter downloadable by omitting only that optional sticker.
+              imgEl.setAttribute('data-capture-skip', 'true');
             }
-          } catch(e) {}
+          } catch(e) {
+            imgEl.setAttribute('data-capture-skip', 'true');
+          }
         }
       }
 
       await window.LetterDownloadFlow?.waitForAssets(targetEl);
 
-      const letterCanvas = await html2canvas(targetEl, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        onclone: (clonedDoc) => {
-          const paper = clonedDoc.getElementById('letter-paper');
-          if (paper) {
-            paper.style.animation  = 'none';
-            paper.style.filter     = 'none';
-            paper.style.transform  = 'none';
-            paper.style.opacity    = '1';
+      const paperWidth = Math.max(targetEl.scrollWidth, targetEl.offsetWidth, 1);
+      const paperHeight = Math.max(targetEl.scrollHeight, targetEl.offsetHeight, 1);
+      const isIOS = _isIOSBrowser();
+      const maxCaptureSide = isIOS ? 2600 : 4096;
+      const preferredScale = isIOS ? 1.25 : 2;
+      const captureScale = Math.max(0.5, Math.min(preferredScale, maxCaptureSide / Math.max(paperWidth, paperHeight)));
+
+      const renderDom = () => html2canvas(targetEl, {
+          scale: captureScale,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: null,
+          imageTimeout: 5000,
+          logging: false,
+          onclone: (clonedDoc) => {
+            const paper = clonedDoc.getElementById('letter-paper');
+            if (paper) {
+              paper.style.animation  = 'none';
+              paper.style.filter     = 'none';
+              paper.style.transform  = 'none';
+              paper.style.opacity    = '1';
+            }
+
+            // Safari can fail while rasterizing the SVG turbulence paper grain.
+            // The gradients and ruled paper remain, only the subtle noise is removed.
+            const captureStyle = clonedDoc.createElement('style');
+            captureStyle.textContent = '.letter-paper::before{background-image:none!important;mix-blend-mode:normal!important}';
+            clonedDoc.head.appendChild(captureStyle);
+
+            // Force GIF stickers to be fully visible and rendered in the canvas capture
+            clonedDoc.querySelectorAll('.letter-header-gif-sticker, .letter-gif-sticker, #letter-header-gif-sticker-wrap, #letter-gif-sticker-wrap').forEach(wrap => {
+              const image = wrap.matches('img') ? wrap : wrap.querySelector('img');
+              if (!image || image.hasAttribute('data-capture-skip') || !image.getAttribute('src')) {
+                wrap.style.display = 'none';
+                return;
+              }
+              wrap.style.opacity = '1';
+              wrap.style.visibility = 'visible';
+              wrap.style.transform = 'none';
+              wrap.style.animation = 'none';
+              wrap.style.transition = 'none';
+              wrap.classList.add('is-visible');
+            });
+
+            clonedDoc.querySelectorAll('*').forEach(el => {
+              el.style.animation  = 'none';
+              el.style.transition = 'none';
+            });
           }
+        });
 
-          // Force GIF stickers to be fully visible and rendered in the canvas capture
-          clonedDoc.querySelectorAll('.letter-header-gif-sticker, .letter-gif-sticker, #letter-header-gif-sticker-wrap, #letter-gif-sticker-wrap').forEach(wrap => {
-            wrap.style.opacity = '1';
-            wrap.style.visibility = 'visible';
-            wrap.style.transform = 'none';
-            wrap.style.animation = 'none';
-            wrap.style.transition = 'none';
-            wrap.classList.add('is-visible');
-          });
-
-          clonedDoc.querySelectorAll('*').forEach(el => {
-            el.style.animation  = 'none';
-            el.style.transition = 'none';
-          });
-        }
-      });
-
-      // Restore original image URLs
-      for (const imgEl of stickerImgs) {
-        if (imgEl.hasAttribute('data-original-src')) {
-          imgEl.src = imgEl.getAttribute('data-original-src');
-          imgEl.removeAttribute('data-original-src');
+      if (_isMobileCaptureContext()) {
+        // Direct canvas rendering avoids DOM-clone and memory failures on mobile browsers.
+        letterCanvas = _renderVintageFallback(targetEl);
+      } else {
+        try {
+          letterCanvas = await _withTimeout(renderDom(), 8000);
+        } catch (captureError) {
+          console.warn('[Vintage] DOM capture unavailable, using safe renderer:', captureError);
+          letterCanvas = _renderVintageFallback(targetEl);
         }
       }
 
-      if (btnContainer)  btnContainer.style.display  = 'block';
-      if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
-
       // 1080x1920 keeps the PNG crisp while staying within iPhone canvas memory limits.
-      const storyW = 1080, storyH = 1920;
-      const story  = document.createElement('canvas');
+      // iOS uses a slightly smaller buffer because PNG encoding temporarily duplicates it.
+      const storyW = isIOS ? 900 : 1080;
+      const storyH = isIOS ? 1600 : 1920;
+      story = document.createElement('canvas');
       story.width  = storyW;
       story.height = storyH;
       const ctx = story.getContext('2d');
+      if (!ctx) throw new Error('CANVAS_CONTEXT_UNAVAILABLE');
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
 
@@ -872,26 +1039,33 @@ function _initDownloadButton(config) {
       ctx.drawImage(letterCanvas, dx, dy, dw, dh);
       ctx.restore();
 
-      resultBlob = await new Promise(resolve => story.toBlob(resolve, 'image/png'));
-      letterCanvas.width = 0; letterCanvas.height = 0;
-      story.width = 0; story.height = 0;
+      resultBlob = await new Promise((resolve, reject) => {
+        try {
+          story.toBlob((blob) => blob ? resolve(blob) : reject(new Error('PNG_ENCODE_FAILED')), 'image/png');
+        } catch (error) {
+          reject(error);
+        }
+      });
 
     } catch (err) {
       console.error('[Vintage] Download failed:', err);
-      document.querySelectorAll('[data-original-src]').forEach((imgEl) => {
-        imgEl.src = imgEl.getAttribute('data-original-src');
-        imgEl.removeAttribute('data-original-src');
-      });
-      const btnContainer  = document.getElementById('save-letter-container');
-      const scrollWrapper = document.querySelector('.letter-scroll');
-      if (btnContainer)  btnContainer.style.display  = 'block';
-      if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
-
       btn.innerHTML = '❌ Failed to save';
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
       setTimeout(() => { btn.innerHTML = originalText; }, 3000);
       throw err;
+    } finally {
+      stickerImgs.forEach((imgEl) => {
+        if (imgEl.hasAttribute('data-original-src')) {
+          imgEl.src = imgEl.getAttribute('data-original-src');
+          imgEl.removeAttribute('data-original-src');
+        }
+        imgEl.removeAttribute('data-capture-skip');
+      });
+      if (btnContainer) btnContainer.style.display = 'block';
+      if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
+      if (letterCanvas) { letterCanvas.width = 0; letterCanvas.height = 0; }
+      if (story) { story.width = 0; story.height = 0; }
     }
 
     btn.innerHTML = '✓ Saved!';
