@@ -762,6 +762,7 @@ function _initDownloadButton(config) {
   if (!btn) return;
 
   const _doCapture = async () => {
+    let resultBlob = null;
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Saving... ⏳';
     btn.style.opacity = '0.7';
@@ -793,8 +794,10 @@ function _initDownloadButton(config) {
         }
       }
 
+      await window.LetterDownloadFlow?.waitForAssets(targetEl);
+
       const letterCanvas = await html2canvas(targetEl, {
-        scale: 3, // High-DPI 300 DPI capture scale for razor-sharp text and graphics
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
@@ -835,8 +838,8 @@ function _initDownloadButton(config) {
       if (btnContainer)  btnContainer.style.display  = 'block';
       if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
 
-      // Compose 9:16 story canvas (Ultra HD 4K / 300 DPI crisp output: 2160x3840)
-      const storyW = 2160, storyH = 3840;
+      // 1080x1920 keeps the PNG crisp while staying within iPhone canvas memory limits.
+      const storyW = 1080, storyH = 1920;
       const story  = document.createElement('canvas');
       story.width  = storyW;
       story.height = storyH;
@@ -869,13 +872,16 @@ function _initDownloadButton(config) {
       ctx.drawImage(letterCanvas, dx, dy, dw, dh);
       ctx.restore();
 
-      const a = document.createElement('a');
-      a.download = 'vintage-letter.png';
-      a.href = story.toDataURL('image/png');
-      a.click();
+      resultBlob = await new Promise(resolve => story.toBlob(resolve, 'image/png'));
+      letterCanvas.width = 0; letterCanvas.height = 0;
+      story.width = 0; story.height = 0;
 
     } catch (err) {
       console.error('[Vintage] Download failed:', err);
+      document.querySelectorAll('[data-original-src]').forEach((imgEl) => {
+        imgEl.src = imgEl.getAttribute('data-original-src');
+        imgEl.removeAttribute('data-original-src');
+      });
       const btnContainer  = document.getElementById('save-letter-container');
       const scrollWrapper = document.querySelector('.letter-scroll');
       if (btnContainer)  btnContainer.style.display  = 'block';
@@ -885,13 +891,14 @@ function _initDownloadButton(config) {
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
       setTimeout(() => { btn.innerHTML = originalText; }, 3000);
-      return;
+      throw err;
     }
 
     btn.innerHTML = '✓ Saved!';
     btn.style.opacity = '1';
     btn.style.pointerEvents = 'auto';
     setTimeout(() => { btn.innerHTML = originalText; }, 2500);
+    return resultBlob;
   };
 
   btn.addEventListener('click', () => {
@@ -901,7 +908,12 @@ function _initDownloadButton(config) {
       setTimeout(() => { btn.innerHTML = originalText; }, 2500);
       return;
     }
-    _doCapture();
+    if (!window.LetterDownloadFlow) {
+      alert('Fitur simpan PNG belum siap. Muat ulang halaman lalu coba kembali.');
+      return;
+    }
+    const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
+    window.LetterDownloadFlow.run({ button: btn, filename: `Vintage_Untuk_${safeName}.png`, createBlob: _doCapture });
   });
 }
 

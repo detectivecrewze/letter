@@ -1078,6 +1078,7 @@ function _initDownloadButton(config) {
   }
 
   const _doCapture = async () => {
+    let resultBlob = null;
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Saving... ⏳';
     btn.style.opacity = '0.7';
@@ -1090,6 +1091,8 @@ function _initDownloadButton(config) {
 
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
       if (btnContainer) btnContainer.style.display = 'none';
+
+      await window.LetterDownloadFlow?.waitForAssets(targetEl);
 
       const letterCanvas = await html2canvas(targetEl, {
         scale: 2,
@@ -1163,19 +1166,10 @@ function _initDownloadButton(config) {
 
       ctx.drawImage(letterCanvas, drawX, drawY, drawW, drawH);
 
-      await new Promise(resolve => {
+      resultBlob = await new Promise(resolve => {
         story.toBlob((blob) => {
-          if (!blob) { resolve(); return; }
-          const url = URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
-          link.download = `Airmail_Untuk_${safeName}.png`;
-          link.href = url;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          setTimeout(() => URL.revokeObjectURL(url), 500);
-          resolve();
+          if (!blob) { resolve(null); return; }
+          resolve(blob);
         }, 'image/png');
       });
 
@@ -1184,12 +1178,17 @@ function _initDownloadButton(config) {
 
     } catch (e) {
       console.error('Screenshot failed:', e);
-      alert('Failed to save. You can still screenshot this screen manually.');
+      const btnContainer = document.getElementById('save-letter-container');
+      const scrollWrapper = document.querySelector('.letter-scroll');
+      if (btnContainer) btnContainer.style.display = 'block';
+      if (scrollWrapper) scrollWrapper.style.overflow = 'auto';
+      throw e;
     } finally {
       btn.innerHTML = originalText;
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
     }
+    return resultBlob;
   };
 
   btn.addEventListener('click', async () => {
@@ -1197,6 +1196,14 @@ function _initDownloadButton(config) {
       alert('System is loading... please try again in a moment.');
       return;
     }
+
+    if (!window.LetterDownloadFlow) {
+      alert('Fitur simpan PNG belum siap. Muat ulang halaman lalu coba kembali.');
+      return;
+    }
+    const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
+    window.LetterDownloadFlow.run({ button: btn, filename: `Airmail_Untuk_${safeName}.png`, createBlob: _doCapture });
+    return;
 
     // Already landscape → langsung capture tanpa modal
     if (window.innerWidth > window.innerHeight) {

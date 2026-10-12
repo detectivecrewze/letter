@@ -1188,6 +1188,7 @@ function _initDownloadButton(config) {
   if (!btn) return;
 
   const _doCapture = async () => {
+    let resultBlob = null;
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Saving... ⏳';
     btn.style.opacity = '0.7';
@@ -1200,6 +1201,8 @@ function _initDownloadButton(config) {
 
       if (scrollWrapper) scrollWrapper.style.overflow = 'hidden';
       if (btnContainer) btnContainer.style.display = 'none';
+
+      await window.LetterDownloadFlow?.waitForAssets(targetEl);
 
       const letterCanvas = await html2canvas(targetEl, {
         scale: window.devicePixelRatio > 1 ? 1.5 : 2,
@@ -1259,11 +1262,9 @@ function _initDownloadButton(config) {
       ctx.drawImage(letterCanvas, dx, dy, dw, dh);
       ctx.restore();
 
-      // Download
-      const a = document.createElement('a');
-      a.download = 'secret-garden-letter.png';
-      a.href = story.toDataURL('image/png');
-      a.click();
+      resultBlob = await new Promise(resolve => story.toBlob(resolve, 'image/png'));
+      letterCanvas.width = 0; letterCanvas.height = 0;
+      story.width = 0; story.height = 0;
 
     } catch (err) {
       console.error('[Garden] Download failed:', err);
@@ -1276,13 +1277,14 @@ function _initDownloadButton(config) {
       btn.style.opacity = '1';
       btn.style.pointerEvents = 'auto';
       setTimeout(() => { btn.innerHTML = originalText; }, 3000);
-      return;
+      throw err;
     }
 
     btn.innerHTML = '✓ Saved!';
     btn.style.opacity = '1';
     btn.style.pointerEvents = 'auto';
     setTimeout(() => { btn.innerHTML = originalText; }, 2500);
+    return resultBlob;
   };
 
   btn.addEventListener('click', () => {
@@ -1292,7 +1294,12 @@ function _initDownloadButton(config) {
       setTimeout(() => { btn.innerHTML = '<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg> Save This Letter'; }, 2500);
       return;
     }
-    _doCapture();
+    if (!window.LetterDownloadFlow) {
+      alert('Fitur simpan PNG belum siap. Muat ulang halaman lalu coba kembali.');
+      return;
+    }
+    const safeName = (config.recipientName || config.to || 'Kamu').replace(/[^a-zA-Z0-9]/g, '_');
+    window.LetterDownloadFlow.run({ button: btn, filename: `Ribbon_Untuk_${safeName}.png`, createBlob: _doCapture });
   });
 }
 
