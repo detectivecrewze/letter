@@ -94,6 +94,45 @@
     return lines;
   }
 
+  // The live letter uses a pair of hand-drawn rules beneath the salutation and
+  // signature. Canvas exports do not include CSS pseudo-elements, so recreate
+  // them here instead of letting the names blend into the body copy.
+  function drawNameUnderscore(ctx, {
+    x,
+    y,
+    width,
+    align = 'left',
+    color,
+    direction = 1
+  }) {
+    if (!Number.isFinite(width) || width < 8) return;
+
+    const left = align === 'right' ? x - width : x;
+    const right = align === 'right' ? x : x + width;
+    const shorterWidth = width * 0.78;
+    const shorterLeft = align === 'right' ? right - shorterWidth : left;
+    const shorterRight = align === 'right' ? right : left + shorterWidth;
+
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = color;
+
+    ctx.globalAlpha = 0.5;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(right, y + (direction * 2));
+    ctx.stroke();
+
+    ctx.globalAlpha = 0.28;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(shorterLeft, y + 8);
+    ctx.lineTo(shorterRight, y + 8 - (direction * 1.6));
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function createSafeLetterCanvas(target, options = {}) {
     if (!target) throw new Error('LETTER_TARGET_MISSING');
     const width = 720;
@@ -126,14 +165,15 @@
     applyCanvasFont(measure, bodyFont);
     let bodyLines = wrapCanvasText(measure, body, contentWidth);
     let bodyLineHeight = Math.round(bodySize * 1.45);
-    let estimatedHeight = padding * 2 + Math.max(1, titleLines.length) * 58 + Math.max(1, bodyLines.length) * bodyLineHeight + 280;
+    // Includes breathing room for the two signature rules at both ends.
+    let estimatedHeight = padding * 2 + Math.max(1, titleLines.length) * 58 + Math.max(1, bodyLines.length) * bodyLineHeight + 320;
     while (estimatedHeight > 2800 && bodySize > 22) {
       bodySize -= 2;
       bodyFont = fontFromElement(bodyEl, bodySize, '"Caveat", cursive', '400');
       applyCanvasFont(measure, bodyFont);
       bodyLines = wrapCanvasText(measure, body, contentWidth);
       bodyLineHeight = Math.round(bodySize * 1.45);
-      estimatedHeight = padding * 2 + Math.max(1, titleLines.length) * 58 + Math.max(1, bodyLines.length) * bodyLineHeight + 280;
+      estimatedHeight = padding * 2 + Math.max(1, titleLines.length) * 58 + Math.max(1, bodyLines.length) * bodyLineHeight + 320;
     }
 
     const height = Math.max(980, estimatedHeight);
@@ -189,8 +229,16 @@
     ctx.textAlign = 'left';
     ctx.fillStyle = toFont.color;
     applyCanvasFont(ctx, toFont);
-    ctx.fillText(to, padding, y);
-    y += 60;
+    const recipientY = y;
+    ctx.fillText(to, padding, recipientY);
+    drawNameUnderscore(ctx, {
+      x: padding,
+      y: recipientY + toFont.size + 7,
+      width: Math.min(ctx.measureText(to).width, contentWidth),
+      color: toFont.color,
+      direction: 1
+    });
+    y += 78;
     ctx.fillStyle = bodyFont.color;
     applyCanvasFont(ctx, bodyFont);
     bodyLines.forEach((line) => {
@@ -208,7 +256,16 @@
     ctx.textAlign = 'right';
     ctx.fillStyle = fromFont.color;
     applyCanvasFont(ctx, fromFont);
-    ctx.fillText(from, width - padding, y);
+    const senderY = y;
+    ctx.fillText(from, width - padding, senderY);
+    drawNameUnderscore(ctx, {
+      x: width - padding,
+      y: senderY + fromFont.size + 6,
+      width: Math.min(ctx.measureText(from).width, contentWidth),
+      align: 'right',
+      color: fromFont.color,
+      direction: -1
+    });
     return canvas;
   }
 
